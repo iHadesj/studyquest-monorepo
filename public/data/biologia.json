@@ -1,0 +1,110 @@
+{
+  "id": "biologia",
+  "nome": "Biologia",
+  "cor": { "bg": "#14b8a6", "hover": "#0d9488", "ring": "rgba(20, 184, 166, 0.5)" },
+  "niveis": [
+    {
+      "id": "iniciante",
+      "nome": "Iniciante",
+      "xpPorAcerto": 15,
+      "minAcertosParaDesbloquearProximo": 3,
+      "conteudo": {
+        "titulo": "Células e Reinos dos Seres Vivos",
+        "resumo": "A Biologia é o estudo da vida! E a unidade mais básica da vida é a **célula**. Todos os seres vivos são formados por elas.\n\n**A Célula**\nImagine a célula como uma pequena casa. Ela tem partes principais:\n- **Membrana Plasmática:** A parede da casa, que controla o que entra e sai.\n- **Citoplasma:** O interior da casa, onde ficam os móveis (as organelas).\n- **Núcleo:** O escritório, onde fica o manual de instruções (o DNA).\nUma organela muito importante é a **Mitocôndria**, que funciona como a usina de energia da célula, produzindo a energia que precisamos para viver.\n\n**Os Cinco Reinos**\nPara organizar a imensa variedade de vida, os cientistas criaram 5 grandes grupos (reinos):\n- **Reino Monera:** Formado por bactérias. São seres muito simples, unicelulares.\n- **Reino Protista:** Inclui as algas e protozoários.\n- **Reino Fungi:** O reino dos fungos, como cogumelos e bolores.\n- **Reino Plantae:** Onde estão todas as plantas.\n- **Reino Animalia:** O reino dos animais, incluindo nós, seres humanos."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é a estrutura conhecida como a 'usina de energia' da célula?",
+          "opcoes": ["Núcleo", "Ribossomo", "Mitocôndria"],
+          "respostaCorreta": "Mitocôndria"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "As plantas pertencem a qual reino?",
+          "opcoes": ["Animalia", "Fungi", "Plantae"],
+          "respostaCorreta": "Plantae"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "O material genético da célula, o DNA, fica localizado principalmente no ___.",
+          "respostaCorreta": "Núcleo"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "Cogumelos e bolores são exemplos do reino ___.",
+          "opcoes": ["Monera", "Fungi", "Protista"],
+          "respostaCorreta": "Fungi"
+        }
+      ]
+    },
+    {
+      "id": "intermediario",
+      "nome": "Intermediário",
+      "xpPorAcerto": 25,
+      "minAcertosParaDesbloquearProximo": 2,
+      "conteudo": {
+        "titulo": "Genética e Corpo Humano",
+        "resumo": "Você já se perguntou por que se parece com seus pais? A resposta está na **Genética**!\n\n**DNA e Hereditariedade**\nDentro do núcleo de nossas células está o **DNA**, uma molécula longa que funciona como um manual de instruções para tudo o que somos. Pedaços desse manual que contêm uma instrução específica (como a cor dos olhos) são chamados de **genes**. A **Genética** é o estudo de como esses genes são passados de pais para filhos, um processo chamado de hereditariedade.\n\n**Sistemas do Corpo Humano**\nNosso corpo é uma máquina complexa que funciona graças a vários sistemas trabalhando juntos:\n- **Sistema Circulatório:** Formado pelo coração, veias e artérias, é responsável por transportar sangue, oxigênio e nutrientes para todas as partes do corpo.\n- **Sistema Respiratório:** Composto pelos pulmões, permite a entrada de oxigênio e a saída de gás carbônico.\n- **Sistema Digestório:** Processa os alimentos que comemos, quebrando-os em nutrientes que o corpo pode usar."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "A molécula que carrega nossas informações genéticas é o:",
+          "opcoes": ["RNA", "DNA", "Proteína"],
+          "respostaCorreta": "DNA"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual sistema do corpo humano é responsável pelo transporte de oxigênio e nutrientes?",
+          "opcoes": ["Respiratório", "Digestório", "Circulatório"],
+          "respostaCorreta": "Circulatório"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "O estudo da transmissão de características de pais para filhos é chamado de ___.",
+          "respostaCorreta": "Genética"
+        }
+      ]
+    },
+    {
+      "id": "avancado",
+      "nome": "Avançado",
+      "xpPorAcerto": 40,
+      "minAcertosParaDesbloquearProximo": null,
+      "conteudo": {
+        "titulo": "Evolução e Ecologia",
+        "resumo": "Como a vida se tornou tão diversa? E como os seres vivos interagem? Vamos explorar a Evolução e a Ecologia.\n\n**Teoria da Evolução**\nProposta por **Charles Darwin**, a teoria da evolução por **seleção natural** explica que os indivíduos mais bem adaptados a um ambiente têm mais chances de sobreviver, se reproduzir e passar suas características para os descendentes. Com o tempo, essas pequenas mudanças podem levar ao surgimento de novas espécies.\n\n**Ecologia**\nÉ o estudo da 'casa' dos seres vivos. Um **Ecossistema** é o conjunto de seres vivos (fatores bióticos) e os componentes não-vivos (fatores abióticos, como água, luz e solo) de uma área, e a interação entre eles.\n- **Produtores:** São a base de tudo. Geralmente plantas, que produzem seu próprio alimento através da fotossíntese.\n- **Consumidores:** Se alimentam de outros seres. Os que comem plantas são os **consumidores primários** (herbívoros). Os que comem outros animais são os secundários (carnívoros).\n- **Decompositores:** Fungos e bactérias que reciclam a matéria orgânica morta, devolvendo nutrientes ao solo."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual cientista é mais famoso por desenvolver a teoria da evolução pela seleção natural?",
+          "opcoes": ["Gregor Mendel", "Louis Pasteur", "Charles Darwin"],
+          "respostaCorreta": "Charles Darwin"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "Como são chamados os organismos que se alimentam de produtores (plantas)?",
+          "opcoes": ["Consumidores primários", "Consumidores secundários", "Decompositores"],
+          "respostaCorreta": "Consumidores primários"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "A interação entre os seres vivos e o ambiente em que vivem forma um ___.",
+          "respostaCorreta": "Ecossistema"
+        }
+      ]
+    }
+  ]
+}

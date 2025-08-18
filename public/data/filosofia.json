@@ -1,0 +1,110 @@
+{
+  "id": "filosofia",
+  "nome": "Filosofia",
+  "cor": { "bg": "#6366f1", "hover": "#4f46e5", "ring": "rgba(99, 102, 241, 0.5)" },
+  "niveis": [
+    {
+      "id": "iniciante",
+      "nome": "Iniciante",
+      "xpPorAcerto": 15,
+      "minAcertosParaDesbloquearProximo": 3,
+      "conteudo": {
+        "titulo": "Filósofos Gregos",
+        "resumo": "A filosofia ocidental nasceu na Grécia Antiga. Vamos conhecer seus três maiores pensadores:\n\n**Sócrates**\nFamoso por andar pelas ruas de Atenas questionando as pessoas. Ele acreditava que o verdadeiro conhecimento vem do reconhecimento da própria ignorância, daí sua famosa frase: 'Só sei que nada sei'. Seu método, a **Maiêutica**, consistia em fazer perguntas sucessivas para que a própria pessoa chegasse à verdade.\n\n**Platão**\nDiscípulo de Sócrates, Platão acreditava que o mundo que percebemos com nossos sentidos é apenas uma sombra de um 'Mundo das Ideias', perfeito e imutável. Sua **Alegoria da Caverna** é uma metáfora poderosa sobre como a filosofia pode nos libertar da ignorância (as sombras) e nos levar à luz do conhecimento verdadeiro.\n\n**Aristóteles**\nDiscípulo de Platão, Aristóteles tinha uma visão mais prática. Ele acreditava que o conhecimento é adquirido através da experiência e da observação do mundo real. Para ele, a ética estava ligada à busca pela felicidade, que seria alcançada através da virtude, encontrando sempre o **meio-termo** entre os extremos (por exemplo, a coragem é o meio-termo entre a covardia e a temeridade)."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual filósofo é famoso pela frase 'Só sei que nada sei'?",
+          "opcoes": ["Platão", "Aristóteles", "Sócrates"],
+          "respostaCorreta": "Sócrates"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "A 'Alegoria da Caverna' é uma famosa passagem da obra de qual pensador?",
+          "opcoes": ["Heráclito", "Platão", "Diógenes"],
+          "respostaCorreta": "Platão"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "Para Aristóteles, o caminho para a felicidade era através da virtude e da busca pelo 'meio-___'.",
+          "respostaCorreta": "termo"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "O método de Sócrates para chegar ao conhecimento através de perguntas e respostas é chamado de:",
+          "opcoes": ["Dialética", "Sofismo", "Maiêutica"],
+          "respostaCorreta": "Maiêutica"
+        }
+      ]
+    },
+    {
+      "id": "intermediario",
+      "nome": "Intermediário",
+      "xpPorAcerto": 25,
+      "minAcertosParaDesbloquearProximo": 2,
+      "conteudo": {
+        "titulo": "Racionalismo vs. Empirismo",
+        "resumo": "De onde vem o nosso conhecimento? Este foi o grande debate da filosofia moderna, que dividiu os pensadores em dois grandes grupos:\n\n**Racionalismo**\nOs racionalistas, como **René Descartes**, acreditavam que o conhecimento verdadeiro é obtido através da razão e da lógica, e não dos nossos sentidos, que podem nos enganar. Descartes duvidou de tudo, até da sua própria existência, mas chegou a uma certeza fundamental: se ele estava duvidando, ele estava pensando. Daí sua famosa conclusão: 'Penso, logo existo'.\n\n**Empirismo**\nOs empiristas, como **John Locke**, defendiam o oposto. Para eles, todo o nosso conhecimento vem da experiência sensorial (visão, audição, tato, etc.). Locke afirmava que a mente humana nasce como uma **'tábula rasa'**, uma folha em branco, que vai sendo preenchida com o conhecimento que adquirimos ao longo da vida através das nossas experiências."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual filósofo é o principal representante do Racionalismo, famoso pela frase 'Penso, logo existo'?",
+          "opcoes": ["John Locke", "David Hume", "René Descartes"],
+          "respostaCorreta": "René Descartes"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "A ideia de que a mente humana nasce como uma 'tábula rasa' (folha em branco) pertence a qual corrente?",
+          "opcoes": ["Empirismo", "Ceticismo", "Racionalismo"],
+          "respostaCorreta": "Empirismo"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "O filósofo empirista que acreditava que todo o conhecimento deriva da experiência sensorial foi John ___.",
+          "respostaCorreta": "Locke"
+        }
+      ]
+    },
+    {
+      "id": "avancado",
+      "nome": "Avançado",
+      "xpPorAcerto": 40,
+      "minAcertosParaDesbloquearProximo": null,
+      "conteudo": {
+        "titulo": "Existencialismo",
+        "resumo": "O existencialismo foi uma corrente filosófica popular no século XX que se focou na liberdade e na responsabilidade individual para dar sentido à vida.\n\n**Jean-Paul Sartre**\nSartre é talvez o nome mais famoso do existencialismo. Sua ideia central é que **'a existência precede a essência'**. Isso significa que, ao contrário de um objeto (como uma cadeira, que primeiro é pensada para ter a essência de 'servir para sentar' e depois é construída), o ser humano primeiro existe, nasce no mundo, e só depois, através de suas escolhas e ações, define quem ele é, sua 'essência'. Por isso, para Sartre, estamos 'condenados a ser **livres**', pois somos totalmente responsáveis por criar nosso próprio propósito.\n\n**Friedrich Nietzsche**\nApesar de ser um precursor, Nietzsche influenciou muito o existencialismo com sua crítica aos valores tradicionais e a ideia do **'Super-Homem'** (Übermensch). Para ele, o ser humano deveria superar a moralidade comum e criar seus próprios valores, vivendo a vida com paixão e poder."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "A famosa frase 'A existência precede a essência' é o pilar do pensamento de qual filósofo?",
+          "opcoes": ["Nietzsche", "Kierkegaard", "Jean-Paul Sartre"],
+          "respostaCorreta": "Jean-Paul Sartre"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "Para o existencialismo, o ser humano está 'condenado a ser ___'.",
+          "opcoes": ["Feliz", "Livre", "Racional"],
+          "respostaCorreta": "Livre"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "O conceito de 'Super-Homem' (Übermensch) foi desenvolvido pelo filósofo Friedrich ___.",
+          "respostaCorreta": "Nietzsche"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "id": "programacao",
+  "nome": "Programação",
+  "cor": { "bg": "#22c55e", "hover": "#16a34a", "ring": "rgba(74, 222, 128, 0.5)" },
+  "niveis": [
+    {
+      "id": "iniciante",
+      "nome": "Iniciante",
+      "xpPorAcerto": 15,
+      "minAcertosParaDesbloquearProximo": 3,
+      "conteudo": {
+        "titulo": "Lógica e Variáveis",
+        "resumo": "Bem-vindo ao mundo da programação! O primeiro passo é entender a lógica de programação, que é a base para 'conversar' com o computador.\n\n**Variáveis**\nImagine que variáveis são como caixas onde guardamos informações. Cada caixa tem um nome (identificador) e guarda um valor. Em JavaScript, temos três formas principais de criar essas 'caixas':\n- `let`: Cria uma variável cujo valor pode mudar. Ex: `let idade = 25;`\n- `const`: Cria uma constante, ou seja, uma variável cujo valor não pode mudar depois de definido. Ex: `const anoNascimento = 1998;`\n- `var`: Uma forma mais antiga, que hoje é menos usada. Prefira `let` e `const`.\n\n**Tipos de Dados**\nAs informações que guardamos têm tipos diferentes:\n- `String`: Para textos. Ex: `'Olá, mundo!'`\n- `Number`: Para números, sejam inteiros ou com casas decimais. Ex: `10`, `3.14`\n- `Boolean`: Para valores de verdadeiro ou falso. Ex: `true`, `false`\n\n**Operadores**\nUsamos operadores para realizar comparações. O operador `>` verifica se um número é maior que outro, e o resultado é sempre um booleano. O operador `===` é muito importante: ele verifica se dois valores são iguais E do mesmo tipo."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual palavra-chave é usada para declarar uma variável que não pode ser reatribuída em JavaScript?",
+          "opcoes": ["let", "var", "const"],
+          "respostaCorreta": "const"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é o tipo de dado para um texto em programação?",
+          "opcoes": ["Number", "Boolean", "String"],
+          "respostaCorreta": "String"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "O operador '===' em JavaScript verifica tanto o valor quanto o ___.",
+          "respostaCorreta": "tipo"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual o resultado da expressão '5 > 3'?",
+          "opcoes": ["true", "false", "undefined"],
+          "respostaCorreta": "true"
+        }
+      ]
+    },
+    {
+      "id": "intermediario",
+      "nome": "Intermediário",
+      "xpPorAcerto": 25,
+      "minAcertosParaDesbloquearProximo": 2,
+      "conteudo": {
+        "titulo": "Estruturas Condicionais e Loops",
+        "resumo": "Agora que sabemos guardar dados, vamos aprender a tomar decisões e repetir tarefas.\n\n**Estruturas Condicionais (if/else)**\nPermitem que o seu código execute blocos diferentes dependendo de uma condição ser verdadeira ou falsa.\n- `if`: Executa um bloco de código SE uma condição for verdadeira. Ex: `if (idade >= 18) { console.log('É maior de idade'); }`\n- `else`: Executa um bloco de código alternativo SE a condição do `if` for falsa.\n\n**Laços de Repetição (Loops)**\nSão usados para executar o mesmo bloco de código várias vezes.\n- `for`: É o loop mais comum. Ideal para quando você sabe quantas vezes quer repetir uma tarefa, como percorrer todos os itens de uma lista. Ex: `for (let i = 0; i < 5; i++) { console.log(i); }` (imprime de 0 a 4).\n- `while`: Repete um bloco de código ENQUANTO uma condição for verdadeira. Cuidado para não criar um loop infinito!"
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "preenchimento",
+          "pergunta": "A estrutura condicional que executa um bloco de código se uma condição for verdadeira é o ___.",
+          "respostaCorreta": "if"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual laço de repetição é mais adequado para percorrer todos os itens de uma lista (array)?",
+          "opcoes": ["if", "while", "for"],
+          "respostaCorreta": "for"
+        },
+        {
+          "id": 3,
+          "tipo": "multipla_escolha",
+          "pergunta": "O que o comando 'else' faz em uma estrutura 'if/else'?",
+          "opcoes": ["Executa se a condição do 'if' for verdadeira", "Executa se a condição do 'if' for falsa", "Repete o código"],
+          "respostaCorreta": "Executa se a condição do 'if' for falsa"
+        }
+      ]
+    },
+    {
+      "id": "avancado",
+      "nome": "Avançado",
+      "xpPorAcerto": 40,
+      "minAcertosParaDesbloquearProximo": null,
+      "conteudo": {
+        "titulo": "Funções e Arrays",
+        "resumo": "Neste nível, vamos organizar nosso código em blocos reutilizáveis e aprender a trabalhar com listas de dados.\n\n**Funções**\nSão blocos de código que realizam uma tarefa específica e podem ser chamados (executados) sempre que precisarmos. Elas ajudam a não repetir código.\n- `function`: Palavra-chave para criar uma função. Ex: `function somar(a, b) { return a + b; }`\n- `return`: Palavra-chave que encerra a função e pode enviar um valor de volta para quem a chamou.\n\n**Arrays (Listas)**\nArrays são um tipo especial de variável que pode guardar múltiplos valores em uma lista ordenada.\n- `[]`: Usamos colchetes para criar um array. Ex: `const frutas = ['Maçã', 'Banana', 'Laranja'];`\n- **Índices**: Acessamos os itens de um array por sua posição (índice), que sempre começa em 0. Para pegar o primeiro item ('Maçã'), usamos `frutas[0]`.\n- **Métodos**: Arrays têm métodos úteis, como `.push()`, que adiciona um novo item ao final da lista."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Como você acessa o primeiro elemento de um array chamado 'nomes'?",
+          "opcoes": ["nomes[1]", "nomes.first()", "nomes[0]"],
+          "respostaCorreta": "nomes[0]"
+        },
+        {
+          "id": 2,
+          "tipo": "preenchimento",
+          "pergunta": "A palavra-chave para criar um bloco de código reutilizável em JavaScript é ___.",
+          "respostaCorreta": "function"
+        },
+        {
+          "id": 3,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual método adiciona um novo item ao final de um array?",
+          "opcoes": ["array.add()", "array.push()", "array.append()"],
+          "respostaCorreta": "array.push()"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "O que uma função 'return' faz?",
+          "opcoes": ["Imprime um valor na tela", "Encerra a função e envia um valor de volta", "Cria uma nova variável"],
+          "respostaCorreta": "Encerra a função e envia um valor de volta"
+        }
+      ]
+    }
+  ]
+}

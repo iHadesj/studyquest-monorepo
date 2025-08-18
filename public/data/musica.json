@@ -1,0 +1,117 @@
+{
+  "id": "musica",
+  "nome": "Música",
+  "cor": { "bg": "#84cc16", "hover": "#65a30d", "ring": "rgba(132, 204, 22, 0.5)" },
+  "niveis": [
+    {
+      "id": "iniciante",
+      "nome": "Iniciante",
+      "xpPorAcerto": 15,
+      "minAcertosParaDesbloquearProximo": 3,
+      "conteudo": {
+        "titulo": "Instrumentos e Notas Musicais",
+        "resumo": "A música é a arte de combinar sons. Para começar, vamos conhecer suas ferramentas (os instrumentos) e seu alfabeto (as notas).\n\n**As Notas Musicais**\nSão a base de toda melodia. Existem **sete** notas principais, que formam a escala musical. A sequência que aprendemos é:\n**Dó - Ré - Mi - Fá - Sol - Lá - Si**\nApós o 'Si', a sequência recomeça em um 'Dó' mais agudo, e assim por diante.\n\n**Famílias de Instrumentos**\nOs instrumentos são agrupados pelo modo como produzem o som:\n- **Cordas:** O som é produzido pela vibração de cordas. Ex: **Violão**, violino, baixo.\n- **Sopro:** O som é produzido pela vibração do ar. Ex: Flauta, saxofone, trompete.\n- **Percussão:** O som é produzido ao bater, raspar ou agitar o instrumento. Ex: Bateria, tambor, chocalho.\n- **Teclas:** O som é produzido ao pressionar teclas. Ex: **Piano**, teclado, órgão."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual destes é um instrumento de cordas?",
+          "opcoes": ["Flauta", "Bateria", "Violão"],
+          "respostaCorreta": "Violão"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "Quantas são as notas musicais principais?",
+          "opcoes": ["Cinco", "Sete", "Nove"],
+          "respostaCorreta": "Sete"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "A sequência das notas musicais é Dó, Ré, Mi, Fá, Sol, Lá e ___.",
+          "respostaCorreta": "Si"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "O piano é um instrumento de qual família?",
+          "opcoes": ["Sopro", "Percussão", "Teclas"],
+          "respostaCorreta": "Teclas"
+        }
+      ]
+    },
+    {
+      "id": "intermediario",
+      "nome": "Intermediário",
+      "xpPorAcerto": 25,
+      "minAcertosParaDesbloquearProximo": 2,
+      "conteudo": {
+        "titulo": "Gêneros Musicais",
+        "resumo": "A música se manifesta de inúmeras formas. Os gêneros musicais são como 'rótulos' que nos ajudam a classificar estilos com características semelhantes.\n\n**Música Clássica**\nÉ um gênero amplo, geralmente associado a orquestras e instrumentos acústicos. Compositores como **Beethoven** e **Mozart** são mestres deste estilo, conhecido por sua complexidade e estrutura formal.\n\n**Rock**\nNascido nos anos 50, o Rock é marcado pela energia e pelo uso de instrumentos como a **guitarra elétrica**, o baixo e a bateria. Possui inúmeros subgêneros, do rock 'n' roll clássico ao heavy metal.\n\n**Jazz**\nOriginário das comunidades afro-americanas de Nova Orleans, nos EUA, o **Jazz** é um gênero que tem a **improvisação** como uma de suas principais características. É comum que os músicos criem solos espontaneamente durante a performance."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual gênero musical é famoso pelo uso de guitarras elétricas com distorção?",
+          "opcoes": ["Samba", "Rock", "Música Clássica"],
+          "respostaCorreta": "Rock"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "Beethoven e Mozart são compositores de qual gênero musical?",
+          "opcoes": ["Jazz", "Música Clássica", "Pop"],
+          "respostaCorreta": "Música Clássica"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "O gênero musical que nasceu nos Estados Unidos e é conhecido pela improvisação é o ___.",
+          "respostaCorreta": "Jazz"
+        }
+      ]
+    },
+    {
+      "id": "avancado",
+      "nome": "Avançado",
+      "xpPorAcerto": 40,
+      "minAcertosParaDesbloquearProximo": null,
+      "conteudo": {
+        "titulo": "Teoria Musical Básica",
+        "resumo": "Para entender a música mais a fundo, precisamos conhecer seus três elementos fundamentais e como ela é organizada no tempo.\n\n**Os Três Elementos da Música**\n- **Melodia:** É a 'voz' principal da música, a sucessão de notas que cantamos ou assobiamos.\n- **Harmonia:** É a combinação de notas tocadas ao mesmo tempo para dar suporte à melodia. Um **acorde** (três ou mais notas simultâneas) é a base da harmonia.\n- **Ritmo:** É a organização dos sons no tempo, o que nos faz querer bater o pé.\n\n**Organização no Tempo**\n- **Andamento:** É a velocidade da música (rápida, moderada ou lenta).\n- **Compasso:** É a forma de dividir a música em pequenas partes de tempo iguais. O compasso **4/4**, o mais comum, significa que cada 'caixinha' de música (compasso) tem 4 tempos."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "O que define a 'velocidade' de uma música?",
+          "opcoes": ["Harmonia", "Andamento", "Melodia"],
+          "respostaCorreta": "Andamento"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "Um conjunto de três ou mais notas tocadas ao mesmo tempo forma um:",
+          "opcoes": ["Acorde", "Ritmo", "Compasso"],
+          "respostaCorreta": "Acorde"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "A sucessão de notas musicais de forma coerente e agradável é chamada de ___.",
+          "respostaCorreta": "Melodia"
+        },
+        {
+            "id": 4,
+            "tipo": "multipla_escolha",
+            "pergunta": "O que é um compasso 4/4?",
+            "opcoes": ["Quatro notas por segundo", "Quatro tempos por compasso", "Uma música com quatro instrumentos"],
+            "respostaCorreta": "Quatro tempos por compasso"
+        }
+      ]
+    }
+  ]
+}

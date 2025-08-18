@@ -1,0 +1,110 @@
+{
+  "id": "quimica",
+  "nome": "Química",
+  "cor": { "bg": "#ef4444", "hover": "#dc2626", "ring": "rgba(239, 68, 68, 0.5)" },
+  "niveis": [
+    {
+      "id": "iniciante",
+      "nome": "Iniciante",
+      "xpPorAcerto": 15,
+      "minAcertosParaDesbloquearProximo": 3,
+      "conteudo": {
+        "titulo": "Tabela Periódica e Estados da Matéria",
+        "resumo": "A Química é a ciência que estuda a matéria e suas transformações. Para começar, vamos entender como os 'ingredientes' do universo são organizados e como eles se apresentam.\n\n**A Tabela Periódica**\nÉ um grande mapa que organiza todos os elementos químicos conhecidos. Cada elemento tem um símbolo único, como 'O' para Oxigênio e **'Au'** para Ouro. Os elementos são organizados em ordem crescente de número atômico e agrupados por propriedades semelhantes. Os gases nobres, na última coluna, são famosos por sua grande **estabilidade**.\n\n**Estados da Matéria**\nA matéria pode existir em três estados principais:\n- **Sólido:** Partículas muito juntas e organizadas (ex: gelo).\n- **Líquido:** Partículas próximas, mas desorganizadas, podem fluir (ex: água).\n- **Gasoso:** Partículas muito afastadas e em movimento constante (ex: vapor d'água).\nA mudança de um estado para outro tem nomes específicos, como **vaporização** (líquido para gasoso)."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é o símbolo do elemento químico Ouro?",
+          "opcoes": ["Ag", "Fe", "Au"],
+          "respostaCorreta": "Au"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "A passagem do estado líquido para o gasoso é chamada de:",
+          "opcoes": ["Fusão", "Vaporização", "Solidificação"],
+          "respostaCorreta": "Vaporização"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "A fórmula química da água é H2___.",
+          "respostaCorreta": "O"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "Os gases nobres, como o Hélio (He), são conhecidos por serem muito ___.",
+          "opcoes": ["Reativos", "Estáveis", "Líquidos"],
+          "respostaCorreta": "Estáveis"
+        }
+      ]
+    },
+    {
+      "id": "intermediario",
+      "nome": "Intermediário",
+      "xpPorAcerto": 25,
+      "minAcertosParaDesbloquearProximo": 2,
+      "conteudo": {
+        "titulo": "Ligações Químicas e Reações",
+        "resumo": "Os átomos raramente ficam sozinhos. Eles se unem para formar tudo o que vemos, através das ligações químicas.\n\n**Tipos de Ligações**\n- **Ligação Iônica:** Ocorre quando um átomo 'doa' elétrons para outro. Geralmente acontece entre um metal e um não-metal. O sal de cozinha (NaCl) é um exemplo clássico.\n- **Ligação Covalente:** Ocorre quando os átomos 'compartilham' elétrons. A molécula de água (H2O) é formada por ligações covalentes.\n\n**Reações Químicas**\nUma reação química é um processo que transforma substâncias em outras. As substâncias que iniciam a reação são chamadas de **reagentes**, e as substâncias formadas no final são os **produtos**. A lei da conservação das massas, de Lavoisier, diz que 'na natureza, nada se cria, nada se perde, tudo se transforma'."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "A ligação que ocorre pela transferência de elétrons entre um metal e um não-metal é a ligação ___.",
+          "opcoes": ["Metálica", "Covalente", "Iônica"],
+          "respostaCorreta": "Iônica"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "Em uma reação química, as substâncias iniciais são chamadas de:",
+          "opcoes": ["Produtos", "Reagentes", "Catalisadores"],
+          "respostaCorreta": "Reagentes"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "A ligação formada pelo compartilhamento de elétrons entre átomos é a ligação ___.",
+          "respostaCorreta": "Covalente"
+        }
+      ]
+    },
+    {
+      "id": "avancado",
+      "nome": "Avançado",
+      "xpPorAcerto": 40,
+      "minAcertosParaDesbloquearProximo": null,
+      "conteudo": {
+        "titulo": "Química Orgânica",
+        "resumo": "A Química Orgânica é o ramo que estuda os compostos formados pelo elemento **Carbono**. É a química da vida, pois a maioria das moléculas dos seres vivos é orgânica.\n\n**O Carbono**\nO carbono é especial porque consegue formar quatro ligações químicas estáveis, permitindo a criação de cadeias longas e complexas, que são a base para moléculas como proteínas e DNA.\n\n**Hidrocarbonetos**\nSão a classe mais simples de compostos orgânicos, formados apenas por átomos de Carbono e Hidrogênio. O gás de cozinha (butano) e a gasolina são exemplos.\n\n**Funções Orgânicas**\nSão grupos de átomos que dão características específicas às moléculas orgânicas. Algumas funções importantes são:\n- **Álcool:** Possui o grupo -OH (ex: etanol, presente em bebidas alcoólicas).\n- **Ácido Carboxílico:** Possui o grupo -COOH (ex: ácido acético, o principal componente do vinagre)."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual elemento é a base de todos os compostos orgânicos?",
+          "opcoes": ["Oxigênio", "Hidrogênio", "Carbono"],
+          "respostaCorreta": "Carbono"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "A função orgânica presente no vinagre (ácido acético) é:",
+          "opcoes": ["Álcool", "Éter", "Ácido Carboxílico"],
+          "respostaCorreta": "Ácido Carboxílico"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "Compostos formados apenas por carbono e hidrogênio são chamados de ___.",
+          "respostaCorreta": "Hidrocarbonetos"
+        }
+      ]
+    }
+  ]
+}

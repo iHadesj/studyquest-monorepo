@@ -1,0 +1,52 @@
+{
+  "id": "matematica",
+  "nome": "Matemática",
+  "cor": { "bg": "#3b82f6", "hover": "#2563eb", "ring": "rgba(96, 165, 250, 0.5)" },
+  "niveis": [
+    {
+      "id": "iniciante",
+      "nome": "Iniciante",
+      "xpPorAcerto": 10,
+      "minAcertosParaDesbloquearProximo": 3,
+      "conteudo": {
+        "titulo": "Fundamentos da Aritmética",
+        "resumo": "A aritmética é a base de toda a matemática! Aqui, vamos dominar as quatro operações fundamentais que usamos no dia a dia.\n\n**Adição (+):** É o ato de juntar quantidades. Se você tem 7 maçãs e ganha mais 5, você soma 7 + 5 para encontrar o total de 12 maçãs.\n\n**Subtração (-):** É o ato de retirar uma quantidade de outra. Se você tem 10 reais e gasta 3, você subtrai 10 - 3 para descobrir que sobraram 7 reais.\n\n**Multiplicação (*):** É uma forma de somar o mesmo número várias vezes. Em vez de fazer 4 + 4 + 4, você pode multiplicar 4 * 3, que resulta em 12.\n\n**Divisão (/):** É o ato de repartir uma quantidade em partes iguais. Se você tem 20 doces para dividir entre 4 amigos, você divide 20 / 4 para descobrir que cada um receberá 5 doces."
+      },
+      "exercicios": [
+        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Quanto é 7 + 5?", "opcoes": ["10", "12", "14", "11"], "respostaCorreta": "12" },
+        { "id": 2, "tipo": "multipla_escolha", "pergunta": "Quanto é 10 - 3?", "opcoes": ["6", "8", "7"], "respostaCorreta": "7" },
+        { "id": 3, "tipo": "preenchimento", "pergunta": "O resultado de 4 * 3 é ___.", "respostaCorreta": "12" },
+        { "id": 4, "tipo": "multipla_escolha", "pergunta": "Quanto é 20 / 4?", "opcoes": ["4", "5", "6"], "respostaCorreta": "5" }
+      ]
+    },
+    {
+      "id": "intermediario",
+      "nome": "Intermediário",
+      "xpPorAcerto": 20,
+      "minAcertosParaDesbloquearProximo": 2,
+      "conteudo": {
+        "titulo": "Equações e Frações",
+        "resumo": "Vamos avançar para resolver problemas com valores desconhecidos e trabalhar com partes de um todo.\n\n**Equações de 1º Grau**\nUma equação é como uma balança em equilíbrio. O objetivo é descobrir o valor de uma incógnita, geralmente representada por 'X'. Para resolver, você precisa isolar o 'X' em um dos lados da igualdade.\nEx: Na equação `2X + 5 = 15`, primeiro passamos o 5 para o outro lado subtraindo: `2X = 15 - 5`, que resulta em `2X = 10`. Depois, passamos o 2 que está multiplicando para o outro lado dividindo: `X = 10 / 2`, então `X = 5`.\n\n**Frações**\nFrações representam partes de um inteiro. Uma fração como 1/2 significa uma parte de um todo que foi dividido em duas. Para somar frações com denominadores (o número de baixo) diferentes, como `1/2 + 1/4`, precisamos primeiro encontrar um denominador comum (neste caso, 4). A soma fica `2/4 + 1/4`, que é igual a `3/4`."
+      },
+      "exercicios": [
+        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Qual o valor de X na equação 2X + 5 = 15?", "opcoes": ["10", "5", "20"], "respostaCorreta": "5" },
+        { "id": 2, "tipo": "multipla_escolha", "pergunta": "Qual é o resultado da soma de 1/2 + 1/4?", "opcoes": ["3/4", "2/6", "1/6"], "respostaCorreta": "3/4" },
+        { "id": 3, "tipo": "preenchimento", "pergunta": "Se X - 8 = 2, qual o valor de X?", "respostaCorreta": "10" }
+      ]
+    },
+    {
+      "id": "avancado",
+      "nome": "Avançado",
+      "xpPorAcerto": 40,
+      "minAcertosParaDesbloquearProximo": null,
+      "conteudo": {
+        "titulo": "Trigonometria Básica",
+        "resumo": "A trigonometria é o estudo das relações entre os lados e os ângulos dos triângulos, especialmente os triângulos retângulos (aqueles com um ângulo de 90 graus).\n\n**Teorema de Pitágoras**\nÉ a regra mais famosa dos triângulos retângulos. Ela diz que o quadrado da hipotenusa (o lado maior, oposto ao ângulo de 90 graus) é igual à soma dos quadrados dos catetos (os outros dois lados). Fórmula: a² = b² + c².\n\n**Seno, Cosseno e Tangente**\nSão as três principais razões trigonométricas. Elas relacionam os ângulos de um triângulo retângulo com as razões entre os comprimentos de seus lados.\n- **Seno (sin):** Cateto Oposto / Hipotenusa\n- **Cosseno (cos):** Cateto Adjacente / Hipotenusa\n- **Tangente (tan):** Cateto Oposto / Cateto Adjacente\nO seno de 30 graus, por exemplo, é sempre 0.5 (ou 1/2)."
+      },
+      "exercicios": [
+        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Em um triângulo retângulo com catetos 3 e 4, qual a hipotenusa?", "opcoes": ["5", "6", "7"], "respostaCorreta": "5" },
+        { "id": 2, "tipo": "multipla_escolha", "pergunta": "Qual é o seno de 30 graus?", "opcoes": ["1", "0.5", "0.866"], "respostaCorreta": "0.5" }
+      ]
+    }
+  ]
+}
