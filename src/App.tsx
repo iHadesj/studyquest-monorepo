@@ -2,15 +2,14 @@ import { useState, useEffect } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import { ExercisePage } from './pages/ExercisePage';
 import { SubjectSelector } from './components/SubjectSelector';
-import { XPBar } from './components/XPBar';
 import { useProgressStore } from './hooks/useProgressStore';
 import type { Materia, Nivel } from './interfaces';
 import { LevelHubPage } from './pages/LevelHubPage';
 import { ContentPage } from './pages/ContentPage';
 import { AppContainer, Footer, MainContent } from './style/globalStyle';
 import { LevelSelector } from './pages/LevelSelector';
+import { UserLevelBar } from './components/UserLevelBar';
 
-// --- ESTILOS GLOBAIS ---
 const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
@@ -19,22 +18,22 @@ const GlobalStyle = createGlobalStyle`
     -moz-osx-font-smoothing: grayscale;
     background-color: #36393f;
     color: #dcddde;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+    }
   }
 `;
 
-// --- TIPOS ---
-// Este tipo representa a matéria sem os níveis, usado na tela de seleção.
-// Garante que a interface Materia tenha as novas propriedades.
 type SubjectInfo = Omit<Materia, 'niveis'> & {
   categoria: string;
   iconName: string;
 };
 
-// --- COMPONENTES ESTILIZADOS (Fora do App para melhor performance) ---
 const ResetButton = styled.button`
   bottom: 1rem;
   right: 1rem;
-  background-color: #ed4245; /* Vermelho Discord */
+  background-color: #ed4245;
   color: white;
   font-size: 0.75rem;
   font-weight: bold;
@@ -59,7 +58,7 @@ const FooterWrapper = styled.div`
     font-size: 0.875rem;
   }
   a {
-    color: #5865f2; /* Azul Discord */
+    color: #5865f2;
     text-decoration: none;
     &:hover {
       text-decoration: underline;
@@ -113,10 +112,9 @@ export default function App() {
 
   const handleSelectLevel = (level: Nivel) => {
     setSelectedLevel(level);
-    setScreen('hub'); // Leva para a nova tela de escolha
+    setScreen('hub');
   };
 
-  // Funções de navegação para "voltar"
   const backToSubjects = () => {
     setSelectedSubject(null);
     setScreen('subject');
@@ -127,7 +125,7 @@ export default function App() {
   };
 
   const backToHub = () => {
-    setScreen('hub');
+    setScreen('level');
   };
 
   const renderScreen = () => {
@@ -137,7 +135,6 @@ export default function App() {
       );
     }
 
-    // Lógica de renderização com as novas telas
     if (screen === 'hub' && selectedSubject && selectedLevel) {
       return (
         <LevelHubPage
@@ -189,7 +186,7 @@ export default function App() {
     <>
       <GlobalStyle />
       <AppContainer>
-        <XPBar />
+        <UserLevelBar />
         <MainContent>{renderScreen()}</MainContent>
       </AppContainer>
       <Footer>

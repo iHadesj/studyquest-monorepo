@@ -11,6 +11,10 @@ export const SummaryText = styled.p`
   line-height: 1.8;
   color: #dcddde;
   white-space: pre-wrap;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
 `;
 
 export const StartExercisesButton = styled.button`

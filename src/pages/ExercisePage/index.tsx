@@ -40,7 +40,7 @@ const XPResultsContainer = styled.div`
 const BonusXPText = styled.p`
   font-size: 1rem;
   font-weight: bold;
-  color: #43b581; /* Verde Discord */
+  color: #43b581;
   margin: 0;
 `;
 

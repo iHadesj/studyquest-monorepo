@@ -1,6 +1,30 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
-// --- ESTILOS GLOBAIS COM TEMA DARK MODE (ESTILO DISCORD) ---
+// --- DEFINIÇÃO DAS ANIMAÇÕES (KEYFRAMES) ---
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const scaleIn = keyframes`
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+`;
+
+// --- ESTILOS GLOBAIS COM ANIMAÇÕES ---
 export const AppContainer = styled.div`
   background-color: #36393f;
   color: #dcddde;
@@ -8,14 +32,13 @@ export const AppContainer = styled.div`
   padding-top: 5rem;
   min-height: 100vh;
   font-family: 'Fira Code', monospace;
-
-  /* Adiciona um espaço no final para não cobrir o conteúdo */
   padding-bottom: 5rem;
 `;
 
 export const MainContent = styled.div`
   max-width: 1280px;
   margin: 0 auto;
+  animation: ${fadeIn} 0.4s ease-in-out;
 `;
 
 export const BackButton = styled.button`
@@ -27,6 +50,7 @@ export const BackButton = styled.button`
   font-family: 'Fira Code', monospace;
   font-size: 1rem;
   font-weight: bold;
+  transition: color 0.2s ease-in-out;
   &:hover {
     color: #ffffff;
   }
@@ -41,6 +65,7 @@ export const Title = styled.h1`
   border-bottom: 2px solid #40444b;
   padding-bottom: 0.5rem;
   letter-spacing: -1px;
+  animation: ${fadeIn} 0.5s ease-out;
 `;
 
 export const Subtitle = styled.p`
@@ -48,6 +73,8 @@ export const Subtitle = styled.p`
   color: #b9bbbe;
   margin-bottom: 2rem;
   text-align: center;
+  animation: ${fadeIn} 0.5s ease-out 0.2s;
+  animation-fill-mode: backwards;
 `;
 
 export const BarWrapper = styled.div`
@@ -92,7 +119,7 @@ export const LevelButton = styled.button`
   border-radius: 4px;
   border: 1px solid #40444b;
   text-align: left;
-  transition: all 0.2s;
+  transition: all 0.2s ease-in-out;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -100,9 +127,11 @@ export const LevelButton = styled.button`
     props.disabled ? 'rgba(47, 49, 54, 0.3)' : '#2f3136'};
   color: ${(props) => (props.disabled ? '#72767d' : '#dcddde')};
   cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
+
   &:hover {
     background-color: ${(props) => !props.disabled && '#40444b'};
     border-color: #5c5c5c;
+    transform: ${(props) => !props.disabled && 'scale(1.02)'};
   }
   h2 {
     font-family: 'Fira Code', monospace;
@@ -136,6 +165,10 @@ export const ExerciseBox = styled.div`
   border: 1px solid #40444b;
   padding: 1.5rem;
   border-radius: 4px;
+  transition: box-shadow 0.2s ease-in-out;
+  &:hover {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  }
 `;
 
 export const QuestionText = styled.p`
@@ -154,6 +187,7 @@ export const OptionLabel = styled.label`
   border-radius: 4px;
   border: 1px solid #40444b;
   cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
   &:hover {
     background-color: #40444b;
   }
@@ -176,6 +210,7 @@ export const TextInput = styled.input`
   color: #dcddde;
   font-family: 'Fira Code', monospace;
   font-size: 1.1rem;
+  transition: border-color 0.2s ease-in-out;
   &:focus {
     outline: none;
     border-color: #5865f2;
@@ -192,9 +227,10 @@ export const SubmitButton = styled.button`
   border-radius: 4px;
   font-size: 1.1rem;
   border: none;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease-in-out;
   &:hover {
     background-color: ${(props) => !props.disabled && '#3aa570'};
+    transform: ${(props) => !props.disabled && 'scale(1.05)'};
   }
 `;
 
@@ -206,6 +242,7 @@ export const ModalOverlay = styled.div`
   align-items: center;
   justify-content: center;
   z-index: 50;
+  animation: ${fadeIn} 0.3s ease-in-out;
 `;
 
 export const ModalContent = styled.div`
@@ -217,6 +254,7 @@ export const ModalContent = styled.div`
   text-align: center;
   max-width: 28rem;
   width: 90%;
+  animation: ${scaleIn} 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 `;
 
 export const XPDisplayModal = styled.div`
@@ -241,7 +279,7 @@ export const ContinueButton = styled.button`
   padding: 0.75rem;
   border-radius: 4px;
   border: none;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease-in-out;
   cursor: pointer;
   &:hover {
     background-color: #72767d;

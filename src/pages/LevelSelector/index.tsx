@@ -12,7 +12,21 @@ import { LockIcon } from '../../style/icons';
 import { Star } from 'phosphor-react';
 import styled from 'styled-components';
 
-// --- COMPONENTES ESTILIZADOS PARA AS ESTRELAS ---
+// --- COMPONENTES ESTILIZADOS (ATUALIZADOS) ---
+const HeaderContainer = styled.div`
+  position: relative;
+  text-align: center;
+  padding: 10px 0;
+  margin-bottom: 3rem;
+`;
+
+const AlignedBackButton = styled(BackButton)`
+  position: absolute;
+  left: 0;
+  transform: translateY(-50%);
+  margin-bottom: 0;
+`;
+
 const LevelInfoContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -55,9 +69,23 @@ export const LevelSelector = ({
 
   return (
     <LevelSelectorWrapper>
-      <BackButton onClick={onBack}>&larr; Voltar para matérias</BackButton>
-      <Title>Matéria: {subject.nome}</Title>
-      <Subtitle>Selecione o nível para iniciar os estudos.</Subtitle>
+      {/* O cabeçalho agora usa a nova estrutura de posicionamento */}
+      <HeaderContainer>
+        <AlignedBackButton onClick={onBack}>
+          &larr; Voltar para matérias
+        </AlignedBackButton>
+
+        {/* O Título e o Subtítulo agora são centralizados por defeito */}
+        <Title
+          style={{ border: 'none', paddingBottom: 0, marginBottom: '0.25rem' }}
+        >
+          Matéria: {subject.nome}
+        </Title>
+        <Subtitle style={{ margin: 0 }}>
+          Selecione o nível para iniciar os estudos.
+        </Subtitle>
+      </HeaderContainer>
+
       <LevelList>
         {subject.niveis.map((level, index) => {
           const unlocked = isLevelUnlocked(index);

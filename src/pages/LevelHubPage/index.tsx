@@ -1,9 +1,14 @@
 import { BookOpen, PencilSimple } from 'phosphor-react';
 import type { Materia, Nivel } from '../../interfaces';
-import { BackButton, Subtitle, Title } from '../../style/globalStyle';
-import { HubWrapper, OptionButton, OptionsContainer } from './style';
+import { Subtitle, Title } from '../../style/globalStyle';
+import {
+  AlignedBackButton,
+  HubHeader,
+  HubWrapper,
+  OptionButton,
+  OptionsContainer,
+} from './style';
 
-// --- COMPONENTE PRINCIPAL ---
 export const LevelHubPage = ({
   subject,
   level,
@@ -19,9 +24,15 @@ export const LevelHubPage = ({
 }) => {
   return (
     <HubWrapper>
-      <BackButton onClick={onBack}>&larr; Voltar para Matérias</BackButton>
-      <Title>{subject.nome}</Title>
-      <Subtitle>{level.nome}</Subtitle>
+      <HubHeader>
+        <AlignedBackButton onClick={onBack}>&larr; Voltar</AlignedBackButton>
+        <Title
+          style={{ border: 'none', paddingBottom: 0, marginBottom: '0.25rem' }}
+        >
+          {subject.nome}
+        </Title>
+        <Subtitle style={{ margin: 0 }}>{level.nome}</Subtitle>
+      </HubHeader>
 
       <OptionsContainer>
         <OptionButton onClick={onSelectStudy}>
