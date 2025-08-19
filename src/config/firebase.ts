@@ -2,15 +2,14 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// Esta é a forma correta e segura de aceder às suas chaves.
-// Ele lê do .env.local no seu PC e das Environment Variables na Vercel.
+// CORREÇÃO: Usando `import.meta.env` para aceder às variáveis de ambiente do Vite
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: 'AIzaSyBv8eIrGZW6Mc-kfoegkuRc_bSdcH6nUiI',
+  authDomain: 'studyquest-app.firebaseapp.com',
+  projectId: 'studyquest-app',
+  storageBucket: 'studyquest-app.firebasestorage.app',
+  messagingSenderId: '287105047992',
+  appId: '1:287105047992:web:8cfe6a64a30525bcd9434d',
 };
 
 // Inicializa o Firebase
