@@ -42,6 +42,7 @@ export const MainContent = styled.div`
 `;
 
 export const BackButton = styled.button`
+  position: relative;
   background: none;
   border: none;
   color: #b9bbbe;
@@ -105,6 +106,7 @@ export const XPDisplay = styled.div`
 export const LevelSelectorWrapper = styled.div`
   max-width: 42rem;
   margin: 0 auto;
+  margin-top: 5rem;
 `;
 
 export const LevelList = styled.div`

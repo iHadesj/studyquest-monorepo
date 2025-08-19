@@ -48,3 +48,22 @@ export const CheckCircleIcon = () => (
     <polyline points="22 4 12 14.01 9 11.01"></polyline>
   </svg>
 );
+
+export const XCircleIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    style={{ width: '4rem', height: '4rem', color: '#ed4245' }} // Cor de erro (vermelho)
+  >
+    <circle cx="12" cy="12" r="10"></circle>
+    <line x1="15" y1="9" x2="9" y2="15"></line>
+    <line x1="9" y1="9" x2="15" y2="15"></line>
+  </svg>
+);

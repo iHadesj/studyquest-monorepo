@@ -23,6 +23,7 @@ const HeaderContainer = styled.div`
 const AlignedBackButton = styled(BackButton)`
   position: absolute;
   left: 0;
+  top: 0;
   transform: translateY(-50%);
   margin-bottom: 0;
 `;

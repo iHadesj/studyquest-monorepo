@@ -17,11 +17,11 @@ import {
   XPDisplayModal,
 } from '../../style/globalStyle';
 import { useProgressStore } from '../../hooks/useProgressStore';
-import { CheckCircleIcon, StarIcon } from '../../style/icons';
-import type { Materia, Nivel } from '../../interfaces';
+import { CheckCircleIcon, StarIcon, XCircleIcon } from '../../style/icons';
+import type { Exercicio, Materia, Nivel } from '../../interfaces';
 import { Star } from 'phosphor-react';
 
-// --- COMPONENTES ESTILIZADOS PARA AS ESTRELAS E RESULTADOS ---
+// --- COMPONENTES ESTILIZADOS ADICIONAIS ---
 const StarsContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -44,6 +44,29 @@ const BonusXPText = styled.p`
   margin: 0;
 `;
 
+const WrongAnswersContainer = styled.div`
+  margin-top: 1.5rem;
+  text-align: left;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: #202225;
+  padding: 1rem;
+  border-radius: 4px;
+`;
+
+const WrongAnswerItem = styled.div`
+  & + & {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #40444b;
+  }
+  p {
+    margin: 0.25rem 0;
+  }
+`;
+
+type WrongAnswer = Exercicio & { userAnswer?: string };
+
 export const ExercisePage = ({
   subject,
   level,
@@ -60,20 +83,32 @@ export const ExercisePage = ({
     xpGanhos: 0,
     bonusXP: 0,
     estrelas: 0,
+    passou: false,
+    wrongAnswers: [] as WrongAnswer[],
   });
-  const { addXP, completeLevel } = useProgressStore();
 
-  const handleAnswerChange = (exerciseId: number, answer: string) =>
+  const { addXP, completeLevel, progress } = useProgressStore();
+  const currentProgress = progress[subject.id]?.[level.id];
+  const currentAttempts = currentProgress?.tentativas || 0;
+
+  const handleAnswerChange = (exerciseId: number, answer: string) => {
     setAnswers((prev) => ({ ...prev, [exerciseId]: answer }));
+  };
 
   const handleSubmit = () => {
     let correctCount = 0;
+    const wrongAnswersList: WrongAnswer[] = [];
+
     level.exercicios.forEach((ex) => {
-      if (
-        answers[ex.id]?.trim().toLowerCase() ===
-        ex.respostaCorreta.trim().toLowerCase()
-      ) {
+      const userAnswer = answers[ex.id]?.trim().toLowerCase();
+      const correctAnswer = ex.respostaCorreta.trim().toLowerCase();
+      if (userAnswer === correctAnswer) {
         correctCount++;
+      } else {
+        wrongAnswersList.push({
+          ...ex,
+          userAnswer: answers[ex.id] || 'Não respondido',
+        });
       }
     });
 
@@ -95,15 +130,24 @@ export const ExercisePage = ({
 
     const xpEarned = correctCount * level.xpPorAcerto;
     const totalXp = xpEarned + bonusXP;
+    const newAttempts = currentAttempts + 1;
+
+    const passouNosAcertos =
+      level.minAcertosParaDesbloquearProximo !== null &&
+      correctCount >= level.minAcertosParaDesbloquearProximo;
+    const pontuacaoPerfeita = correctCount === totalQuestions;
+    const passou = passouNosAcertos || pontuacaoPerfeita;
 
     setResults({
       acertos: correctCount,
       xpGanhos: xpEarned,
       bonusXP,
       estrelas,
+      passou,
+      wrongAnswers: wrongAnswersList,
     });
     addXP(totalXp);
-    completeLevel(subject.id, level.id, correctCount, estrelas);
+    completeLevel(subject.id, level.id, correctCount, estrelas, newAttempts);
     setShowResults(true);
   };
 
@@ -113,9 +157,9 @@ export const ExercisePage = ({
     return (
       <ModalOverlay>
         <ModalContent>
-          <CheckCircleIcon />
+          {results.passou ? <CheckCircleIcon /> : <XCircleIcon />}
           <Title as="h2" style={{ fontSize: '1.875rem', marginTop: '1rem' }}>
-            Nível Concluído!
+            {results.passou ? 'Nível Concluído!' : 'Tente Novamente!'}
           </Title>
 
           <StarsContainer>
@@ -134,19 +178,38 @@ export const ExercisePage = ({
             perguntas.
           </Subtitle>
 
-          {/* CORREÇÃO: Agrupando os resultados de XP */}
           <XPResultsContainer>
             <XPDisplayModal style={{ margin: 0 }}>
               <StarIcon />
               <span>+{results.xpGanhos} XP Ganhos</span>
             </XPDisplayModal>
-
             {results.bonusXP > 0 && (
-              <BonusXPText>
-                +{results.bonusXP} XP Bônus por Performance!
-              </BonusXPText>
+              <BonusXPText>+{results.bonusXP} XP Bônus!</BonusXPText>
             )}
           </XPResultsContainer>
+
+          {results.wrongAnswers.length > 0 && (
+            <WrongAnswersContainer>
+              <h4 style={{ marginTop: 0 }}>
+                {results.passou
+                  ? 'Questões para revisar:'
+                  : 'Respostas Erradas:'}
+              </h4>
+              {results.wrongAnswers.map((q) => (
+                <WrongAnswerItem key={q.id}>
+                  <p>
+                    <strong>Pergunta:</strong> {q.pergunta}
+                  </p>
+                  <p style={{ color: '#ed4245' }}>
+                    <strong>Sua resposta:</strong> {q.userAnswer}
+                  </p>
+                  <p style={{ color: '#43b581' }}>
+                    <strong>Resposta correta:</strong> {q.respostaCorreta}
+                  </p>
+                </WrongAnswerItem>
+              ))}
+            </WrongAnswersContainer>
+          )}
 
           <ContinueButton onClick={onBack}>Continuar Jornada</ContinueButton>
         </ModalContent>
@@ -167,7 +230,7 @@ export const ExercisePage = ({
           marginBottom: '1.5rem',
         }}
       >
-        Exercícios: {level.nome}
+        Exercícios: {level.nome} ({3 - currentAttempts} tentativas restantes)
       </Title>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         {level.exercicios.map((ex, index) => (

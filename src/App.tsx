@@ -1,15 +1,23 @@
 import { useState, useEffect } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import { ExercisePage } from './pages/ExercisePage';
+import { LevelSelector } from './pages/LevelSelector';
 import { SubjectSelector } from './components/SubjectSelector';
 import { useProgressStore } from './hooks/useProgressStore';
 import type { Materia, Nivel } from './interfaces';
 import { LevelHubPage } from './pages/LevelHubPage';
 import { ContentPage } from './pages/ContentPage';
-import { AppContainer, Footer, MainContent } from './style/globalStyle';
-import { LevelSelector } from './pages/LevelSelector';
-import { UserLevelBar } from './components/UserLevelBar';
+import {
+  AppContainer,
+  Footer,
+  MainContent,
+  BarWrapper,
+} from './style/globalStyle';
+import { ProfileSetup } from './components/ProfileSetup';
+import { TopBar } from './components/TopBar';
+import { House } from 'phosphor-react';
 
+// --- ESTILOS GLOBAIS ---
 const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
@@ -18,21 +26,16 @@ const GlobalStyle = createGlobalStyle`
     -moz-osx-font-smoothing: grayscale;
     background-color: #36393f;
     color: #dcddde;
-
-    @media (max-width: 768px) {
-      font-size: 1rem;
-    }
   }
 `;
 
+// --- TIPOS ---
 type SubjectInfo = Omit<Materia, 'niveis'> & {
   categoria: string;
   iconName: string;
 };
 
 const ResetButton = styled.button`
-  bottom: 1rem;
-  right: 1rem;
   background-color: #ed4245;
   color: white;
   font-size: 0.75rem;
@@ -53,6 +56,7 @@ const FooterWrapper = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+  position: relative;
   p {
     margin: 0;
     font-size: 0.875rem;
@@ -64,10 +68,41 @@ const FooterWrapper = styled.div`
       text-decoration: underline;
     }
   }
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
+
+  @media (max-width: 480px) {
+    justify-content: center;
+    p {
+      display: none;
+    }
+  }
+`;
+
+const HomeButton = styled.button`
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #5865f2;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+    background-color: #4f5bd5;
+  }
+
+  @media (max-width: 480px) {
+    position: static;
+    transform: none;
+    margin: 0 1rem;
   }
 `;
 
@@ -77,20 +112,23 @@ export default function App() {
   const [selectedSubject, setSelectedSubject] = useState<Materia | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<Nivel | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { resetProgress } = useProgressStore();
+
+  const { resetProgress, username } = useProgressStore();
 
   useEffect(() => {
-    const fetchSubjectsList = async () => {
-      try {
-        const response = await fetch('/data/materias.json');
-        const data = await response.json();
-        setSubjectsList(data);
-      } catch (error) {
-        console.error('Falha ao carregar a lista de matérias:', error);
-      }
-    };
-    fetchSubjectsList();
-  }, []);
+    if (username) {
+      const fetchSubjectsList = async () => {
+        try {
+          const response = await fetch('/data/materias.json');
+          const data = await response.json();
+          setSubjectsList(data);
+        } catch (error) {
+          console.error('Falha ao carregar a lista de matérias:', error);
+        }
+      };
+      fetchSubjectsList();
+    }
+  }, [username]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -115,8 +153,9 @@ export default function App() {
     setScreen('hub');
   };
 
-  const backToSubjects = () => {
+  const backToHome = () => {
     setSelectedSubject(null);
+    setSelectedLevel(null);
     setScreen('subject');
   };
 
@@ -125,8 +164,12 @@ export default function App() {
   };
 
   const backToHub = () => {
-    setScreen('level');
+    setScreen('hub');
   };
+
+  if (!username) {
+    return <ProfileSetup />;
+  }
 
   const renderScreen = () => {
     if (isLoading) {
@@ -134,7 +177,6 @@ export default function App() {
         <p style={{ textAlign: 'center', fontSize: '1.5rem' }}>Carregando...</p>
       );
     }
-
     if (screen === 'hub' && selectedSubject && selectedLevel) {
       return (
         <LevelHubPage
@@ -146,7 +188,6 @@ export default function App() {
         />
       );
     }
-
     if (screen === 'content' && selectedSubject && selectedLevel) {
       return (
         <ContentPage
@@ -156,7 +197,6 @@ export default function App() {
         />
       );
     }
-
     if (screen === 'exercise' && selectedSubject && selectedLevel) {
       return (
         <ExercisePage
@@ -166,17 +206,15 @@ export default function App() {
         />
       );
     }
-
     if (screen === 'level' && selectedSubject) {
       return (
         <LevelSelector
           subject={selectedSubject}
           onSelect={handleSelectLevel}
-          onBack={backToSubjects}
+          onBack={backToHome}
         />
       );
     }
-
     return (
       <SubjectSelector subjects={subjectsList} onSelect={handleSelectSubject} />
     );
@@ -185,16 +223,28 @@ export default function App() {
   return (
     <>
       <GlobalStyle />
+
+      <BarWrapper>
+        <TopBar />
+      </BarWrapper>
+
       <AppContainer>
-        <UserLevelBar />
         <MainContent>{renderScreen()}</MainContent>
       </AppContainer>
+
       <Footer>
         <FooterWrapper>
           <p>
             Desenvolvido por{' '}
             <a href="https://github.com/iHadesJ">Eduardo Alexandre</a>
           </p>
+
+          {screen !== 'subject' && (
+            <HomeButton onClick={backToHome} title="Voltar ao menu principal">
+              <House size={24} weight="bold" />
+            </HomeButton>
+          )}
+
           <ResetButton onClick={resetProgress}>Resetar Progresso</ResetButton>
         </FooterWrapper>
       </Footer>
