@@ -1,12 +1,18 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 // --- TIPOS ---
+export type FirestoreUserData = {
+  username: string | null;
+  avatarSeed: string | null;
+  xp: number;
+  progress: UserProgress;
+};
+
 type LevelProgress = {
   acertos: number;
   concluido: boolean;
   estrelas: number;
-  tentativas: number; // Adicionamos o contador de tentativas
+  tentativas: number;
 };
 
 type UserProgress = {
@@ -15,60 +21,27 @@ type UserProgress = {
   };
 };
 
-type ProgressState = {
-  xp: number;
-  progress: UserProgress;
-  addXP: (amount: number) => void;
-  // A função agora também recebe as tentativas
-  completeLevel: (
-    materiaId: string,
-    nivelId: string,
-    acertos: number,
-    estrelas: number,
-    tentativas: number
-  ) => void;
-  resetProgress: () => void;
-  setProfile: (username: string, avatarSeed: string) => void;
-  username: string | null;
-  avatarSeed: string | null;
+type ProgressState = FirestoreUserData & {
+  hydrateFromFirestore: (data: FirestoreUserData) => void;
+  resetLocalStore: () => void;
 };
 
 // --- GERENCIAMENTO DE ESTADO COM ZUSTAND ---
-export const useProgressStore = create<ProgressState>()(
-  persist(
-    (set) => ({
-      username: null,
-      avatarSeed: null,
-      xp: 0,
-      progress: {},
-      addXP: (amount) => set((state) => ({ xp: state.xp + amount })),
-      completeLevel: (materiaId, nivelId, acertos, estrelas, tentativas) =>
-        set((state) => {
-          const currentProgress = state.progress[materiaId]?.[nivelId];
-          // Mantém a melhor pontuação (mais estrelas)
-          const bestStars = Math.max(currentProgress?.estrelas || 0, estrelas);
+export const useProgressStore = create<ProgressState>()((set) => ({
+  username: null,
+  avatarSeed: null,
+  xp: 0,
+  progress: {},
 
-          return {
-            progress: {
-              ...state.progress,
-              [materiaId]: {
-                ...state.progress[materiaId],
-                [nivelId]: {
-                  acertos,
-                  concluido: true,
-                  estrelas: bestStars,
-                  tentativas, // Salva o novo número de tentativas
-                },
-              },
-            },
-          };
-        }),
-      resetProgress: () =>
-        set({ xp: 0, progress: {}, username: null, avatarSeed: null }),
-      setProfile: (username, avatarSeed) => set({ username, avatarSeed }),
-    }),
-    {
-      name: 'studyquest-progress',
-    }
-  )
-);
+  hydrateFromFirestore: (data) => {
+    set({
+      username: data.username,
+      avatarSeed: data.avatarSeed,
+      xp: data.xp,
+      progress: data.progress,
+    });
+  },
+
+  resetLocalStore: () =>
+    set({ xp: 0, progress: {}, username: null, avatarSeed: null }),
+}));

@@ -20,6 +20,8 @@ import { useProgressStore } from '../../hooks/useProgressStore';
 import { CheckCircleIcon, StarIcon, XCircleIcon } from '../../style/icons';
 import type { Exercicio, Materia, Nivel } from '../../interfaces';
 import { Star } from 'phosphor-react';
+import { doc, increment, updateDoc } from 'firebase/firestore';
+import { auth, db } from '../../config/firebase';
 
 // --- COMPONENTES ESTILIZADOS ADICIONAIS ---
 const StarsContainer = styled.div`
@@ -67,6 +69,7 @@ const WrongAnswerItem = styled.div`
 
 type WrongAnswer = Exercicio & { userAnswer?: string };
 
+// --- COMPONENTE PRINCIPAL ---
 export const ExercisePage = ({
   subject,
   level,
@@ -87,7 +90,8 @@ export const ExercisePage = ({
     wrongAnswers: [] as WrongAnswer[],
   });
 
-  const { addXP, completeLevel, progress } = useProgressStore();
+  // Agora lemos todo o progresso do Zustand para ter os dados atuais
+  const { progress } = useProgressStore();
   const currentProgress = progress[subject.id]?.[level.id];
   const currentAttempts = currentProgress?.tentativas || 0;
 
@@ -95,7 +99,10 @@ export const ExercisePage = ({
     setAnswers((prev) => ({ ...prev, [exerciseId]: answer }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
     let correctCount = 0;
     const wrongAnswersList: WrongAnswer[] = [];
 
@@ -146,8 +153,25 @@ export const ExercisePage = ({
       passou,
       wrongAnswers: wrongAnswersList,
     });
-    addXP(totalXp);
-    completeLevel(subject.id, level.id, correctCount, estrelas, newAttempts);
+
+    // --- LÓGICA DE ATUALIZAÇÃO DO FIRESTORE ---
+    const userDocRef = doc(db, 'users', user.uid);
+    const bestStars = Math.max(currentProgress?.estrelas || 0, estrelas);
+
+    try {
+      await updateDoc(userDocRef, {
+        xp: increment(totalXp),
+        [`progress.${subject.id}.${level.id}`]: {
+          acertos: correctCount,
+          concluido: true,
+          estrelas: bestStars,
+          tentativas: newAttempts,
+        },
+      });
+    } catch (error) {
+      console.error('Erro ao guardar o progresso:', error);
+    }
+
     setShowResults(true);
   };
 

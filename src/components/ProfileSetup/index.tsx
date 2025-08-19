@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { useProgressStore } from '../../hooks/useProgressStore';
+import { doc, updateDoc } from 'firebase/firestore'; // Importa a função de atualização
+import { auth, db } from '../../config/firebase'; // Importa a configuração do Firebase
 import { Title } from '../../style/globalStyle';
+// A função setProfile do zustand já não é necessária aqui
+// import { useProgressStore } from '../../hooks/useProgressStore';
 
-// --- COMPONENTES ESTILIZADOS ---
+// --- COMPONENTES ESTILIZADOS (permanecem os mesmos) ---
 const SetupContainer = styled.div`
-  background: black;
   display: flex;
+  background-color: #36393f;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -99,14 +102,25 @@ const avatarSeeds = [
   'Sadie',
 ];
 
+// --- COMPONENTE PRINCIPAL ---
 export const ProfileSetup = () => {
   const [username, setUsername] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState(avatarSeeds[0]);
-  const setProfile = useProgressStore((state) => state.setProfile);
 
-  const handleSave = () => {
-    if (username.trim()) {
-      setProfile(username.trim(), selectedAvatar);
+  const handleSave = async () => {
+    const user = auth.currentUser;
+
+    if (user && username.trim()) {
+      const userDocRef = doc(db, 'users', user.uid);
+
+      try {
+        await updateDoc(userDocRef, {
+          username: username.trim(),
+          avatarSeed: selectedAvatar,
+        });
+      } catch (error) {
+        console.error('Erro ao guardar o perfil:', error);
+      }
     }
   };
 
@@ -114,7 +128,7 @@ export const ProfileSetup = () => {
     <SetupContainer>
       <SetupBox>
         <Title style={{ border: 'none', padding: 0, fontSize: '2rem' }}>
-          Crie seu Perfil
+          Crie o seu Perfil
         </Title>
         <p
           style={{
@@ -123,24 +137,23 @@ export const ProfileSetup = () => {
             marginBottom: '2rem',
           }}
         >
-          Escolha um nome e um avatar para começar sua jornada.
+          Escolha um nome e um avatar para começar a sua jornada.
         </p>
 
         <label htmlFor="username" style={{ display: 'none' }}>
-          Nome de Usuário
+          Nome de Utilizador
         </label>
         <UsernameInput
           id="username"
           type="text"
-          placeholder="Digite seu nome"
+          placeholder="Digite o seu nome"
           value={username}
-          style={{ width: '90%' }}
           onChange={(e) => setUsername(e.target.value)}
           maxLength={15}
         />
 
         <h3 style={{ color: '#ffffff', marginBottom: '1rem' }}>
-          Escolha seu Avatar:
+          Escolha o seu Avatar:
         </h3>
         <AvatarGrid>
           {avatarSeeds.map((seed) => (

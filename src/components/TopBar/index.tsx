@@ -1,7 +1,10 @@
 import styled from 'styled-components';
+import { signOut } from 'firebase/auth'; // Importa a função de logout
+import { auth } from '../../config/firebase'; // Importa a configuração do Firebase
 import { useProgressStore } from '../../hooks/useProgressStore';
+import { SignOut } from 'phosphor-react'; // Ícone para o botão de sair
 
-// --- COMPONENTES ESTILIZADOS (COM MEDIA QUERIES) ---
+// --- COMPONENTES ESTILIZADOS ---
 const TopBarContainer = styled.div`
   display: flex;
   align-items: center;
@@ -87,9 +90,28 @@ const XPText = styled.span`
   font-weight: bold;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
 
-  /* Esconde o texto de XP em telas muito pequenas */
   @media (max-width: 480px) {
     display: none;
+  }
+`;
+
+// NOVO: Botão de Logout
+const LogoutButton = styled.button`
+  background: none;
+  border: none;
+  color: #b9bbbe;
+  cursor: pointer;
+  margin-left: 1rem;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+
+  &:hover {
+    color: #ffffff;
+    background-color: #40444b;
   }
 `;
 
@@ -115,6 +137,14 @@ export const TopBar = () => {
   const { level, progress, xpInCurrentLevel, xpNeededForLevel } =
     calculateLevelInfo(xp);
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
+
   return (
     <TopBarContainer>
       <ProfileInfo>
@@ -132,6 +162,10 @@ export const TopBar = () => {
           <XPText>{`${xpInCurrentLevel} / ${xpNeededForLevel} XP`}</XPText>
         </ProgressBarContainer>
       </LevelBarContainer>
+
+      <LogoutButton onClick={handleLogout} title="Sair">
+        <SignOut size={24} />
+      </LogoutButton>
     </TopBarContainer>
   );
 };

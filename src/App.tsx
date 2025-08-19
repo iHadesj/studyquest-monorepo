@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
+import { onAuthStateChanged, type User } from 'firebase/auth';
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore'; // Importa o updateDoc
+import { auth, db } from './config/firebase';
 import { ExercisePage } from './pages/ExercisePage';
 import { LevelSelector } from './pages/LevelSelector';
 import { SubjectSelector } from './components/SubjectSelector';
-import { useProgressStore } from './hooks/useProgressStore';
+import {
+  useProgressStore,
+  type FirestoreUserData,
+} from './hooks/useProgressStore';
 import type { Materia, Nivel } from './interfaces';
 import { LevelHubPage } from './pages/LevelHubPage';
 import { ContentPage } from './pages/ContentPage';
@@ -15,7 +21,9 @@ import {
 } from './style/globalStyle';
 import { ProfileSetup } from './components/ProfileSetup';
 import { TopBar } from './components/TopBar';
-import { House } from 'phosphor-react';
+import { House, Trophy } from 'phosphor-react';
+import { AuthPage } from './pages/AuthPage';
+import { RankingPage } from './pages/Ranking';
 
 // --- ESTILOS GLOBAIS ---
 const GlobalStyle = createGlobalStyle`
@@ -102,7 +110,21 @@ const HomeButton = styled.button`
   @media (max-width: 480px) {
     position: static;
     transform: none;
-    margin: 0 1rem;
+  }
+`;
+
+export const RankingButton = styled.button`
+  background: none;
+  border: none;
+  color: #b9bbbe;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.875rem;
+  &:hover {
+    color: #ffffff;
   }
 `;
 
@@ -111,9 +133,36 @@ export default function App() {
   const [subjectsList, setSubjectsList] = useState<SubjectInfo[]>([]);
   const [selectedSubject, setSelectedSubject] = useState<Materia | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<Nivel | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { resetProgress, username } = useProgressStore();
+  const { username, hydrateFromFirestore, resetLocalStore } =
+    useProgressStore();
+  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setFirebaseUser(user);
+      if (!user) {
+        resetLocalStore();
+        setIsLoading(false);
+      }
+    });
+    return () => unsubscribe();
+  }, [resetLocalStore]);
+
+  useEffect(() => {
+    if (firebaseUser) {
+      const userDocRef = doc(db, 'users', firebaseUser.uid);
+      const unsubscribe = onSnapshot(userDocRef, (doc) => {
+        if (doc.exists()) {
+          const userData = doc.data() as FirestoreUserData;
+          hydrateFromFirestore(userData);
+        }
+        setIsLoading(false);
+      });
+      return () => unsubscribe();
+    }
+  }, [firebaseUser, hydrateFromFirestore]);
 
   useEffect(() => {
     if (username) {
@@ -134,6 +183,7 @@ export default function App() {
     window.scrollTo(0, 0);
   }, [screen]);
 
+  // --- FUNÇÕES DE NAVEGAÇÃO E LÓGICA ---
   const handleSelectSubject = async (subjectInfo: SubjectInfo) => {
     setIsLoading(true);
     try {
@@ -167,16 +217,41 @@ export default function App() {
     setScreen('hub');
   };
 
+  // CORREÇÃO: Nova função para resetar o progresso no Firestore
+  const handleResetProgress = async () => {
+    if (firebaseUser) {
+      const userDocRef = doc(db, 'users', firebaseUser.uid);
+      try {
+        // Atualiza o documento no Firestore para os valores iniciais
+        await updateDoc(userDocRef, {
+          xp: 0,
+          progress: {},
+        });
+        // A atualização local acontecerá automaticamente via onSnapshot
+        backToHome(); // Volta para a tela inicial
+      } catch (error) {
+        console.error('Erro ao resetar o progresso:', error);
+      }
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <p style={{ textAlign: 'center', fontSize: '1.5rem', color: 'white' }}>
+        A carregar...
+      </p>
+    );
+  }
+
+  if (!firebaseUser) {
+    return <AuthPage />;
+  }
+
   if (!username) {
     return <ProfileSetup />;
   }
 
   const renderScreen = () => {
-    if (isLoading) {
-      return (
-        <p style={{ textAlign: 'center', fontSize: '1.5rem' }}>Carregando...</p>
-      );
-    }
     if (screen === 'hub' && selectedSubject && selectedLevel) {
       return (
         <LevelHubPage
@@ -220,32 +295,52 @@ export default function App() {
     );
   };
 
+  if (screen === 'ranking') {
+    return (
+      <>
+        <GlobalStyle />
+        <BarWrapper>
+          <TopBar />
+        </BarWrapper>
+        <AppContainer>
+          <MainContent>
+            <RankingPage onBack={backToHome} />
+          </MainContent>
+        </AppContainer>
+        <Footer>
+          {/* ... (rodapé simplificado para a página de ranking) ... */}
+        </Footer>
+      </>
+    );
+  }
+
   return (
     <>
       <GlobalStyle />
-
       <BarWrapper>
         <TopBar />
       </BarWrapper>
-
       <AppContainer>
         <MainContent>{renderScreen()}</MainContent>
       </AppContainer>
-
       <Footer>
         <FooterWrapper>
           <p>
             Desenvolvido por{' '}
             <a href="https://github.com/iHadesJ">Eduardo Alexandre</a>
           </p>
-
+          <RankingButton onClick={() => setScreen('ranking')}>
+            <Trophy weight="bold" /> Ranking
+          </RankingButton>
           {screen !== 'subject' && (
             <HomeButton onClick={backToHome} title="Voltar ao menu principal">
               <House size={24} weight="bold" />
             </HomeButton>
           )}
 
-          <ResetButton onClick={resetProgress}>Resetar Progresso</ResetButton>
+          {/* <ResetButton onClick={handleResetProgress}>
+            Resetar Progresso
+          </ResetButton> */}
         </FooterWrapper>
       </Footer>
     </>
