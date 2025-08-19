@@ -186,6 +186,7 @@ export const AuthPage = () => {
           <InputWrapper>
             <Input
               type="email"
+              style={{ width: '80%' }}
               placeholder="E-mail"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -196,6 +197,7 @@ export const AuthPage = () => {
             <Input
               type={showPassword ? 'text' : 'password'} // Altera o tipo do input
               placeholder="Palavra-passe"
+              style={{ width: '80%' }}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
