@@ -5,7 +5,7 @@ import { useProgressStore } from '../../hooks/useProgressStore';
 import { SignOut } from 'phosphor-react'; // Ícone para o botão de sair
 
 // --- COMPONENTES ESTILIZADOS ---
-const TopBarContainer = styled.div`
+export const TopBarContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -15,13 +15,13 @@ const TopBarContainer = styled.div`
   margin: 0 auto;
 `;
 
-const ProfileInfo = styled.div`
+export const ProfileInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 0.75rem;
 `;
 
-const Avatar = styled.img`
+export const Avatar = styled.img`
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -29,7 +29,7 @@ const Avatar = styled.img`
   border: 2px solid #40444b;
 `;
 
-const Username = styled.span`
+export const Username = styled.span`
   color: #ffffff;
   font-weight: bold;
   font-size: 1rem;
@@ -39,7 +39,7 @@ const Username = styled.span`
   }
 `;
 
-const LevelBarContainer = styled.div`
+export const LevelBarContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -47,7 +47,7 @@ const LevelBarContainer = styled.div`
   max-width: 400px;
 `;
 
-const LevelDisplay = styled.div`
+export const LevelDisplay = styled.div`
   background-color: #5865f2;
   color: white;
   font-weight: bold;
@@ -63,7 +63,7 @@ const LevelDisplay = styled.div`
   border: 2px solid #2f3136;
 `;
 
-const ProgressBarContainer = styled.div`
+export const ProgressBarContainer = styled.div`
   width: 100%;
   background-color: #202225;
   border-radius: 8px;
@@ -73,14 +73,14 @@ const ProgressBarContainer = styled.div`
   border: 1px solid #40444b;
 `;
 
-const ProgressBarFill = styled.div<{ progress: number }>`
+export const ProgressBarFill = styled.div<{ progress: number }>`
   width: ${(props) => props.progress}%;
   height: 100%;
   background: linear-gradient(90deg, #43b581, #5865f2);
   transition: width 0.5s ease-in-out;
 `;
 
-const XPText = styled.span`
+export const XPText = styled.span`
   position: absolute;
   left: 50%;
   top: 50%;
@@ -96,7 +96,7 @@ const XPText = styled.span`
 `;
 
 // NOVO: Botão de Logout
-const LogoutButton = styled.button`
+export const LogoutButton = styled.button`
   background: none;
   border: none;
   color: #b9bbbe;
