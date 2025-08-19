@@ -66,7 +66,6 @@ const FooterWrapper = styled.div`
   margin: 0 auto;
   width: 100%;
   position: relative;
-  padding: 0 1rem;
   p {
     margin: 0;
     font-size: 0.875rem;
