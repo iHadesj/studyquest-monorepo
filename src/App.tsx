@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import { onAuthStateChanged, type User } from 'firebase/auth';
-import { doc, onSnapshot, updateDoc } from 'firebase/firestore'; // Importa o updateDoc
+import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './config/firebase';
 import { ExercisePage } from './pages/ExercisePage';
 import { LevelSelector } from './pages/LevelSelector';
