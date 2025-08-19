@@ -276,7 +276,7 @@ export default function App() {
     return <AuthPage />;
   }
 
-  if (!username) {
+  if (firebaseUser && !username) {
     return <ProfileSetup />;
   }
 
