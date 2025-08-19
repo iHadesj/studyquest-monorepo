@@ -43,7 +43,7 @@ type SubjectInfo = Omit<Materia, 'niveis'> & {
   iconName: string;
 };
 
-const ResetButton = styled.button`
+export const ResetButton = styled.button`
   background-color: #ed4245;
   color: white;
   font-size: 0.75rem;
@@ -218,7 +218,7 @@ export default function App() {
   };
 
   // CORREÇÃO: Nova função para resetar o progresso no Firestore
-  const handleResetProgress = async () => {
+  /*   const handleResetProgress = async () => {
     if (firebaseUser) {
       const userDocRef = doc(db, 'users', firebaseUser.uid);
       try {
@@ -233,7 +233,7 @@ export default function App() {
         console.error('Erro ao resetar o progresso:', error);
       }
     }
-  };
+  }; */
 
   if (isLoading) {
     return (
