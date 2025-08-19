@@ -296,7 +296,7 @@ export const Footer = styled.footer`
   background-color: #202225;
   color: #b9bbbe;
   text-align: center;
-  padding: 0.5rem;
+  padding: 1rem;
   font-size: 0.875rem;
   border-top: 1px solid #2f3136;
   z-index: 1000;

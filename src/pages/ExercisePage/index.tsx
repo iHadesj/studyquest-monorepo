@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
+import { doc, updateDoc, increment } from 'firebase/firestore';
+import { auth, db } from '../../config/firebase';
 import {
   BackButton,
   ContinueButton,
@@ -20,8 +22,6 @@ import { useProgressStore } from '../../hooks/useProgressStore';
 import { CheckCircleIcon, StarIcon, XCircleIcon } from '../../style/icons';
 import type { Exercicio, Materia, Nivel } from '../../interfaces';
 import { Star } from 'phosphor-react';
-import { doc, increment, updateDoc } from 'firebase/firestore';
-import { auth, db } from '../../config/firebase';
 
 // --- COMPONENTES ESTILIZADOS ADICIONAIS ---
 const StarsContainer = styled.div`
@@ -49,7 +49,7 @@ const BonusXPText = styled.p`
 const WrongAnswersContainer = styled.div`
   margin-top: 1.5rem;
   text-align: left;
-  max-height: 200px;
+  max-height: 150px;
   overflow-y: auto;
   background-color: #202225;
   padding: 1rem;
@@ -65,6 +65,14 @@ const WrongAnswerItem = styled.div`
   p {
     margin: 0.25rem 0;
   }
+`;
+
+const EncouragementText = styled.div`
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #202225;
+  border-radius: 4px;
+  color: #b9bbbe;
 `;
 
 type WrongAnswer = Exercicio & { userAnswer?: string };
@@ -90,7 +98,7 @@ export const ExercisePage = ({
     wrongAnswers: [] as WrongAnswer[],
   });
 
-  // Agora lemos todo o progresso do Zustand para ter os dados atuais
+  // CORREÇÃO: Removemos addXP e completeLevel, pois não são mais usados aqui
   const { progress } = useProgressStore();
   const currentProgress = progress[subject.id]?.[level.id];
   const currentAttempts = currentProgress?.tentativas || 0;
@@ -154,20 +162,30 @@ export const ExercisePage = ({
       wrongAnswers: wrongAnswersList,
     });
 
-    // --- LÓGICA DE ATUALIZAÇÃO DO FIRESTORE ---
     const userDocRef = doc(db, 'users', user.uid);
     const bestStars = Math.max(currentProgress?.estrelas || 0, estrelas);
 
     try {
-      await updateDoc(userDocRef, {
-        xp: increment(totalXp),
-        [`progress.${subject.id}.${level.id}`]: {
-          acertos: correctCount,
-          concluido: true,
-          estrelas: bestStars,
-          tentativas: newAttempts,
-        },
-      });
+      if (passou) {
+        await updateDoc(userDocRef, {
+          xp: increment(totalXp),
+          [`progress.${subject.id}.${level.id}`]: {
+            acertos: correctCount,
+            concluido: true,
+            estrelas: bestStars,
+            tentativas: newAttempts,
+          },
+        });
+      } else {
+        await updateDoc(userDocRef, {
+          [`progress.${subject.id}.${level.id}`]: {
+            acertos: correctCount,
+            concluido: false,
+            estrelas: bestStars,
+            tentativas: newAttempts,
+          },
+        });
+      }
     } catch (error) {
       console.error('Erro ao guardar o progresso:', error);
     }
@@ -202,23 +220,21 @@ export const ExercisePage = ({
             perguntas.
           </Subtitle>
 
-          <XPResultsContainer>
-            <XPDisplayModal style={{ margin: 0 }}>
-              <StarIcon />
-              <span>+{results.xpGanhos} XP Ganhos</span>
-            </XPDisplayModal>
-            {results.bonusXP > 0 && (
-              <BonusXPText>+{results.bonusXP} XP Bônus!</BonusXPText>
-            )}
-          </XPResultsContainer>
+          {results.passou && (
+            <XPResultsContainer>
+              <XPDisplayModal style={{ margin: 0 }}>
+                <StarIcon />
+                <span>+{results.xpGanhos} XP Ganhos</span>
+              </XPDisplayModal>
+              {results.bonusXP > 0 && (
+                <BonusXPText>+{results.bonusXP} XP Bônus!</BonusXPText>
+              )}
+            </XPResultsContainer>
+          )}
 
-          {results.wrongAnswers.length > 0 && (
+          {results.passou && results.wrongAnswers.length > 0 && (
             <WrongAnswersContainer>
-              <h4 style={{ marginTop: 0 }}>
-                {results.passou
-                  ? 'Questões para revisar:'
-                  : 'Respostas Erradas:'}
-              </h4>
+              <h4 style={{ marginTop: 0 }}>Questões para revisar:</h4>
               {results.wrongAnswers.map((q) => (
                 <WrongAnswerItem key={q.id}>
                   <p>
@@ -233,6 +249,15 @@ export const ExercisePage = ({
                 </WrongAnswerItem>
               ))}
             </WrongAnswersContainer>
+          )}
+
+          {!results.passou && (
+            <EncouragementText>
+              <p>
+                Reveja o material de estudo para encontrar as respostas corretas
+                e tente novamente!
+              </p>
+            </EncouragementText>
           )}
 
           <ContinueButton onClick={onBack}>Continuar Jornada</ContinueButton>

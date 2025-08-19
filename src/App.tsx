@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle, keyframes } from 'styled-components';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './config/firebase';
@@ -43,7 +43,8 @@ type SubjectInfo = Omit<Materia, 'niveis'> & {
   iconName: string;
 };
 
-export const ResetButton = styled.button`
+// --- COMPONENTES ESTILIZADOS ---
+/* const ResetButton = styled.button`
   background-color: #ed4245;
   color: white;
   font-size: 0.75rem;
@@ -56,7 +57,7 @@ export const ResetButton = styled.button`
     background-color: #c7383a;
   }
 `;
-
+ */
 const FooterWrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -65,6 +66,7 @@ const FooterWrapper = styled.div`
   margin: 0 auto;
   width: 100%;
   position: relative;
+  padding: 0 1rem;
   p {
     margin: 0;
     font-size: 0.875rem;
@@ -94,8 +96,8 @@ const HomeButton = styled.button`
   color: white;
   border: none;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -110,10 +112,11 @@ const HomeButton = styled.button`
   @media (max-width: 480px) {
     position: static;
     transform: none;
+    margin: 0 1rem;
   }
 `;
 
-export const RankingButton = styled.button`
+const RankingButton = styled.button`
   background: none;
   border: none;
   color: #b9bbbe;
@@ -126,6 +129,28 @@ export const RankingButton = styled.button`
   &:hover {
     color: #ffffff;
   }
+`;
+
+const spin = keyframes`
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+const LoadingSpinner = styled.div`
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-left-color: #5865f2;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: ${spin} 1s linear infinite;
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5rem 0;
 `;
 
 export default function App() {
@@ -183,7 +208,6 @@ export default function App() {
     window.scrollTo(0, 0);
   }, [screen]);
 
-  // --- FUNÇÕES DE NAVEGAÇÃO E LÓGICA ---
   const handleSelectSubject = async (subjectInfo: SubjectInfo) => {
     setIsLoading(true);
     try {
@@ -217,29 +241,34 @@ export default function App() {
     setScreen('hub');
   };
 
-  // CORREÇÃO: Nova função para resetar o progresso no Firestore
   /*   const handleResetProgress = async () => {
     if (firebaseUser) {
       const userDocRef = doc(db, 'users', firebaseUser.uid);
       try {
-        // Atualiza o documento no Firestore para os valores iniciais
         await updateDoc(userDocRef, {
           xp: 0,
           progress: {},
         });
-        // A atualização local acontecerá automaticamente via onSnapshot
-        backToHome(); // Volta para a tela inicial
+        backToHome();
       } catch (error) {
         console.error('Erro ao resetar o progresso:', error);
       }
     }
   }; */
 
-  if (isLoading) {
+  if (isLoading && !firebaseUser) {
     return (
-      <p style={{ textAlign: 'center', fontSize: '1.5rem', color: 'white' }}>
-        A carregar...
-      </p>
+      <div
+        style={{
+          backgroundColor: '#36393f',
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <LoadingSpinner />
+      </div>
     );
   }
 
@@ -252,6 +281,9 @@ export default function App() {
   }
 
   const renderScreen = () => {
+    if (screen === 'ranking') {
+      return <RankingPage onBack={backToHome} />;
+    }
     if (screen === 'hub' && selectedSubject && selectedLevel) {
       return (
         <LevelHubPage
@@ -295,50 +327,36 @@ export default function App() {
     );
   };
 
-  if (screen === 'ranking') {
-    return (
-      <>
-        <GlobalStyle />
-        <BarWrapper>
-          <TopBar />
-        </BarWrapper>
-        <AppContainer>
-          <MainContent>
-            <RankingPage onBack={backToHome} />
-          </MainContent>
-        </AppContainer>
-        <Footer>
-          {/* ... (rodapé simplificado para a página de ranking) ... */}
-        </Footer>
-      </>
-    );
-  }
-
   return (
     <>
       <GlobalStyle />
       <BarWrapper>
         <TopBar />
       </BarWrapper>
+
       <AppContainer>
-        <MainContent>{renderScreen()}</MainContent>
+        <MainContent>
+          {isLoading ? (
+            <LoadingContainer>
+              <LoadingSpinner />
+            </LoadingContainer>
+          ) : (
+            renderScreen()
+          )}
+        </MainContent>
       </AppContainer>
+
       <Footer>
         <FooterWrapper>
-          <p>
-            Desenvolvido por{' '}
-            <a href="https://github.com/iHadesJ">Eduardo Alexandre</a>
-          </p>
           <RankingButton onClick={() => setScreen('ranking')}>
             <Trophy weight="bold" /> Ranking
           </RankingButton>
-          {screen !== 'subject' && (
+          {screen !== 'subject' && screen !== 'ranking' && (
             <HomeButton onClick={backToHome} title="Voltar ao menu principal">
               <House size={24} weight="bold" />
             </HomeButton>
           )}
-
-          {/* <ResetButton onClick={handleResetProgress}>
+          {/*      <ResetButton onClick={handleResetProgress}>
             Resetar Progresso
           </ResetButton> */}
         </FooterWrapper>

@@ -100,6 +100,14 @@ const avatarSeeds = [
   'Daisy',
   'Milo',
   'Sadie',
+  'Rocky',
+  'Zoe',
+  'Bear',
+  'Ruby',
+  'Leo',
+  'Cleo',
+  'Oscar',
+  'Penny',
 ];
 
 // --- COMPONENTE PRINCIPAL ---
@@ -146,6 +154,7 @@ export const ProfileSetup = () => {
         <UsernameInput
           id="username"
           type="text"
+          style={{ width: '90%' }}
           placeholder="Digite o seu nome"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
