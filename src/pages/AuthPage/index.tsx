@@ -16,8 +16,7 @@ const AuthContainer = styled.div`
   justify-content: center;
   min-height: 100vh;
   background-color: #36393f;
-  /* Adiciona um fundo com gradiente para o efeito de vidro funcionar */
-  background-image: linear-gradient(to top right, #4e54c8, #8f94fb);
+  background-image: linear-gradient(to top right, #090b3c, #8f94fb);
 `;
 
 const AuthBox = styled.div`
