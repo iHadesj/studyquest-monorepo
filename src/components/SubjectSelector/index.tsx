@@ -99,7 +99,6 @@ export const SubjectSelector = ({
   subjects: readonly SubjectInfo[];
   onSelect: (subject: SubjectInfo) => void;
 }) => {
-  // Agrupa as matérias por categoria
   const groupedSubjects = subjects.reduce((acc, subject) => {
     const category = subject.categoria || 'Outros';
     if (!acc[category]) {

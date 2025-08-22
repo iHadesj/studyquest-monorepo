@@ -98,7 +98,6 @@ export const ExercisePage = ({
     wrongAnswers: [] as WrongAnswer[],
   });
 
-  // CORREÇÃO: Removemos addXP e completeLevel, pois não são mais usados aqui
   const { progress } = useProgressStore();
   const currentProgress = progress[subject.id]?.[level.id];
   const currentAttempts = currentProgress?.tentativas || 0;

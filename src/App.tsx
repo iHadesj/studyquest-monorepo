@@ -24,6 +24,7 @@ import { TopBar } from './components/TopBar';
 import { House, Trophy } from 'phosphor-react';
 import { AuthPage } from './pages/AuthPage';
 import { RankingPage } from './pages/Ranking';
+import { ModalUserPerfil } from './components/ModalUserPerfil';
 
 // --- ESTILOS GLOBAIS ---
 const GlobalStyle = createGlobalStyle`
@@ -44,20 +45,6 @@ type SubjectInfo = Omit<Materia, 'niveis'> & {
 };
 
 // --- COMPONENTES ESTILIZADOS ---
-/* const ResetButton = styled.button`
-  background-color: #ed4245;
-  color: white;
-  font-size: 0.75rem;
-  font-weight: bold;
-  padding: 0.3rem 0.5rem;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  &:hover {
-    background-color: #c7383a;
-  }
-`;
- */
 const FooterWrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -149,7 +136,9 @@ const LoadingContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 5rem 0;
+  height: 100vh;
+  width: 100%;
+  background-color: #36393f;
 `;
 
 export default function App() {
@@ -157,6 +146,8 @@ export default function App() {
   const [subjectsList, setSubjectsList] = useState<SubjectInfo[]>([]);
   const [selectedSubject, setSelectedSubject] = useState<Materia | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<Nivel | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [isLoading, setIsLoading] = useState(true);
 
   const { username, hydrateFromFirestore, resetLocalStore } =
@@ -164,44 +155,58 @@ export default function App() {
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setFirebaseUser(user);
+
       if (!user) {
         resetLocalStore();
         setIsLoading(false);
+        return;
       }
+
+      setIsLoading(true);
+      const userDocRef = doc(db, 'users', user.uid);
+
+      const unsubscribeFirestore = onSnapshot(
+        userDocRef,
+        (doc) => {
+          if (doc.exists()) {
+            const userData = doc.data() as FirestoreUserData;
+            hydrateFromFirestore(userData);
+          } else {
+            hydrateFromFirestore({
+              username: null,
+              xp: 0,
+              progress: {},
+              avatarSeed: Math.random().toString(36).substring(7),
+            });
+          }
+          setIsLoading(false);
+        },
+        (error) => {
+          console.error('Erro ao buscar dados do usuário:', error);
+          setIsLoading(false);
+        }
+      );
+
+      return () => unsubscribeFirestore();
     });
-    return () => unsubscribe();
-  }, [resetLocalStore]);
+
+    return () => unsubscribeAuth();
+  }, [hydrateFromFirestore, resetLocalStore]);
 
   useEffect(() => {
-    if (firebaseUser) {
-      const userDocRef = doc(db, 'users', firebaseUser.uid);
-      const unsubscribe = onSnapshot(userDocRef, (doc) => {
-        if (doc.exists()) {
-          const userData = doc.data() as FirestoreUserData;
-          hydrateFromFirestore(userData);
-        }
-        setIsLoading(false);
-      });
-      return () => unsubscribe();
-    }
-  }, [firebaseUser, hydrateFromFirestore]);
-
-  useEffect(() => {
-    if (username) {
-      const fetchSubjectsList = async () => {
-        try {
-          const response = await fetch('/data/materias.json');
-          const data = await response.json();
-          setSubjectsList(data);
-        } catch (error) {
-          console.error('Falha ao carregar a lista de matérias:', error);
-        }
-      };
-      fetchSubjectsList();
-    }
-  }, [username]);
+    const fetchSubjectsList = async () => {
+      try {
+        const response = await fetch('/data/materias.json');
+        const data = await response.json();
+        setSubjectsList(data);
+      } catch (error) {
+        console.error('Falha ao carregar a lista de matérias:', error);
+      }
+    };
+    fetchSubjectsList();
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -240,34 +245,11 @@ export default function App() {
     setScreen('hub');
   };
 
-  /*   const handleResetProgress = async () => {
-    if (firebaseUser) {
-      const userDocRef = doc(db, 'users', firebaseUser.uid);
-      try {
-        await updateDoc(userDocRef, {
-          xp: 0,
-          progress: {},
-        });
-        backToHome();
-      } catch (error) {
-        console.error('Erro ao resetar o progresso:', error);
-      }
-    }
-  }; */
-
-  if (isLoading && !firebaseUser) {
+  if (isLoading) {
     return (
-      <div
-        style={{
-          backgroundColor: '#36393f',
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+      <LoadingContainer>
         <LoadingSpinner />
-      </div>
+      </LoadingContainer>
     );
   }
 
@@ -330,19 +312,11 @@ export default function App() {
     <>
       <GlobalStyle />
       <BarWrapper>
-        <TopBar />
+        <TopBar onClick={() => setIsModalOpen(true)} />
       </BarWrapper>
 
       <AppContainer>
-        <MainContent>
-          {isLoading ? (
-            <LoadingContainer>
-              <LoadingSpinner />
-            </LoadingContainer>
-          ) : (
-            renderScreen()
-          )}
-        </MainContent>
+        <MainContent>{renderScreen()}</MainContent>
       </AppContainer>
 
       <Footer>
@@ -355,10 +329,11 @@ export default function App() {
               <House size={24} weight="bold" />
             </HomeButton>
           )}
-          {/*      <ResetButton onClick={handleResetProgress}>
-            Resetar Progresso
-          </ResetButton> */}
         </FooterWrapper>
+        <ModalUserPerfil
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
       </Footer>
     </>
   );

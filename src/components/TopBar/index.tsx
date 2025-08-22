@@ -1,8 +1,8 @@
 import styled from 'styled-components';
-import { signOut } from 'firebase/auth'; // Importa a função de logout
-import { auth } from '../../config/firebase'; // Importa a configuração do Firebase
+import { signOut } from 'firebase/auth';
+import { auth } from '../../config/firebase';
 import { useProgressStore } from '../../hooks/useProgressStore';
-import { SignOut } from 'phosphor-react'; // Ícone para o botão de sair
+import { SignOut } from 'phosphor-react';
 
 // --- COMPONENTES ESTILIZADOS ---
 export const TopBarContainer = styled.div`
@@ -26,6 +26,7 @@ export const Avatar = styled.img`
   height: 40px;
   border-radius: 50%;
   background-color: #2f3136;
+  cursor: pointer;
   border: 2px solid #40444b;
 `;
 
@@ -95,7 +96,6 @@ export const XPText = styled.span`
   }
 `;
 
-// NOVO: Botão de Logout
 export const LogoutButton = styled.button`
   background: none;
   border: none;
@@ -131,8 +131,12 @@ const calculateLevelInfo = (xp: number) => {
   return { level, progress, xpInCurrentLevel, xpNeededForLevel };
 };
 
+type TopBarProps = {
+  onClick?: () => void;
+};
+
 // --- COMPONENTE PRINCIPAL ---
-export const TopBar = () => {
+export const TopBar = ({ onClick }: TopBarProps) => {
   const { xp, username, avatarSeed } = useProgressStore();
   const { level, progress, xpInCurrentLevel, xpNeededForLevel } =
     calculateLevelInfo(xp);
@@ -151,6 +155,7 @@ export const TopBar = () => {
         <Avatar
           src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${avatarSeed}`}
           alt="User Avatar"
+          onClick={onClick}
         />
         <Username>{username}</Username>
       </ProfileInfo>

@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { doc, updateDoc } from 'firebase/firestore'; // Importa a função de atualização
-import { auth, db } from '../../config/firebase'; // Importa a configuração do Firebase
+import { doc, updateDoc } from 'firebase/firestore';
+import { auth, db } from '../../config/firebase';
 import { Title } from '../../style/globalStyle';
-// A função setProfile do zustand já não é necessária aqui
-// import { useProgressStore } from '../../hooks/useProgressStore';
 
 // --- COMPONENTES ESTILIZADOS (permanecem os mesmos) ---
 const SetupContainer = styled.div`
