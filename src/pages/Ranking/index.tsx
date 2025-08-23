@@ -225,13 +225,10 @@ export const RankingPage = ({ onBack }: { onBack: () => void }) => {
             isCurrentUser={user.uid === currentUserId}
           >
             <Rank>#{index + 1}</Rank>
-            <AvatarContainer onClick={onClick}>
-              <Avatar
-                src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${avatarSeed}`}
-                alt="User Avatar"
-              />
-              <SettingsIcon weight="fill" />
-            </AvatarContainer>
+            <Avatar
+              src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${user.avatarSeed}`}
+              alt={user.username}
+            />
             <UserInfo>
               <Username>{user.username}</Username>
               <UserStats>
