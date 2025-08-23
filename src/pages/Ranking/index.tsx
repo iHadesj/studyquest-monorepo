@@ -127,12 +127,12 @@ const CenteredContainer = styled.div`
 // --- LÓGICA UTILITÁRIA ---
 const calculateLevel = (xp: number) => {
   let level = 1;
-  let requiredXp = 150;
-  let totalXpForNext = 150;
+  let requiredXp = 200;
+  let totalXpForNext = 200;
 
   while (xp >= totalXpForNext) {
     level++;
-    requiredXp += 50;
+    requiredXp += 100;
     totalXpForNext += requiredXp;
   }
   return level;
@@ -225,10 +225,13 @@ export const RankingPage = ({ onBack }: { onBack: () => void }) => {
             isCurrentUser={user.uid === currentUserId}
           >
             <Rank>#{index + 1}</Rank>
-            <Avatar
-              src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${user.avatarSeed}`}
-              alt={user.username}
-            />
+            <AvatarContainer onClick={onClick}>
+              <Avatar
+                src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${avatarSeed}`}
+                alt="User Avatar"
+              />
+              <SettingsIcon weight="fill" />
+            </AvatarContainer>
             <UserInfo>
               <Username>{user.username}</Username>
               <UserStats>

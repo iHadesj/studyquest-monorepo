@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import { useProgressStore } from '../../hooks/useProgressStore';
-import { SignOut } from 'phosphor-react';
+import { SignOut, Gear } from 'phosphor-react';
 
 // --- COMPONENTES ESTILIZADOS ---
 export const TopBarContainer = styled.div`
@@ -21,13 +21,35 @@ export const ProfileInfo = styled.div`
   gap: 0.75rem;
 `;
 
-export const Avatar = styled.img`
+export const Avatar = styled.img<{
+  $pointer?: boolean;
+}>`
   width: 40px;
   height: 40px;
   border-radius: 50%;
   background-color: #2f3136;
-  cursor: pointer;
   border: 2px solid #40444b;
+  cursor: ${(props) => (props.$pointer ? 'pointer' : 'default')};
+`;
+
+export const AvatarContainer = styled.div`
+  position: relative;
+  cursor: pointer;
+`;
+
+export const SettingsIcon = styled(Gear)`
+  position: absolute;
+  bottom: 6px;
+  right: 0;
+  transform: translate(25%, 25%);
+
+  background-color: #40444b;
+  color: #ffffff;
+  border-radius: 50%;
+  padding: 2px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #2f3136;
 `;
 
 export const Username = styled.span`
@@ -152,11 +174,13 @@ export const TopBar = ({ onClick }: TopBarProps) => {
   return (
     <TopBarContainer>
       <ProfileInfo>
-        <Avatar
-          src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${avatarSeed}`}
-          alt="User Avatar"
-          onClick={onClick}
-        />
+        <AvatarContainer onClick={onClick}>
+          <Avatar
+            src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${avatarSeed}`}
+            alt="User Avatar"
+          />
+          <SettingsIcon weight="fill" />
+        </AvatarContainer>
         <Username>{username}</Username>
       </ProfileInfo>
 
