@@ -13,7 +13,7 @@ export const SummaryText = styled.p`
   white-space: pre-wrap;
 
   @media (max-width: 768px) {
-    font-size: 1rem;
+    font-size: 0.8rem;
   }
 `;
 

@@ -67,6 +67,7 @@ const FooterWrapper = styled.div`
 
   @media (max-width: 480px) {
     justify-content: center;
+    gap: 1rem;
     p {
       display: none;
     }
@@ -143,12 +144,15 @@ const LoadingContainer = styled.div`
 
 export default function App() {
   const [screen, setScreen] = useState('subject');
+  const [isInitializing, setIsInitializing] = useState(true);
   const [subjectsList, setSubjectsList] = useState<SubjectInfo[]>([]);
   const [selectedSubject, setSelectedSubject] = useState<Materia | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<Nivel | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
+
+  console.log(isLoading);
 
   const { username, hydrateFromFirestore, resetLocalStore } =
     useProgressStore();
@@ -160,11 +164,10 @@ export default function App() {
 
       if (!user) {
         resetLocalStore();
-        setIsLoading(false);
+        setIsInitializing(false); // <-- CHANGE THIS
         return;
       }
 
-      setIsLoading(true);
       const userDocRef = doc(db, 'users', user.uid);
 
       const unsubscribeFirestore = onSnapshot(
@@ -181,11 +184,11 @@ export default function App() {
               avatarSeed: Math.random().toString(36).substring(7),
             });
           }
-          setIsLoading(false);
+          setIsInitializing(false); // <-- CHANGE THIS
         },
         (error) => {
           console.error('Erro ao buscar dados do usuário:', error);
-          setIsLoading(false);
+          setIsInitializing(false); // <-- AND CHANGE THIS
         }
       );
 
@@ -245,7 +248,7 @@ export default function App() {
     setScreen('hub');
   };
 
-  if (isLoading) {
+  if (isInitializing) {
     return (
       <LoadingContainer>
         <LoadingSpinner />
@@ -285,6 +288,7 @@ export default function App() {
         />
       );
     }
+
     if (screen === 'exercise' && selectedSubject && selectedLevel) {
       return (
         <ExercisePage

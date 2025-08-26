@@ -67,6 +67,25 @@ export const Title = styled.h1`
   padding-bottom: 0.5rem;
   letter-spacing: -1px;
   animation: ${fadeIn} 0.5s ease-out;
+  @media (max-width: 480px) {
+    font-size: 1.5rem;
+  }
+`;
+
+export const TitleExercise = styled.h1`
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  border-bottom: 2px solid #40444b;
+  padding-bottom: 0.5rem;
+  letter-spacing: -1px;
+  animation: ${fadeIn} 0.5s ease-out;
+
+  @media (max-width: 480px) {
+    font-size: 1.2rem;
+  }
 `;
 
 export const Subtitle = styled.p`
@@ -106,7 +125,7 @@ export const XPDisplay = styled.div`
 export const LevelSelectorWrapper = styled.div`
   max-width: 42rem;
   margin: 0 auto;
-  margin-top: 5rem;
+  margin-top: 2rem;
 `;
 
 export const LevelList = styled.div`
@@ -174,11 +193,15 @@ export const ExerciseBox = styled.div`
 `;
 
 export const QuestionText = styled.p`
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: bold;
   margin: 0 0 1rem 0;
   line-height: 1.5;
   color: #ffffff;
+
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+  }
 `;
 
 export const OptionLabel = styled.label`
@@ -200,11 +223,13 @@ export const RadioInput = styled.input`
   width: 1rem;
   height: 1rem;
   accent-color: #5865f2;
+  @media (max-width: 480px) {
+    font-size: 0.7rem;
+  }
 `;
 
 export const TextInput = styled.input`
-  max-width: 692px;
-  width: 100%;
+  width: 90%;
   padding: 0.75rem;
   background-color: #202225;
   border: 1px solid #40444b;
@@ -216,6 +241,10 @@ export const TextInput = styled.input`
   &:focus {
     outline: none;
     border-color: #5865f2;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
   }
 `;
 

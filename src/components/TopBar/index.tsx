@@ -11,7 +11,7 @@ export const TopBarContainer = styled.div`
   justify-content: space-between;
   width: 100%;
   max-width: 1280px;
-  gap: 0.5rem;
+  gap: 2rem;
   margin: 0 auto;
 `;
 

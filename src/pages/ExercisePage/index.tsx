@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { doc, updateDoc, increment } from 'firebase/firestore';
 import { auth, db } from '../../config/firebase';
@@ -16,6 +16,7 @@ import {
   Subtitle,
   TextInput,
   Title,
+  TitleExercise,
   XPDisplayModal,
 } from '../../style/globalStyle';
 import { useProgressStore } from '../../hooks/useProgressStore';
@@ -87,6 +88,7 @@ export const ExercisePage = ({
   level: Nivel;
   onBack: () => void;
 }) => {
+  const [shuffledExercises, setShuffledExercises] = useState<Exercicio[]>([]);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState({
@@ -102,6 +104,17 @@ export const ExercisePage = ({
   const currentProgress = progress[subject.id]?.[level.id];
   const currentAttempts = currentProgress?.tentativas || 0;
 
+  // This effect runs once to shuffle and select 10 exercises.
+  useEffect(() => {
+    // Check if there are more than 10 exercises to shuffle from
+    if (level.exercicios.length > 10) {
+      const shuffled = [...level.exercicios].sort(() => 0.5 - Math.random());
+      setShuffledExercises(shuffled.slice(0, 10));
+    } else {
+      setShuffledExercises([...level.exercicios]);
+    }
+  }, [level.exercicios]);
+
   const handleAnswerChange = (exerciseId: number, answer: string) => {
     setAnswers((prev) => ({ ...prev, [exerciseId]: answer }));
   };
@@ -113,7 +126,8 @@ export const ExercisePage = ({
     let correctCount = 0;
     const wrongAnswersList: WrongAnswer[] = [];
 
-    level.exercicios.forEach((ex) => {
+    // Evaluate answers against the 10 shuffled questions
+    shuffledExercises.forEach((ex) => {
       const userAnswer = answers[ex.id]?.trim().toLowerCase();
       const correctAnswer = ex.respostaCorreta.trim().toLowerCase();
       if (userAnswer === correctAnswer) {
@@ -126,7 +140,7 @@ export const ExercisePage = ({
       }
     });
 
-    const totalQuestions = level.exercicios.length;
+    const totalQuestions = shuffledExercises.length;
     const percentage = (correctCount / totalQuestions) * 100;
     let estrelas = 0;
     let bonusXP = 0;
@@ -192,7 +206,8 @@ export const ExercisePage = ({
     setShowResults(true);
   };
 
-  const allAnswered = Object.keys(answers).length === level.exercicios.length;
+  // Check if all *displayed* questions have been answered
+  const allAnswered = Object.keys(answers).length === shuffledExercises.length;
 
   if (showResults) {
     return (
@@ -215,7 +230,7 @@ export const ExercisePage = ({
           </StarsContainer>
 
           <Subtitle as="p" style={{ fontSize: '1rem', marginBottom: 0 }}>
-            Você acertou {results.acertos} de {level.exercicios.length}{' '}
+            Você acertou {results.acertos} de {shuffledExercises.length}{' '}
             perguntas.
           </Subtitle>
 
@@ -268,10 +283,9 @@ export const ExercisePage = ({
   return (
     <LessonWrapper>
       <BackButton onClick={onBack}>&larr; Voltar</BackButton>
-      <Title
+      <TitleExercise
         as="h2"
         style={{
-          fontSize: '1.75rem',
           border: 'none',
           padding: 0,
           textAlign: 'left',
@@ -279,9 +293,10 @@ export const ExercisePage = ({
         }}
       >
         Exercícios: {level.nome} ({3 - currentAttempts} tentativas restantes)
-      </Title>
+      </TitleExercise>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-        {level.exercicios.map((ex, index) => (
+        {/* Map over the shuffled exercises instead of the full list */}
+        {shuffledExercises.map((ex, index) => (
           <ExerciseBox key={ex.id}>
             <QuestionText>
               {index + 1}. {ex.pergunta}

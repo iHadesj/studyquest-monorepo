@@ -33,7 +33,6 @@ export const ContentPage = ({
           as="h1"
           style={{
             textAlign: 'left',
-            fontSize: '2rem',
             border: 'none',
             padding: 0,
           }}

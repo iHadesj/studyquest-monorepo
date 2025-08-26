@@ -11,7 +11,7 @@ import {
   StatValue,
   StatLabel,
 } from './style';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ProfileEditor } from '../ProfileEditor';
 
 const EditProfileButton = styled.button`
@@ -37,7 +37,14 @@ export function ModalUserPerfil({
   rank,
 }: ModalUserPerfilProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const { username, avatarSeed, xp } = useProgressStore();
+  const { username, avatarSeed, xp, progress } = useProgressStore();
+
+  const completedTasks = useMemo(() => {
+    if (!progress) return 0;
+    return Object.values(progress)
+      .flatMap((subject) => Object.values(subject))
+      .filter((level) => level.concluido).length;
+  }, [progress]);
 
   return (
     <>
@@ -72,8 +79,8 @@ export function ModalUserPerfil({
                 )}
 
                 <StatBox>
-                  <StatValue>12</StatValue>
-                  <StatLabel>Conquistas</StatLabel>
+                  <StatValue>{completedTasks}</StatValue>
+                  <StatLabel>Fases Concluídas</StatLabel>
                 </StatBox>
               </StatsContainer>
               <EditProfileButton onClick={() => setIsEditing(true)}>

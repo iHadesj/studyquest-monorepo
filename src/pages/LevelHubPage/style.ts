@@ -5,7 +5,7 @@ import { BackButton } from '../../style/globalStyle';
 export const HubWrapper = styled.div`
   max-width: 42rem;
   margin: 0 auto;
-  margin-top: 5rem;
+  margin-top: 2rem;
   text-align: center;
 `;
 

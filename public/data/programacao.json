@@ -1,7 +1,11 @@
 {
   "id": "programacao",
   "nome": "Programação",
-  "cor": { "bg": "#22c55e", "hover": "#16a34a", "ring": "rgba(74, 222, 128, 0.5)" },
+  "cor": {
+    "bg": "#22c55e",
+    "hover": "#16a34a",
+    "ring": "rgba(74, 222, 128, 0.5)"
+  },
   "niveis": [
     {
       "id": "iniciante",
@@ -9,37 +13,30 @@
       "xpPorAcerto": 15,
       "minAcertosParaDesbloquearProximo": 3,
       "conteudo": {
-        "titulo": "Lógica e Variáveis",
-        "resumo": "Bem-vindo ao mundo da programação! O primeiro passo é entender a lógica de programação, que é a base para 'conversar' com o computador.\n\n**Variáveis**\nImagine que variáveis são como caixas onde guardamos informações. Cada caixa tem um nome (identificador) e guarda um valor. Em JavaScript, temos três formas principais de criar essas 'caixas':\n- `let`: Cria uma variável cujo valor pode mudar. Ex: `let idade = 25;`\n- `const`: Cria uma constante, ou seja, uma variável cujo valor não pode mudar depois de definido. Ex: `const anoNascimento = 1998;`\n- `var`: Uma forma mais antiga, que hoje é menos usada. Prefira `let` e `const`.\n\n**Tipos de Dados**\nAs informações que guardamos têm tipos diferentes:\n- `String`: Para textos. Ex: `'Olá, mundo!'`\n- `Number`: Para números, sejam inteiros ou com casas decimais. Ex: `10`, `3.14`\n- `Boolean`: Para valores de verdadeiro ou falso. Ex: `true`, `false`\n\n**Operadores**\nUsamos operadores para realizar comparações. O operador `>` verifica se um número é maior que outro, e o resultado é sempre um booleano. O operador `===` é muito importante: ele verifica se dois valores são iguais E do mesmo tipo."
+        "titulo": "Lógica, Variáveis e Tipos de Dados",
+        "resumo": "Bem-vindo ao fascinante mundo da programação! O primeiro passo é entender a **lógica de programação** (a arte de criar uma sequência de passos para resolver um problema) e as ferramentas básicas para 'conversar' com o computador. Usaremos **JavaScript**, uma das linguagens mais populares e versáteis do mundo, para nossos exemplos.\n\n**1. Variáveis: As Caixas de Informação**\nImagine que variáveis são como caixas etiquetadas onde guardamos informações. Cada caixa tem um nome (identificador) e guarda um valor. Em JavaScript moderno, temos duas formas principais de criar essas 'caixas':\n- `let`: Cria uma variável cujo valor pode ser alterado depois. É ideal para valores que mudam durante a execução do programa, como uma pontuação de jogo. Ex: `let pontuacao = 100; pontuacao = 120;`\n- `const`: Cria uma constante, uma variável cujo valor **não pode** mudar depois de definido. É a melhor prática para valores que devem permanecer fixos, como a data de nascimento ou o valor de PI. Ex: `const anoNascimento = 1998;`\n- `var`: Uma forma mais antiga que você pode encontrar em códigos legados. Seu comportamento pode gerar erros inesperados (principalmente com escopo), então a regra de ouro é: **sempre prefira `let` e `const`**.\n\n**2. Tipos de Dados: A Natureza da Informação**\nAs informações que guardamos têm tipos diferentes. Os mais importantes são:\n- `String`: Para textos. Devem sempre estar entre aspas simples (`' '`) ou duplas (`\" \"`). Ex: `'Olá, mundo!'`, `'2025'`.\n- `Number`: Para números, sejam inteiros (`10`) ou com casas decimais (`3.14`).\n- `Boolean`: Representa valores lógicos de verdadeiro (`true`) ou falso (`false`). É a base para tomar decisões no código.\n- `undefined`: O valor padrão de uma variável que foi declarada, mas ainda não recebeu um valor. Ex: `let nome;` (o valor de `nome` é `undefined`).\n- `null`: Representa a ausência intencional de um valor. É diferente de `undefined`, pois é um valor que o programador define. Ex: `let usuarioLogado = null;`.\n\n**3. Operadores: Manipulando e Comparando Dados**\n- **Aritméticos**: Para cálculos matemáticos.\n  - `+` (adição), `-` (subtração), `*` (multiplicação), `/` (divisão).\n  - `%` (Módulo): Retorna o resto de uma divisão. Ex: `10 % 3` retorna `1`.\n- **Atribuição**: Para atribuir valores.\n  - `=` (atribuição simples). Ex: `let idade = 25;`.\n  - `+=`, `-=`: Adiciona ou subtrai um valor da variável. Ex: `idade += 1;` é o mesmo que `idade = idade + 1;`.\n- **Comparação**: Para comparar valores. O resultado é sempre um `Boolean` (`true` ou `false`).\n  - `>` (maior que), `<` (menor que), `>=` (maior ou igual), `<=` (menor ou igual).\n  - `===` (Estritamente Igual): **Verifica se dois valores são iguais E do mesmo tipo.** É a forma mais segura e recomendada de comparação. Ex: `10 === 10` (true), mas `'10' === 10` (false).\n  - `!==` (Estritamente Diferente): O oposto do `===`. Verifica se os valores ou os tipos são diferentes.\n  - **Evite `==` e `!=`**: Estes operadores tentam converter os tipos antes de comparar, o que pode causar resultados inesperados (Ex: `'10' == 10` retorna `true`).\n\n**4. Comentários: Anotações no Código**\nComentários são trechos de texto que o computador ignora. Servem para explicar o que o código faz.\n- `// Comentário de uma linha`\n- `/* Comentário de múltiplas linhas */`"
       },
       "exercicios": [
-        {
-          "id": 1,
-          "tipo": "multipla_escolha",
-          "pergunta": "Qual palavra-chave é usada para declarar uma variável que não pode ser reatribuída em JavaScript?",
-          "opcoes": ["let", "var", "const"],
-          "respostaCorreta": "const"
-        },
-        {
-          "id": 2,
-          "tipo": "multipla_escolha",
-          "pergunta": "Qual é o tipo de dado para um texto em programação?",
-          "opcoes": ["Number", "Boolean", "String"],
-          "respostaCorreta": "String"
-        },
-        {
-          "id": 3,
-          "tipo": "preenchimento",
-          "pergunta": "O operador '===' em JavaScript verifica tanto o valor quanto o ___.",
-          "respostaCorreta": "tipo"
-        },
-        {
-          "id": 4,
-          "tipo": "multipla_escolha",
-          "pergunta": "Qual o resultado da expressão '5 > 3'?",
-          "opcoes": ["true", "false", "undefined"],
-          "respostaCorreta": "true"
-        }
+        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Qual palavra-chave é usada para declarar uma variável que não pode ser reatribuída em JavaScript?", "opcoes": ["let", "var", "const"], "respostaCorreta": "const" },
+        { "id": 2, "tipo": "multipla_escolha", "pergunta": "Qual é o tipo de dado para um texto em programação?", "opcoes": ["Number", "Boolean", "String"], "respostaCorreta": "String" },
+        { "id": 3, "tipo": "preenchimento", "pergunta": "O operador '===' em JavaScript verifica tanto o valor quanto o ___.", "respostaCorreta": "tipo" },
+        { "id": 4, "tipo": "multipla_escolha", "pergunta": "Qual o resultado da expressão '5 > 3'?", "opcoes": ["true", "false", "undefined"], "respostaCorreta": "true" },
+        { "id": 5, "tipo": "preenchimento", "pergunta": "Qual o valor da variável 'x' após a execução do código `let x;`?", "respostaCorreta": "undefined" },
+        { "id": 6, "tipo": "multipla_escolha", "pergunta": "Qual o resultado da expressão `10 * 2 / 5`?", "opcoes": ["4", "10", "2"], "respostaCorreta": "4" },
+        { "id": 7, "tipo": "multipla_escolha", "pergunta": "Qual a principal razão para se preferir `===` em vez de `==`?", "opcoes": ["É mais rápido", "Ele compara o valor e o tipo, evitando conversões inesperadas", "Ele só pode ser usado com números"], "respostaCorreta": "Ele compara o valor e o tipo, evitando conversões inesperadas" },
+        { "id": 8, "tipo": "preenchimento", "pergunta": "Qual operador é usado para a divisão em JavaScript?", "respostaCorreta": "/" },
+        { "id": 9, "tipo": "multipla_escolha", "pergunta": "Em `const PI = 3.14;`, 'PI' é um(a)...?", "opcoes": ["Variável", "Constante", "Função"], "respostaCorreta": "Constante" },
+        { "id": 10, "tipo": "preenchimento", "pergunta": "Qual o resultado de 'Olá' + ' Mundo'?", "respostaCorreta": "Olá Mundo" },
+        { "id": 11, "tipo": "multipla_escolha", "pergunta": "Qual o valor da expressão `'3' + 2` em JavaScript?", "opcoes": ["5", "32", "Erro"], "respostaCorreta": "32" },
+        { "id": 12, "tipo": "preenchimento", "pergunta": "A palavra-chave `var` cria variáveis com escopo de ___.", "respostaCorreta": "função" },
+        { "id": 13, "tipo": "multipla_escolha", "pergunta": "Em que tipo de dado a expressão `10 < 5` resulta?", "opcoes": ["Number", "Boolean", "String"], "respostaCorreta": "Boolean" },
+        { "id": 14, "tipo": "preenchimento", "pergunta": "Qual o resultado de `10 % 3` (operador de resto da divisão)?", "respostaCorreta": "1" },
+        { "id": 15, "tipo": "multipla_escolha", "pergunta": "Qual é a maneira correta de escrever um comentário de uma única linha?", "opcoes": ["", "/* comentário */", "// comentário"], "respostaCorreta": "// comentário" },
+        { "id": 16, "tipo": "preenchimento", "pergunta": "Qual operador de atribuição adiciona um valor a uma variável? Ex: `x += 5`.", "respostaCorreta": "+=" },
+        { "id": 17, "tipo": "multipla_escolha", "pergunta": "Se `let x = 10;`, o que acontece se você tentar fazer `x = 'dez';`?", "opcoes": ["Ocorre um erro", "O valor de `x` muda para 'dez'", "O tipo de `x` é convertido para 'String'"], "respostaCorreta": "O valor de `x` muda para 'dez'" },
+        { "id": 18, "tipo": "preenchimento", "pergunta": "Qual tipo de dado é usado para representar um valor ausente, intencionalmente, em JavaScript?", "respostaCorreta": "null" },
+        { "id": 19, "tipo": "multipla_escolha", "pergunta": "O que a instrução `typeof 42` retorna?", "opcoes": ["'number'", "'string'", "'boolean'"], "respostaCorreta": "'number'" },
+        { "id": 20, "tipo": "multipla_escolha", "pergunta": "Qual das seguintes variáveis tem um escopo de bloco (block scope)?", "opcoes": ["`var`", "`const`", "`global`"], "respostaCorreta": "`const`" }
       ]
     },
     {
@@ -48,30 +45,30 @@
       "xpPorAcerto": 25,
       "minAcertosParaDesbloquearProximo": 2,
       "conteudo": {
-        "titulo": "Estruturas Condicionais e Loops",
-        "resumo": "Agora que sabemos guardar dados, vamos aprender a tomar decisões e repetir tarefas.\n\n**Estruturas Condicionais (if/else)**\nPermitem que o seu código execute blocos diferentes dependendo de uma condição ser verdadeira ou falsa.\n- `if`: Executa um bloco de código SE uma condição for verdadeira. Ex: `if (idade >= 18) { console.log('É maior de idade'); }`\n- `else`: Executa um bloco de código alternativo SE a condição do `if` for falsa.\n\n**Laços de Repetição (Loops)**\nSão usados para executar o mesmo bloco de código várias vezes.\n- `for`: É o loop mais comum. Ideal para quando você sabe quantas vezes quer repetir uma tarefa, como percorrer todos os itens de uma lista. Ex: `for (let i = 0; i < 5; i++) { console.log(i); }` (imprime de 0 a 4).\n- `while`: Repete um bloco de código ENQUANTO uma condição for verdadeira. Cuidado para não criar um loop infinito!"
+        "titulo": "Estruturas Condicionais e Laços de Repetição",
+        "resumo": "Agora que sabemos guardar e manipular dados, vamos aprender a controlar o fluxo do nosso programa: tomar decisões e repetir tarefas. Isso é o que realmente dá poder e inteligência ao seu código.\n\n**1. Estruturas Condicionais: Tomando Decisões**\nPermitem que o código execute blocos diferentes dependendo de uma condição ser `true` ou `false`.\n- `if`: Executa um bloco de código SE uma condição for verdadeira. Ex: `if (idade >= 18) { console.log('É maior de idade.'); }`\n- `else`: Executa um bloco alternativo SE a condição do `if` for falsa. Ex: `if (idade >= 18) { ... } else { console.log('É menor de idade.'); }`\n- `else if`: Permite testar múltiplas condições em sequência. O programa executa o bloco do primeiro `if` ou `else if` que encontrar como verdadeiro e ignora os demais. Ex: `if (nota >= 7) { console.log('Aprovado'); } else if (nota >= 5) { console.log('Recuperação'); } else { console.log('Reprovado'); }`\n- **Operador Ternário**: Uma forma compacta de escrever um `if/else`. A sintaxe é: `condição ? valor_se_true : valor_se_false`. Ex: `let status = idade >= 18 ? 'Adulto' : 'Menor de idade';`\n\n**2. Operadores Lógicos: Combinando Condições**\n- `&&` (E lógico): Retorna `true` somente se **TODAS** as condições forem verdadeiras. Ex: `if (usuarioAtivo && temPermissao) { ... }` (Só executa se o usuário estiver ativo E tiver permissão).\n- `||` (OU lógico): Retorna `true` se **PELO MENOS UMA** das condições for verdadeira. Ex: `if (ehFimDeSemana || ehFeriado) { ... }` (Executa se for fim de semana OU se for feriado).\n- `!` (NÃO lógico): Inverte o valor de uma condição. `true` vira `false` e `false` vira `true`. Ex: `if (!estaLogado) { console.log('Por favor, faça o login.'); }`.\n\n**3. Laços de Repetição (Loops): Automatizando Tarefas**\nSão usados para executar o mesmo bloco de código várias vezes, evitando o princípio **DRY (Don't Repeat Yourself - Não se Repita)**.\n- `for`: O loop mais comum, ideal para quando você sabe o número de repetições. Sua estrutura é `for (inicialização; condição; incremento)`.\n  - `inicialização`: Onde o contador começa (ex: `let i = 0`).\n  - `condição`: O loop continua enquanto for `true` (ex: `i < 5`).\n  - `incremento`: O que acontece ao final de cada repetição (ex: `i++`).\n  - Exemplo: `for (let i = 0; i < 3; i++) { console.log('Executando vez ' + (i+1)); }`\n- `while`: Repete um bloco de código **ENQUANTO** uma condição for verdadeira. É útil quando não sabemos quantas repetições serão necessárias. **Cuidado:** Se a condição nunca se tornar falsa, você criará um **loop infinito** que travará o programa!\n  - Exemplo: `let contador = 5; while (contador > 0) { console.log(contador); contador--; }`\n- **Controle de Loops**:\n  - `break`: Interrompe e sai do loop imediatamente.\n  - `continue`: Pula a iteração atual e vai para a próxima."
       },
       "exercicios": [
-        {
-          "id": 1,
-          "tipo": "preenchimento",
-          "pergunta": "A estrutura condicional que executa um bloco de código se uma condição for verdadeira é o ___.",
-          "respostaCorreta": "if"
-        },
-        {
-          "id": 2,
-          "tipo": "multipla_escolha",
-          "pergunta": "Qual laço de repetição é mais adequado para percorrer todos os itens de uma lista (array)?",
-          "opcoes": ["if", "while", "for"],
-          "respostaCorreta": "for"
-        },
-        {
-          "id": 3,
-          "tipo": "multipla_escolha",
-          "pergunta": "O que o comando 'else' faz em uma estrutura 'if/else'?",
-          "opcoes": ["Executa se a condição do 'if' for verdadeira", "Executa se a condição do 'if' for falsa", "Repete o código"],
-          "respostaCorreta": "Executa se a condição do 'if' for falsa"
-        }
+        { "id": 1, "tipo": "preenchimento", "pergunta": "A estrutura condicional que executa um bloco de código se uma condição for verdadeira é o ___.", "respostaCorreta": "if" },
+        { "id": 2, "tipo": "multipla_escolha", "pergunta": "Qual laço de repetição é mais adequado para percorrer todos os itens de uma lista (array)?", "opcoes": ["if", "while", "for"], "respostaCorreta": "for" },
+        { "id": 3, "tipo": "multipla_escolha", "pergunta": "O que o comando 'else' faz em uma estrutura 'if/else'?", "opcoes": ["Executa se a condição do 'if' for verdadeira", "Executa se a condição do 'if' for falsa", "Repete o código"], "respostaCorreta": "Executa se a condição do 'if' for falsa" },
+        { "id": 4, "tipo": "multipla_escolha", "pergunta": "Qual operador lógico retorna 'true' apenas se todas as condições forem verdadeiras?", "opcoes": ["||", "!", "&&"], "respostaCorreta": "&&" },
+        { "id": 5, "tipo": "preenchimento", "pergunta": "Para testar várias condições em sequência, você pode usar a estrutura 'if' seguida de '___ if'.", "respostaCorreta": "else" },
+        { "id": 6, "tipo": "multipla_escolha", "pergunta": "O que o loop `while(true)` causa?", "opcoes": ["Um erro de sintaxe", "Um loop infinito", "Ele executa apenas uma vez"], "respostaCorreta": "Um loop infinito" },
+        { "id": 7, "tipo": "preenchimento", "pergunta": "Qual é a saída do código `let a = 5; if (a > 10) { console.log('A'); } else { console.log('B'); }`?", "respostaCorreta": "B" },
+        { "id": 8, "tipo": "multipla_escolha", "pergunta": "O que o operador `||` faz?", "opcoes": ["Retorna true se todas as condições forem verdadeiras", "Retorna true se pelo menos uma condição for verdadeira", "Inverte o valor lógico"], "respostaCorreta": "Retorna true se pelo menos uma condição for verdadeira" },
+        { "id": 9, "tipo": "preenchimento", "pergunta": "O operador `!` é usado para a negação, ou seja, para inverter um valor ___.", "respostaCorreta": "booleano" },
+        { "id": 10, "tipo": "multipla_escolha", "pergunta": "Em um loop `for (let i = 0; i < 3; i++)`, quantas vezes o código será executado?", "opcoes": ["2", "3", "4"], "respostaCorreta": "3" },
+        { "id": 11, "tipo": "multipla_escolha", "pergunta": "Qual a saída do código `if (10 > 5 && 5 > 2) { console.log('OK'); }`?", "opcoes": ["OK", "Nada", "true"], "respostaCorreta": "OK" },
+        { "id": 12, "tipo": "preenchimento", "pergunta": "A variável de um loop `for` que geralmente conta as repetições é chamada de ___.", "respostaCorreta": "contador" },
+        { "id": 13, "tipo": "multipla_escolha", "pergunta": "O que acontece se a condição de um loop `while` nunca se tornar falsa?", "opcoes": ["O código para de funcionar", "O loop é executado apenas uma vez", "Ocorre um loop infinito"], "respostaCorreta": "Ocorre um loop infinito" },
+        { "id": 14, "tipo": "preenchimento", "pergunta": "Qual palavra-chave é usada para sair de um loop imediatamente?", "respostaCorreta": "break" },
+        { "id": 15, "tipo": "multipla_escolha", "pergunta": "Qual a saída do código `let a = 1; while (a < 3) { a++; } console.log(a);`?", "opcoes": ["2", "3", "1"], "respostaCorreta": "3" },
+        { "id": 16, "tipo": "multipla_escolha", "pergunta": "Para que serve a estrutura `switch`?", "opcoes": ["Repetir um bloco de código", "Testar uma variável contra múltiplos valores", "Executar uma função"], "respostaCorreta": "Testar uma variável contra múltiplos valores" },
+        { "id": 17, "tipo": "preenchimento", "pergunta": "O operador `! ` inverte o valor de `true` para ___.", "respostaCorreta": "false" },
+        { "id": 18, "tipo": "multipla_escolha", "pergunta": "Qual o resultado de `if(false || true) { console.log('Verdade'); }`?", "opcoes": ["Verdade", "false", "undefined"], "respostaCorreta": "Verdade" },
+        { "id": 19, "tipo": "preenchimento", "pergunta": "A parte do loop `for` que atualiza a variável do contador é a expressão de ___.", "respostaCorreta": "incremento" },
+        { "id": 20, "tipo": "multipla_escolha", "pergunta": "Em um loop, qual a diferença entre `break` e `continue`?", "opcoes": ["`break` sai do loop, `continue` pula a iteração atual", "`break` continua o loop, `continue` sai do loop", "Não há diferença"], "respostaCorreta": "`break` sai do loop, `continue` pula a iteração atual" }
       ]
     },
     {
@@ -80,37 +77,30 @@
       "xpPorAcerto": 40,
       "minAcertosParaDesbloquearProximo": null,
       "conteudo": {
-        "titulo": "Funções e Arrays",
-        "resumo": "Neste nível, vamos organizar nosso código em blocos reutilizáveis e aprender a trabalhar com listas de dados.\n\n**Funções**\nSão blocos de código que realizam uma tarefa específica e podem ser chamados (executados) sempre que precisarmos. Elas ajudam a não repetir código.\n- `function`: Palavra-chave para criar uma função. Ex: `function somar(a, b) { return a + b; }`\n- `return`: Palavra-chave que encerra a função e pode enviar um valor de volta para quem a chamou.\n\n**Arrays (Listas)**\nArrays são um tipo especial de variável que pode guardar múltiplos valores em uma lista ordenada.\n- `[]`: Usamos colchetes para criar um array. Ex: `const frutas = ['Maçã', 'Banana', 'Laranja'];`\n- **Índices**: Acessamos os itens de um array por sua posição (índice), que sempre começa em 0. Para pegar o primeiro item ('Maçã'), usamos `frutas[0]`.\n- **Métodos**: Arrays têm métodos úteis, como `.push()`, que adiciona um novo item ao final da lista."
+        "titulo": "Funções, Arrays e Objetos",
+        "resumo": "Neste nível, vamos organizar nosso código em blocos reutilizáveis e aprender a trabalhar com as duas estruturas de dados mais importantes do JavaScript: listas (Arrays) e mapas de dados (Objetos).\n\n**1. Funções: Blocos de Código Reutilizáveis**\nFunções são como 'mini-programas' que realizam uma tarefa específica. Elas evitam a repetição de código e deixam tudo mais organizado.\n- **Declaração**: `function minhaFuncao(parametro1, parametro2) { ... }`. Os `parâmetros` são as informações que a função precisa para trabalhar.\n- **Chamada**: Para executar a função, você a 'chama' pelo nome, passando os `argumentos` (os valores reais). Ex: `minhaFuncao(10, 20);`.\n- `return`: A palavra-chave `return` encerra a função e pode enviar um valor de volta para quem a chamou. Uma função sem `return` devolve `undefined`.\n- **Arrow Functions**: Uma sintaxe mais curta e moderna. Ex: `const somar = (a, b) => a + b;`. É muito usada em JavaScript moderno.\n\n**2. Arrays: Listas Ordenadas de Dados**\nArrays são um tipo especial de variável que pode guardar múltiplos valores em uma lista ordenada.\n- **Criação**: `const frutas = ['Maçã', 'Banana', 'Laranja'];`\n- **Acesso por Índice**: Acessamos os itens por sua posição (índice), que **sempre começa em 0**. `frutas[0]` retorna 'Maçã', `frutas[1]` retorna 'Banana'.\n- **Propriedades e Métodos Úteis**:\n  - `.length`: Retorna o número de itens. `frutas.length` retorna `3`.\n  - `.push(item)`: Adiciona um item ao **final** do array.\n  - `.pop()`: Remove o item do **final** do array.\n  - `.shift()`: Remove o item do **início** do array.\n  - `.unshift(item)`: Adiciona um item ao **início** do array.\n  - `.includes(item)`: Verifica se um item existe no array (retorna `true` ou `false`).\n- **Iteração Moderna**: Em vez de loops `for`, é comum usar métodos específicos:\n  - `.forEach(item => { ... })`: Executa uma função para cada item do array.\n  - `.map(item => { ... })`: **Cria um novo array** com os resultados da função aplicada a cada item. Ótimo para transformar dados. Ex: `const numeros = [1, 2, 3]; const dobrados = numeros.map(n => n * 2); // dobrados será [2, 4, 6]`\n  - `.filter(item => { ... })`: **Cria um novo array** apenas com os itens que passaram em uma condição (a função deve retornar `true` ou `false`).\n\n**3. Objetos: Mapas de Dados Não Ordenados**\nEnquanto arrays são listas com índice numérico, objetos são coleções de pares `chave: valor`. São perfeitos para representar entidades com várias características, como um usuário ou um produto.\n- **Criação**: `const usuario = { nome: 'João', idade: 30, isAdmin: true };`\n- **Acesso a Propriedades**:\n  - **Notação de Ponto**: `usuario.nome` (retorna 'João'). É a mais comum.\n  - **Notação de Colchetes**: `usuario['idade']` (retorna 30). É útil quando o nome da chave tem espaços ou é uma variável.\n- **Manipulação**: Você pode adicionar, modificar ou remover propriedades a qualquer momento.\n  - `usuario.cidade = 'São Paulo';` (Adiciona uma nova propriedade)\n  - `usuario.idade = 31;` (Atualiza uma propriedade existente)\n  - `delete usuario.isAdmin;` (Remove uma propriedade)\n- **Métodos**: Uma propriedade de um objeto também pode ser uma função. A isso chamamos de 'método'. Ex: `const carro = { marca: 'Ford', ligar: () => { console.log('O carro ligou!'); } }; carro.ligar();`"
       },
       "exercicios": [
-        {
-          "id": 1,
-          "tipo": "multipla_escolha",
-          "pergunta": "Como você acessa o primeiro elemento de um array chamado 'nomes'?",
-          "opcoes": ["nomes[1]", "nomes.first()", "nomes[0]"],
-          "respostaCorreta": "nomes[0]"
-        },
-        {
-          "id": 2,
-          "tipo": "preenchimento",
-          "pergunta": "A palavra-chave para criar um bloco de código reutilizável em JavaScript é ___.",
-          "respostaCorreta": "function"
-        },
-        {
-          "id": 3,
-          "tipo": "multipla_escolha",
-          "pergunta": "Qual método adiciona um novo item ao final de um array?",
-          "opcoes": ["array.add()", "array.push()", "array.append()"],
-          "respostaCorreta": "array.push()"
-        },
-        {
-          "id": 4,
-          "tipo": "multipla_escolha",
-          "pergunta": "O que uma função 'return' faz?",
-          "opcoes": ["Imprime um valor na tela", "Encerra a função e envia um valor de volta", "Cria uma nova variável"],
-          "respostaCorreta": "Encerra a função e envia um valor de volta"
-        }
+        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Como você acessa o primeiro elemento de um array chamado 'nomes'?", "opcoes": ["nomes[1]", "nomes.first()", "nomes[0]"], "respostaCorreta": "nomes[0]" },
+        { "id": 2, "tipo": "preenchimento", "pergunta": "A palavra-chave para criar um bloco de código reutilizável em JavaScript é ___.", "respostaCorreta": "function" },
+        { "id": 3, "tipo": "multipla_escolha", "pergunta": "Qual método adiciona um novo item ao final de um array?", "opcoes": ["array.add()", "array.push()", "array.append()"], "respostaCorreta": "array.push()" },
+        { "id": 4, "tipo": "multipla_escolha", "pergunta": "O que uma função 'return' faz?", "opcoes": ["Imprime um valor na tela", "Encerra a função e envia um valor de volta", "Cria uma nova variável"], "respostaCorreta": "Encerra a função e envia um valor de volta" },
+        { "id": 5, "tipo": "preenchimento", "pergunta": "Qual propriedade de um array retorna o número de elementos?", "respostaCorreta": "length" },
+        { "id": 6, "tipo": "multipla_escolha", "pergunta": "Qual é a sintaxe para uma 'arrow function' que recebe um parâmetro 'x' e retorna 'x * 2'?", "opcoes": ["function(x) => x*2", "const func = (x) => x*2", "func(x) { return x*2; }"], "respostaCorreta": "const func = (x) => x*2" },
+        { "id": 7, "tipo": "preenchimento", "pergunta": "Objetos guardam dados em pares de 'chave' e ___.", "respostaCorreta": "valor" },
+        { "id": 8, "tipo": "multipla_escolha", "pergunta": "Qual método remove o último item de um array?", "opcoes": ["array.shift()", "array.remove()", "array.pop()"], "respostaCorreta": "array.pop()" },
+        { "id": 9, "tipo": "multipla_escolha", "pergunta": "Qual a diferença entre um array e um objeto?", "opcoes": ["Arrays guardam listas ordenadas, objetos guardam pares de chave-valor", "Arrays só podem guardar números, objetos só podem guardar textos", "Arrays são mais rápidos que objetos"], "respostaCorreta": "Arrays guardam listas ordenadas, objetos guardam pares de chave-valor" },
+        { "id": 10, "tipo": "preenchimento", "pergunta": "Para acessar a propriedade 'idade' de um objeto 'usuario', você usaria a sintaxe 'usuario.____'.", "respostaCorreta": "idade" },
+        { "id": 11, "tipo": "multipla_escolha", "pergunta": "O que o método `.length` de um array retorna?", "opcoes": ["A capacidade máxima do array", "O número de elementos no array", "O tamanho em bytes do array"], "respostaCorreta": "O número de elementos no array" },
+        { "id": 12, "tipo": "preenchimento", "pergunta": "O que a instrução `return` faz em uma função?", "respostaCorreta": "Encerra a função e retorna um valor" },
+        { "id": 13, "tipo": "multipla_escolha", "pergunta": "Qual é a sintaxe correta para criar um array vazio?", "opcoes": ["`const arr = {};`", "`const arr = [];`", "`const arr = array();`"], "respostaCorreta": "`const arr = [];`" },
+        { "id": 14, "tipo": "preenchimento", "pergunta": "Para acessar o valor da chave 'cidade' no objeto `const dados = { cidade: 'São Paulo' };`, você usaria `dados.____`.", "respostaCorreta": "cidade" },
+        { "id": 15, "tipo": "multipla_escolha", "pergunta": "O que o método `.pop()` faz com um array?", "opcoes": ["Adiciona um item ao final", "Remove o primeiro item", "Remove o último item"], "respostaCorreta": "Remove o último item" },
+        { "id": 16, "tipo": "preenchimento", "pergunta": "Em `const funcao = () => { ... }`, o `=>` é usado para criar uma ___.", "respostaCorreta": "arrow function" },
+        { "id": 17, "tipo": "multipla_escolha", "pergunta": "Se `const nomes = ['Ana', 'Bia', 'Carlos'];`, o que `nomes.length` retorna?", "opcoes": ["2", "3", "4"], "respostaCorreta": "3" },
+        { "id": 18, "tipo": "multipla_escolha", "pergunta": "Qual é a saída do código `const a = [10, 20]; a.push(30); console.log(a[2]);`?", "opcoes": ["10", "30", "undefined"], "respostaCorreta": "30" },
+        { "id": 19, "tipo": "preenchimento", "pergunta": "Arrays são um tipo especial de objeto que armazena dados em uma lista ___.", "respostaCorreta": "ordenada" },
+        { "id": 20, "tipo": "multipla_escolha", "pergunta": "O que a expressão `usuario['nome']` retorna?", "opcoes": ["O valor da propriedade 'nome'", "O nome da propriedade", "Um erro"], "respostaCorreta": "O valor da propriedade 'nome'" }
       ]
     }
   ]
