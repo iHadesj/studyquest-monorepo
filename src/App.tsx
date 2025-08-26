@@ -92,7 +92,6 @@ const HomeButton = styled.button`
   transition: all 0.2s ease-in-out;
 
   &:hover {
-    transform: translate(-50%, -50%) scale(1.1);
     background-color: #4f5bd5;
   }
 
