@@ -274,6 +274,10 @@ export const ModalOverlay = styled.div`
   justify-content: center;
   z-index: 50;
   animation: ${fadeIn} 0.3s ease-in-out;
+
+  @media (max-width: 480px) {
+    align-items: flex-start;
+  }
 `;
 
 export const ModalContent = styled.div`
