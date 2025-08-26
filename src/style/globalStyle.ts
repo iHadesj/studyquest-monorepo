@@ -286,6 +286,15 @@ export const ModalContent = styled.div`
   max-width: 28rem;
   width: 90%;
   animation: ${scaleIn} 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  @media (max-width: 480px) {
+    padding: 2rem;
+    overflow-y: auto;
+    max-width: 17rem;
+    margin-top: 1rem;
+    max-height: 489px;
+    width: 90%;
+  }
 `;
 
 export const XPDisplayModal = styled.div`
