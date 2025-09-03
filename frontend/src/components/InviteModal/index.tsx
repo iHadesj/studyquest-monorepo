@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import * as Modal from '../Modal';
+import { socket } from '../../services/socket';
 
 const InviteBox = styled.div`
   display: flex;
