@@ -25,6 +25,7 @@ import { House, Trophy } from 'phosphor-react';
 import { AuthPage } from './pages/AuthPage';
 import { RankingPage } from './pages/Ranking';
 import { ModalUserPerfil } from './components/ModalUserPerfil';
+import { BrainStorm } from './pages/BrainStorm';
 
 // --- ESTILOS GLOBAIS ---
 const GlobalStyle = createGlobalStyle`
@@ -148,6 +149,7 @@ export default function App() {
   const [selectedSubject, setSelectedSubject] = useState<Materia | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<Nivel | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [allSubjectsData, setAllSubjectsData] = useState<Materia[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -228,6 +230,29 @@ export default function App() {
     }
   };
 
+  const handleOnStartBrainstorm = async () => {
+    if (allSubjectsData.length > 0) {
+      setScreen('brainstorm');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const subjectPromises = subjectsList.map((subjectInfo) =>
+        fetch(`/data/${subjectInfo.id}.json`).then((res) => res.json())
+      );
+
+      const allSubjects = await Promise.all(subjectPromises);
+
+      setAllSubjectsData(allSubjects as Materia[]);
+      setScreen('brainstorm');
+    } catch (error) {
+      console.error('Falha ao carregar dados para o modo Brainstorm:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSelectLevel = (level: Nivel) => {
     setSelectedLevel(level);
     setScreen('hub');
@@ -288,6 +313,10 @@ export default function App() {
       );
     }
 
+    if (screen === 'brainstorm') {
+      return <BrainStorm subjects={allSubjectsData} onBack={backToHome} />;
+    }
+
     if (screen === 'exercise' && selectedSubject && selectedLevel) {
       return (
         <ExercisePage
@@ -307,7 +336,11 @@ export default function App() {
       );
     }
     return (
-      <SubjectSelector subjects={subjectsList} onSelect={handleSelectSubject} />
+      <SubjectSelector
+        onStartBrainstorm={handleOnStartBrainstorm}
+        subjects={subjectsList}
+        onSelect={handleSelectSubject}
+      />
     );
   };
 

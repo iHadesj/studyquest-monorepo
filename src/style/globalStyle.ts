@@ -210,6 +210,7 @@ export const OptionLabel = styled.label`
   padding: 0.75rem;
   background-color: #36393f;
   border-radius: 4px;
+  font-size: 0.8rem;
   border: 1px solid #40444b;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
@@ -313,10 +314,13 @@ export const XPDisplayModal = styled.div`
   gap: 0.5rem;
 `;
 
-export const ContinueButton = styled.button`
+export const ContinueButton = styled.button<{
+  variant?: 'primary' | 'secondary';
+}>`
   margin-top: 2rem;
   width: 100%;
-  background-color: #5c5c5c;
+  background-color: ${({ variant }) =>
+    variant === 'primary' ? '#43b581' : '#5c5c5c'};
   color: #ffffff;
   font-family: 'Fira Code', monospace;
   font-weight: bold;

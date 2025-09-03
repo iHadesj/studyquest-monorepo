@@ -70,6 +70,72 @@ const SubjectCard = styled.button<{ color: Materia['cor'] }>`
   }
 `;
 
+// --- NOVOS COMPONENTES ESTILIZADOS PARA O BRAINSTORM ---
+const BrainstormSection = styled.section`
+  margin-top: 5rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid #40444b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+`;
+
+const BrainstormButton = styled.button`
+  background: linear-gradient(45deg, #7289da, #43b581);
+  color: white;
+  font-size: 1.3rem;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+
+  &:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+  }
+`;
+
+const BrainstormInfoCard = styled.div`
+  background-color: #202225;
+  padding: 1.5rem;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 100%;
+  text-align: left;
+  border: 1px solid #40444b;
+
+  h4 {
+    margin-top: 0;
+    font-size: 1.25rem;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  p {
+    color: #b9bbbe;
+    line-height: 1.6;
+  }
+
+  ul {
+    padding-left: 20px;
+    margin-bottom: 0;
+    color: #b9bbbe;
+    line-height: 1.6;
+  }
+
+  li::marker {
+    color: #7289da;
+  }
+`;
+
 // --- LÓGICA DE ÍCONES ---
 const iconMap: { [key: string]: React.ReactNode } = {
   Divide: <Divide size={48} color="white" weight="light" />,
@@ -95,9 +161,11 @@ const getIcon = (iconName: string) => {
 export const SubjectSelector = ({
   subjects,
   onSelect,
+  onStartBrainstorm,
 }: {
   subjects: readonly SubjectInfo[];
   onSelect: (subject: SubjectInfo) => void;
+  onStartBrainstorm: () => void;
 }) => {
   const groupedSubjects = subjects.reduce((acc, subject) => {
     const category = subject.categoria || 'Outros';
@@ -131,6 +199,39 @@ export const SubjectSelector = ({
           </SubjectGrid>
         </section>
       ))}
+
+      {/* --- 3. NOVA SEÇÃO ADICIONADA ABAIXO --- */}
+      <BrainstormSection>
+        <BrainstormButton onClick={onStartBrainstorm}>
+          <Brain size={32} weight="light" />
+          Brainstorm
+        </BrainstormButton>
+        <BrainstormInfoCard>
+          <h4>
+            <Flask size={24} weight="light" /> O que é o Modo Brainstorm?
+          </h4>
+          <p>
+            Um desafio de ritmo acelerado para testar seus conhecimentos gerais!
+            Responda o máximo de perguntas que puder de todas as matérias antes
+            que o tempo acabe.
+          </p>
+          <ul>
+            <li>
+              Você tem <strong>60 segundos</strong> no total.
+            </li>
+            <li>
+              Cada pergunta tem um limite de <strong>10 segundos</strong>.
+            </li>
+            <li>
+              Você começa com <strong>3 vidas</strong>.
+            </li>
+            <li>
+              Respostas rápidas e corretas rendem <strong>mais XP bônus</strong>
+              !
+            </li>
+          </ul>
+        </BrainstormInfoCard>
+      </BrainstormSection>
     </div>
   );
 };
