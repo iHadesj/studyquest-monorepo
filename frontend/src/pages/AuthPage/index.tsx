@@ -31,6 +31,9 @@ interface UserProfile {
   xp: number;
   progress: object;
 }
+const getRandomTag = (min = 1000, max = 9999) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
 
 const authSchema = z.object({
   email: z.string().email({ message: 'Isso aí não parece um e-mail válido.' }),
@@ -93,6 +96,10 @@ export const AuthPage = () => {
         );
         const user = userCredential.user;
 
+        const tempUsername = user.email!.split('@')[0]; // Pega um username temporário do email
+        const userTag = getRandomTag();
+        const fullTag = `${tempUsername}#${userTag}`;
+
         await setDoc(doc(db, 'users', user.uid), {
           uid: user.uid,
           email: user.email,
@@ -101,6 +108,8 @@ export const AuthPage = () => {
           avatarSeed: null,
           xp: 0,
           progress: {},
+          userTag: userTag,
+          fullTag: fullTag,
         });
 
         setIsLogin(true);

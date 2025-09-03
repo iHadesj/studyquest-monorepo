@@ -26,7 +26,8 @@ import { AuthPage } from './pages/AuthPage';
 import { RankingPage } from './pages/Ranking';
 import { ModalUserPerfil } from './components/ModalUserPerfil';
 import { BrainStorm } from './pages/BrainStorm';
-
+import { socket } from './services/socket';
+import { InviteModal } from './components/InviteModal';
 // --- ESTILOS GLOBAIS ---
 const GlobalStyle = createGlobalStyle`
   body {
@@ -150,8 +151,53 @@ export default function App() {
   const [selectedLevel, setSelectedLevel] = useState<Nivel | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [allSubjectsData, setAllSubjectsData] = useState<Materia[]>([]);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
+
+  const { fullTag } = useProgressStore();
+
+  useEffect(() => {
+    // --- 2. LIGA A CONEXÃO QUANDO O APP CARREGAR ---
+    socket.connect();
+
+    // Isso aqui é uma boa prática: quando o componente "morrer"
+    // (o usuário fechar a aba, por exemplo), a gente desliga a conexão.
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    // Listener pra quando a conexão for estabelecida
+    socket.on('connect', () => {
+      console.log('Conectado ao servidor! ID:', socket.id);
+      // Se já temos a tag do usuário, vamos nos registrar
+      if (fullTag) {
+        socket.emit('register', fullTag);
+      }
+    });
+
+    socket.connect();
+
+    // Listener para o convite chegando (por enquanto, só um console.log)
+    socket.on('incoming_invite', ({ from }) => {
+      alert(`Você recebeu um convite de ${from} para jogar!`);
+      // No futuro, aqui a gente mostra um modal de aceite/recusa
+    });
+
+    // Listener para erros de convite
+    socket.on('invite_error', ({ message }) => {
+      alert(`Erro no convite: ${message}`);
+    });
+
+    return () => {
+      socket.off('connect');
+      socket.off('incoming_invite');
+      socket.off('invite_error');
+      socket.disconnect();
+    };
+  }, [fullTag]);
 
   console.log(isLoading);
 
@@ -340,6 +386,7 @@ export default function App() {
         onStartBrainstorm={handleOnStartBrainstorm}
         subjects={subjectsList}
         onSelect={handleSelectSubject}
+        onStartMultiplayer={() => setIsInviteModalOpen(true)}
       />
     );
   };
@@ -369,6 +416,10 @@ export default function App() {
         <ModalUserPerfil
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
+        />
+        <InviteModal
+          isOpen={isInviteModalOpen}
+          onClose={() => setIsInviteModalOpen(false)}
         />
       </Footer>
     </>

@@ -25,6 +25,15 @@ const EditProfileButton = styled.button`
   font-family: 'Fira Code', monospace;
 `;
 
+const UserTag = styled.p`
+  color: #b9bbbe;
+  font-size: 0.9rem;
+  margin: -0.5rem 0 0 0;
+  background-color: #202225;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+`;
+
 interface ModalUserPerfilProps {
   isOpen: boolean;
   onClose: () => void;
@@ -37,7 +46,7 @@ export function ModalUserPerfil({
   rank,
 }: ModalUserPerfilProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const { username, avatarSeed, xp, progress } = useProgressStore();
+  const { username, avatarSeed, xp, progress, fullTag } = useProgressStore();
 
   const completedTasks = useMemo(() => {
     if (!progress) return 0;
@@ -63,6 +72,7 @@ export function ModalUserPerfil({
               />
               <UserInfo>
                 <Username>{username}</Username>
+                {fullTag && <UserTag>{fullTag}</UserTag>}
               </UserInfo>
 
               <StatsContainer>

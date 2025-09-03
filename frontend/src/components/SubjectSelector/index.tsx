@@ -13,6 +13,7 @@ import {
   Book,
   Leaf,
   TestTube,
+  Sword,
 } from 'phosphor-react';
 import { Subtitle, Title } from '../../style/globalStyle';
 import type { Materia } from '../../interfaces';
@@ -101,6 +102,10 @@ const BrainstormButton = styled.button`
   }
 `;
 
+const MultiplayerButton = styled(BrainstormButton)`
+  background: linear-gradient(45deg, #f04747, #faa61a);
+`;
+
 const BrainstormInfoCard = styled.div`
   background-color: #202225;
   padding: 1.5rem;
@@ -162,10 +167,12 @@ export const SubjectSelector = ({
   subjects,
   onSelect,
   onStartBrainstorm,
+  onStartMultiplayer,
 }: {
   subjects: readonly SubjectInfo[];
   onSelect: (subject: SubjectInfo) => void;
   onStartBrainstorm: () => void;
+  onStartMultiplayer: () => void;
 }) => {
   const groupedSubjects = subjects.reduce((acc, subject) => {
     const category = subject.categoria || 'Outros';
@@ -206,6 +213,10 @@ export const SubjectSelector = ({
           <Brain size={32} weight="light" />
           Brainstorm
         </BrainstormButton>
+        <MultiplayerButton onClick={onStartMultiplayer}>
+          <Sword size={32} weight="light" />
+          Multiplayer
+        </MultiplayerButton>
         <BrainstormInfoCard>
           <h4>
             <Flask size={24} weight="light" /> O que é o Modo Brainstorm?

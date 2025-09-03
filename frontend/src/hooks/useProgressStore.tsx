@@ -6,6 +6,8 @@ export type FirestoreUserData = {
   avatarSeed: string | null;
   xp: number;
   progress: UserProgress;
+  userTag?: number;
+  fullTag?: number;
 };
 
 type LevelProgress = {
@@ -32,6 +34,8 @@ export const useProgressStore = create<ProgressState>()((set) => ({
   avatarSeed: null,
   xp: 0,
   progress: {},
+  userTag: undefined,
+  fullTag: undefined,
 
   hydrateFromFirestore: (data) => {
     set({
@@ -39,9 +43,18 @@ export const useProgressStore = create<ProgressState>()((set) => ({
       avatarSeed: data.avatarSeed,
       xp: data.xp,
       progress: data.progress,
+      userTag: data.userTag,
+      fullTag: data.fullTag,
     });
   },
 
   resetLocalStore: () =>
-    set({ xp: 0, progress: {}, username: null, avatarSeed: null }),
+    set({
+      xp: 0,
+      progress: {},
+      username: null,
+      avatarSeed: null,
+      userTag: undefined,
+      fullTag: undefined,
+    }),
 }));
