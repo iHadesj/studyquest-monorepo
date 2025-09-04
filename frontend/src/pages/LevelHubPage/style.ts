@@ -3,6 +3,8 @@ import { BackButton } from '../../style/globalStyle';
 
 // --- COMPONENTES ESTILIZADOS (ATUALIZADOS) ---
 export const HubWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
   max-width: 42rem;
   margin: 0 auto;
   margin-top: 2rem;

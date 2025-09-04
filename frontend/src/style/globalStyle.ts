@@ -33,6 +33,14 @@ export const AppContainer = styled.div`
   min-height: 100vh;
   font-family: 'Fira Code', monospace;
   padding-bottom: 5rem;
+
+  @media (max-width: 480px) {
+    padding-top: 0rem;
+    padding-bottom: 0rem;
+
+    padding: 6rem 2.5rem 6rem 2.5rem;
+    min-height: 100vh;
+  }
 `;
 
 export const MainContent = styled.div`
@@ -69,6 +77,7 @@ export const Title = styled.h1`
   animation: ${fadeIn} 0.5s ease-out;
   @media (max-width: 480px) {
     font-size: 1.5rem;
+    margin-top: 2rem;
   }
 `;
 
@@ -327,10 +336,11 @@ export const ContinueButton = styled.button<{
   padding: 0.75rem;
   border-radius: 4px;
   border: none;
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.3s ease-in-out;
   cursor: pointer;
   &:hover {
-    background-color: #72767d;
+    background-color: ${({ variant }) =>
+      variant === 'primary' ? '#43b58273' : '#ff5f5fac'};
   }
 `;
 

@@ -45,7 +45,9 @@ export const LevelHubPage = ({
 
   return (
     <HubWrapper>
-      <BackButton onClick={onBack}>&larr; Voltar para Níveis</BackButton>
+      <div style={{ display: 'flex' }}>
+        <BackButton onClick={onBack}>&larr; Voltar para Níveis</BackButton>
+      </div>
       <Title>{subject.nome}</Title>
       <Subtitle>{level.nome}</Subtitle>
 

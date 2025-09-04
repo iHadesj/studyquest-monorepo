@@ -185,20 +185,30 @@ export function BrainStorm({ subjects, onBack }: BrainStormProps) {
             até <strong>{QUESTION_TIME_LIMIT} segundos</strong>. Quanto mais
             rápido, mais XP você ganha!
           </Subtitle>
-          <ContinueButton
-            style={{ backgroundColor: '#43b581' }}
-            variant="primary"
-            onClick={startGame}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '1rem',
+              justifyContent: 'center',
+              width: '100%',
+            }}
           >
-            Começar!
-          </ContinueButton>
-          <ContinueButton
-            style={{ marginTop: '0px' }}
-            variant="secondary"
-            onClick={onBack}
-          >
-            Cancelar
-          </ContinueButton>
+            <ContinueButton
+              style={{ marginTop: '0px' }}
+              variant="primary"
+              onClick={startGame}
+            >
+              Começar!
+            </ContinueButton>
+            <ContinueButton
+              style={{ marginTop: '0px' }}
+              variant="secondary"
+              onClick={onBack}
+            >
+              Cancelar
+            </ContinueButton>
+          </div>
         </StartScreen>
       </StormWrapper>
     );
@@ -247,6 +257,12 @@ export function BrainStorm({ subjects, onBack }: BrainStormProps) {
 
   return (
     <StormWrapper>
+      <StatsBar style={{ justifyContent: 'center' }}>
+        <StatItem>
+          <Timer size={20} />
+          <strong>{mainTimeLeft}s</strong>
+        </StatItem>
+      </StatsBar>
       <StatsBar>
         <StatItem>
           <strong>
@@ -279,7 +295,7 @@ export function BrainStorm({ subjects, onBack }: BrainStormProps) {
 
       {currentQuestion && (
         <ExerciseBox
-          style={{ minHeight: '250px', opacity: feedback ? 0.5 : 1 }}
+          style={{ minHeight: '130px', opacity: feedback ? 0.5 : 1 }}
         >
           <QuestionText>{currentQuestion.pergunta}</QuestionText>
           {currentQuestion.tipo === 'multipla_escolha' &&
@@ -316,7 +332,7 @@ export function BrainStorm({ subjects, onBack }: BrainStormProps) {
         </ExerciseBox>
       )}
 
-      <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
+      <div style={{ display: 'flex', gap: '1rem' }}>
         <ContinueButton
           variant="primary"
           onClick={handleAnswerSubmit}

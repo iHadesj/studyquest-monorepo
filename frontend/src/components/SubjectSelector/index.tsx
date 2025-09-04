@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import {
   Divide,
   Code,
@@ -25,6 +25,18 @@ type SubjectInfo = Omit<Materia, 'niveis'> & {
 };
 
 // --- COMPONENTES ESTILIZADOS ---
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
 const CategoryTitle = styled.h2`
   font-size: 1.75rem;
   font-weight: bold;
@@ -73,7 +85,7 @@ const SubjectCard = styled.button<{ color: Materia['cor'] }>`
 
 // --- NOVOS COMPONENTES ESTILIZADOS PARA O BRAINSTORM ---
 const BrainstormSection = styled.section`
-  margin-top: 5rem;
+  margin-top: 2rem;
   padding-top: 2.5rem;
   border-top: 1px solid #40444b;
   display: flex;
@@ -99,6 +111,11 @@ const BrainstormButton = styled.button`
   &:hover {
     transform: translateY(-3px) scale(1.03);
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1rem;
+    padding: 1rem 1.4rem;
   }
 `;
 
@@ -138,6 +155,21 @@ const BrainstormInfoCard = styled.div`
 
   li::marker {
     color: #7289da;
+  }
+`;
+
+export const TitleBrainStorm = styled.h1`
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #ffffff;
+  margin: 0;
+  text-align: center;
+  border-bottom: 2px solid #40444b;
+  padding-bottom: 0.5rem;
+  letter-spacing: -1px;
+  animation: ${fadeIn} 0.5s ease-out;
+  @media (max-width: 480px) {
+    font-size: 1.85rem;
   }
 `;
 
@@ -209,14 +241,25 @@ export const SubjectSelector = ({
 
       {/* --- 3. NOVA SEÇÃO ADICIONADA ABAIXO --- */}
       <BrainstormSection>
-        <BrainstormButton onClick={onStartBrainstorm}>
-          <Brain size={32} weight="light" />
-          Brainstorm
-        </BrainstormButton>
-        <MultiplayerButton onClick={onStartMultiplayer}>
-          <Sword size={32} weight="light" />
-          Multiplayer
-        </MultiplayerButton>
+        <TitleBrainStorm>Brainstorm</TitleBrainStorm>
+        <BrainstormInfoCard
+          style={{
+            display: 'flex',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            gap: '0.5rem',
+          }}
+        >
+          <BrainstormButton onClick={onStartBrainstorm}>
+            <Brain size={32} weight="light" />
+            Solo
+          </BrainstormButton>
+          <MultiplayerButton onClick={onStartMultiplayer}>
+            <Sword size={32} weight="light" />
+            Multiplayer
+          </MultiplayerButton>
+        </BrainstormInfoCard>
+
         <BrainstormInfoCard>
           <h4>
             <Flask size={24} weight="light" /> O que é o Modo Brainstorm?

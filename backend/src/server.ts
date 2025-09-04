@@ -11,10 +11,16 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
     methods: ["GET", "POST"],
   },
 });
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  })
+);
 
 // --- NOSSO "CADERNINHO" DE JOGADORES ONLINE ---
 // Mapeia fullTag -> socket.id
