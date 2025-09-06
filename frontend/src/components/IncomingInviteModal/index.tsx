@@ -1,4 +1,3 @@
-import React from 'react';
 import { socket } from '../../services/socket';
 import * as Modal from '../Modal';
 import { InviteBox, ButtonGroup, ActionButton, InviterTag } from './style';
