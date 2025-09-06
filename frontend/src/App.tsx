@@ -9,7 +9,6 @@ import {
 } from './hooks/useProgressStore';
 import type { Materia, Nivel } from './interfaces';
 
-// Import das Páginas e Componentes
 import { ExercisePage } from './pages/ExercisePage';
 import { LevelSelector } from './pages/LevelSelector';
 import { SubjectSelector } from './components/SubjectSelector';
@@ -24,7 +23,6 @@ import { MultiplayerLobbyPage } from './pages/MultiplayerLobbyPage';
 import { ModalUserPerfil } from './components/ModalUserPerfil';
 import { InviteModal } from './components/InviteModal';
 
-// Import dos Estilos e Utilitários
 import {
   AppContainer,
   Footer,
@@ -57,7 +55,6 @@ type SubjectInfo = Omit<Materia, 'niveis'> & {
 };
 
 export default function App() {
-  // --- Estados de Navegação e Conteúdo ---
   const [screen, setScreen] = useState('subject');
   const [isInitializing, setIsInitializing] = useState(true);
   const [subjectsList, setSubjectsList] = useState<SubjectInfo[]>([]);
@@ -65,7 +62,6 @@ export default function App() {
   const [selectedLevel, setSelectedLevel] = useState<Nivel | null>(null);
   const [allSubjectsData, setAllSubjectsData] = useState<Materia[]>([]);
 
-  // --- Estados de Modais e Multiplayer ---
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isIncomingInviteModalOpen, setIsIncomingInviteModalOpen] =
@@ -73,60 +69,64 @@ export default function App() {
   const [inviterTag, setInviterTag] = useState<string | null>(null);
   const [gameRoomId, setGameRoomId] = useState<string | null>(null);
 
-  // --- Estados de Usuário ---
   const { fullTag, username, hydrateFromFirestore, resetLocalStore } =
     useProgressStore();
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
 
-  // --- EFEITO PARA GERENCIAR O SOCKET ---
   useEffect(() => {
-    socket.connect();
+    // A gente só faz qualquer coisa se o usuário estiver logado e tiver uma fullTag
+    if (fullTag) {
+      // --- Define o que fazer em cada evento ---
+      const onConnect = () => {
+        console.log('Conectado ao servidor! Registrando como:', fullTag);
+        socket.emit('register', fullTag); // Avisa o servidor quem nós somos
+      };
 
-    const onConnect = () => {
-      console.log('Conectado ao servidor! ID:', socket.id);
-      if (fullTag) {
-        socket.emit('register', fullTag);
-      }
-    };
+      const onIncomingInvite = ({ from }: { from: string }) => {
+        setInviterTag(from);
+        setIsIncomingInviteModalOpen(true);
+      };
 
-    const onIncomingInvite = ({ from }: { from: string }) => {
-      setInviterTag(from);
-      setIsIncomingInviteModalOpen(true);
-    };
+      const onInviteError = ({ message }: { message: string }) => {
+        alert(`Erro no convite: ${message}`);
+      };
 
-    const onInviteError = ({ message }: { message: string }) => {
-      alert(`Erro no convite: ${message}`);
-    };
+      const onGameStarted = ({ roomId }: { roomId: string }) => {
+        setIsInviteModalOpen(false);
+        setIsIncomingInviteModalOpen(false);
+        setGameRoomId(roomId);
+        setScreen('multiplayer_lobby');
+      };
 
-    const onGameStarted = ({ roomId }: { roomId: string }) => {
-      setIsInviteModalOpen(false);
-      setIsIncomingInviteModalOpen(false);
-      setGameRoomId(roomId);
-      setScreen('multiplayer_lobby');
-    };
+      const onInviteDeclined = ({ from }: { from: string }) => {
+        alert(`O jogador ${from} recusou seu convite.`);
+        setIsIncomingInviteModalOpen(false);
+      };
 
-    const onInviteDeclined = ({ from }: { from: string }) => {
-      alert(`O jogador ${from} recusou seu convite.`);
-      setIsIncomingInviteModalOpen(false);
-    };
+      // --- Registra todos os "ouvintes" ---
+      socket.on('connect', onConnect);
+      socket.on('incoming_invite', onIncomingInvite);
+      socket.on('invite_error', onInviteError);
+      socket.on('game_started', onGameStarted);
+      socket.on('invite_declined', onInviteDeclined);
 
-    socket.on('connect', onConnect);
-    socket.on('incoming_invite', onIncomingInvite);
-    socket.on('invite_error', onInviteError);
-    socket.on('game_started', onGameStarted);
-    socket.on('invite_declined', onInviteDeclined);
+      // --- Conecta ao servidor ---
+      socket.connect();
 
-    return () => {
-      socket.off('connect', onConnect);
-      socket.off('incoming_invite', onIncomingInvite);
-      socket.off('invite_error', onInviteError);
-      socket.off('game_started', onGameStarted);
-      socket.off('invite_declined', onInviteDeclined);
-      socket.disconnect();
-    };
+      // --- Função de limpeza ---
+      // Roda quando o usuário deslogar (fullTag mudar para null)
+      return () => {
+        console.log('Limpando listeners e desconectando o socket...');
+        socket.off('connect', onConnect);
+        socket.off('incoming_invite', onIncomingInvite);
+        socket.off('invite_error', onInviteError);
+        socket.off('game_started', onGameStarted);
+        socket.off('invite_declined', onInviteDeclined);
+        socket.disconnect();
+      };
+    }
   }, [fullTag]);
 
-  // --- EFEITOS PARA AUTENTICAÇÃO E DADOS ---
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setFirebaseUser(user);
@@ -164,7 +164,6 @@ export default function App() {
     window.scrollTo(0, 0);
   }, [screen]);
 
-  // --- FUNÇÕES DE NAVEGAÇÃO E HANDLERS ---
   const handleSelectSubject = async (subjectInfo: SubjectInfo) => {
     try {
       const response = await fetch(`/data/${subjectInfo.id}.json`);
@@ -213,7 +212,6 @@ export default function App() {
     setScreen('hub');
   };
 
-  // --- RENDERIZAÇÃO ---
   if (isInitializing) {
     return (
       <LoadingContainer>
@@ -309,7 +307,6 @@ export default function App() {
           )}
         </FooterWrapper>
 
-        {/* RENDERIZAÇÃO DOS MODAIS */}
         <ModalUserPerfil
           isOpen={isUserModalOpen}
           onClose={() => setIsUserModalOpen(false)}

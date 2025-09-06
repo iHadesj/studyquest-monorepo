@@ -11,14 +11,12 @@ let allExercises: Exercicio[] = [];
 try {
   console.log("Iniciando carregamento de perguntas...");
 
-  // Caminho para o arquivo "mestre"
   const indexPath = path.join(__dirname, "data", "materias.json");
 
   if (fs.existsSync(indexPath)) {
     const indexFileContent = fs.readFileSync(indexPath, "utf-8");
     const subjects: SubjectInfo[] = JSON.parse(indexFileContent);
 
-    // Agora, para cada matéria listada, a gente carrega o arquivo completo dela
     for (const subjectInfo of subjects) {
       const subjectFileName = `${subjectInfo.id}.json`;
       const subjectFilePath = path.join(__dirname, "data", subjectFileName);

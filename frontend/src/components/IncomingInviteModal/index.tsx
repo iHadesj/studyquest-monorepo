@@ -16,12 +16,11 @@ export function IncomingInviteModal({
   const handleResponse = (accepted: boolean) => {
     if (!inviterTag) return;
 
-    // Emite o evento de resposta para o servidor
     socket.emit('invite_response', {
       inviterTag,
       accepted,
     });
-    onClose(); // Fecha o modal depois de responder
+    onClose();
   };
 
   return (
