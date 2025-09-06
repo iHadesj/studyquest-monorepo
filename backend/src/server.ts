@@ -35,6 +35,7 @@ interface GameRoom {
 const gameRooms = new Map<string, GameRoom>();
 
 const QUESTION_TIME_LIMIT = 15;
+const NEXT_QUESTION_DELAY_MS = 3000;
 
 const sendNextQuestion = (roomId: string) => {
   const room = gameRooms.get(roomId);
@@ -63,7 +64,7 @@ const sendNextQuestion = (roomId: string) => {
           isCorrect: false,
         });
         io.to(roomId).emit("update_score", room.players);
-        setTimeout(() => sendNextQuestion(roomId), 3000);
+        setTimeout(() => sendNextQuestion(roomId), NEXT_QUESTION_DELAY_MS);
       }
     }, 1000);
   } else {
@@ -194,7 +195,7 @@ io.on("connection", (socket) => {
       io.to(roomId).emit("answer_result", { playerTag, isCorrect });
       io.to(roomId).emit("update_score", room.players);
 
-      setTimeout(() => sendNextQuestion(roomId), 3000);
+      setTimeout(() => sendNextQuestion(roomId), NEXT_QUESTION_DELAY_MS);
     }
   );
 
@@ -204,6 +205,7 @@ io.on("connection", (socket) => {
       if (id === socket.id) {
         onlineUsers.delete(tag);
         console.log(`Jogador ${tag} removido dos online.`);
+        // Futuramente: Adicionar lógica para encerrar a sala se um jogador desconectar no meio da partida.
         break;
       }
     }
