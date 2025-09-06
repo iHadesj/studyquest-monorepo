@@ -1,10 +1,7 @@
 import { Exercicio, Materia } from "./interfaces";
 
-// A gente importa o "índice" de matérias primeiro
 import materiasIndex from "./data/materias.json";
 
-// Agora, importamos o conteúdo de cada arquivo de matéria individualmente
-// e usamos "as Materia" para dar um voto de confiança ao TypeScript.
 import biologiaDataRaw from "./data/biologia.json";
 import cienciasDataRaw from "./data/ciencias.json";
 import filosofiaDataRaw from "./data/filosofia.json";
@@ -29,7 +26,6 @@ const musicaData = musicaDataRaw as unknown as Materia;
 const programacaoData = programacaoDataRaw as unknown as Materia;
 const quimicaData = quimicaDataRaw as unknown as Materia;
 
-// Criamos um "mapa" para acessar facilmente os dados de cada matéria pela sua ID
 const subjectDataMap: { [key: string]: Materia } = {
   biologia: biologiaData,
   ciencias: cienciasData,
@@ -49,9 +45,7 @@ let allExercises: Exercicio[] = [];
 try {
   console.log("Carregando perguntas a partir dos módulos JSON importados...");
 
-  // Iteramos sobre o nosso "índice" (materias.json)
   for (const subjectInfo of materiasIndex) {
-    // Usamos o mapa para pegar os dados completos da matéria
     const subjectData = subjectDataMap[subjectInfo.id];
 
     if (subjectData && subjectData.niveis) {

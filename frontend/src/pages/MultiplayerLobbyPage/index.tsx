@@ -8,6 +8,7 @@ import {
   RadioInput,
   SubmitButton,
   BackButton,
+  TextInput,
 } from '../../style/globalStyle';
 import { socket } from '../../services/socket';
 import { Timer, Trophy } from 'phosphor-react';
@@ -30,6 +31,13 @@ const Scoreboard = styled.div`
   border-radius: 8px;
 `;
 
+const PlayerTag = styled.span`
+  max-width: 150px; // Largura máxima que o nome pode ocupar
+  white-space: nowrap; // Impede que o nome quebre a linha
+  overflow: hidden; // Esconde o que passar da largura máxima
+  text-overflow: ellipsis; // Adiciona os "..." no final
+`;
+
 const PlayerScore = styled.div<{ isWinner?: boolean; isMe?: boolean }>`
   font-weight: ${(props) => (props.isMe || props.isWinner ? 'bold' : 'normal')};
   color: ${(props) =>
@@ -38,6 +46,9 @@ const PlayerScore = styled.div<{ isWinner?: boolean; isMe?: boolean }>`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.3s ease-in-out;
+  // Adiciona um flex-basis para ajudar na distribuição do espaço
+  flex-basis: 45%;
+  justify-content: center;
 `;
 
 const TimerDisplay = styled.div<{ timeLow: boolean }>`
@@ -223,7 +234,7 @@ export function MultiplayerLobbyPage({
       <Scoreboard>
         {players.map((p) => (
           <PlayerScore key={p.tag} isMe={p.tag === myTag}>
-            {p.tag}: {p.score}
+            <PlayerTag>{p.tag}</PlayerTag>: {p.score}
           </PlayerScore>
         ))}
       </Scoreboard>
@@ -264,6 +275,16 @@ export function MultiplayerLobbyPage({
                 </OptionLabel>
               ))}
             </div>
+          )}
+          {currentQuestion.tipo === 'preenchimento' && (
+            <TextInput
+              type="text"
+              value={selectedAnswer}
+              onChange={(e) => setSelectedAnswer(e.target.value)}
+              placeholder="Digite sua resposta aqui"
+              disabled={hasAnswered}
+              autoFocus
+            />
           )}
           <SubmitButton
             onClick={handleAnswerSubmit}
