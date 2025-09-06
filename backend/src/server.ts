@@ -5,7 +5,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { getRandomQuestion } from "./GameManager";
 import { Exercicio } from "./interfaces";
-import routes from "./routes/index.tsx";
+import routes from "./routes";
 
 dotenv.config();
 const app = express();
