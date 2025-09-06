@@ -44,29 +44,46 @@ const sendNextQuestion = (roomId: string) => {
   const room = gameRooms.get(roomId);
   if (!room) return;
 
+  // Limpa qualquer timer antigo pra não dar B.O.
   if (room.questionTimer) {
-    clearTimeout(room.questionTimer);
+    clearInterval(room.questionTimer); // MUDANÇA AQUI: de clearTimeout para clearInterval
   }
 
   const nextQuestion = getRandomQuestion();
   if (nextQuestion) {
     room.currentQuestion = nextQuestion;
-    room.questionStartTime = Date.now(); // <-- Guarda o "carimbo de tempo" do início
+    room.questionStartTime = Date.now();
     const { respostaCorreta, ...questionForPlayers } = nextQuestion;
 
     io.to(roomId).emit("new_question", questionForPlayers);
-    io.to(roomId).emit("timer_tick", { timeLeft: QUESTION_TIME_LIMIT_S }); // Envia o tempo inicial pro front
     console.log(`Enviando nova pergunta para a sala ${roomId}`);
 
-    // Timer para caso ninguém responda a tempo
-    room.questionTimer = setTimeout(() => {
-      io.to(roomId).emit("answer_result", {
-        playerTag: "O TEMPO",
-        isCorrect: false,
-      });
-      setTimeout(() => sendNextQuestion(roomId), NEXT_QUESTION_DELAY_MS);
-    }, QUESTION_TIME_LIMIT_S * 1000);
+    // ==========================================================
+    // >>>>> AQUI ESTÁ A MÁGICA DO CRONÔMETRO <<<<<
+    // ==========================================================
+    let timeLeft = QUESTION_TIME_LIMIT_S;
+    io.to(roomId).emit("timer_tick", { timeLeft }); // Envia o tempo inicial
+
+    // Inicia um cronômetro que roda a cada 1 segundo
+    room.questionTimer = setInterval(() => {
+      timeLeft -= 1;
+      io.to(roomId).emit("timer_tick", { timeLeft }); // Envia o tempo atualizado
+
+      // Se o tempo acabar...
+      if (timeLeft <= 0) {
+        clearInterval(room.questionTimer!); // Para o cronômetro
+
+        io.to(roomId).emit("answer_result", {
+          playerTag: "O TEMPO",
+          isCorrect: false,
+        });
+
+        // Espera um pouco e manda a próxima pergunta
+        setTimeout(() => sendNextQuestion(roomId), NEXT_QUESTION_DELAY_MS);
+      }
+    }, 1000); // Roda a cada 1000ms = 1 segundo
   } else {
+    // Fim de jogo
     io.to(roomId).emit("game_over", { finalScores: room.players });
     gameRooms.delete(roomId);
   }
@@ -174,7 +191,7 @@ io.on("connection", (socket) => {
 
       // Para o timer de "tempo esgotado" assim que a primeira resposta chega
       if (room.questionTimer) {
-        clearTimeout(room.questionTimer);
+        clearInterval(room.questionTimer); // CORRETO
         room.questionTimer = null;
       }
 

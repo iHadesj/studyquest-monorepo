@@ -1,98 +1,30 @@
 import { useState, useEffect, useMemo } from 'react';
-import styled from 'styled-components';
+import { AnimatePresence } from 'framer-motion';
+
+// Componentes globais que ainda usamos
 import {
   Title,
-  ExerciseBox,
-  QuestionText,
-  OptionLabel,
-  RadioInput,
   SubmitButton,
   BackButton,
   TextInput,
+  QuestionText,
 } from '../../style/globalStyle';
+
+// Nossos novos componentes estilizados
+import * as S from './style';
+
+// Hooks e Serviços
 import { socket } from '../../services/socket';
-import { Timer, Trophy } from 'phosphor-react';
 import { useProgressStore } from '../../hooks/useProgressStore';
+
+// Ícones e Tipos
+import { Timer, Trophy } from 'phosphor-react';
 import type { Exercicio } from '../../interfaces';
+import { Radio } from '@mui/material';
 
-const LobbyWrapper = styled.div`
-  max-width: 48rem;
-  margin: 2rem auto;
-  text-align: center;
-`;
-
-const Scoreboard = styled.div`
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 2rem;
-  font-size: 1.5rem;
-  background-color: #2f3136;
-  padding: 1rem;
-  border-radius: 8px;
-`;
-
-const PlayerTag = styled.span`
-  max-width: 150px; // Largura máxima que o nome pode ocupar
-  white-space: nowrap; // Impede que o nome quebre a linha
-  overflow: hidden; // Esconde o que passar da largura máxima
-  text-overflow: ellipsis; // Adiciona os "..." no final
-`;
-
-const PlayerScore = styled.div<{ isWinner?: boolean; isMe?: boolean }>`
-  font-weight: ${(props) => (props.isMe || props.isWinner ? 'bold' : 'normal')};
-  color: ${(props) =>
-    props.isWinner ? '#f1c40f' : props.isMe ? '#5865f2' : 'white'};
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease-in-out;
-  // Adiciona um flex-basis para ajudar na distribuição do espaço
-  flex-basis: 45%;
-  justify-content: center;
-`;
-
-const TimerDisplay = styled.div<{ timeLow: boolean }>`
-  font-size: 2rem;
-  font-weight: bold;
-  color: ${(props) => (props.timeLow ? '#ed4245' : 'white')};
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-`;
-
-const FeedbackText = styled.p`
-  height: 2rem;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #faa61a;
-  transition: opacity 0.3s ease-in-out;
-`;
-
-const GameOverScreen = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  padding: 2rem;
-  background-color: #202225;
-  border-radius: 8px;
-  animation: fadeIn 0.5s ease-in-out;
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-`;
-
+// --- Tipagens locais para o componente ---
 type Player = { tag: string; score: number };
+type RoundResult = { status: 'CERTO!' | 'ERRADO!'; points?: number };
 
 interface MultiplayerLobbyPageProps {
   roomId: string;
@@ -103,34 +35,51 @@ export function MultiplayerLobbyPage({
   roomId,
   onGoHome,
 }: MultiplayerLobbyPageProps) {
+  // --- Estados do Componente ---
   const [currentQuestion, setCurrentQuestion] = useState<Omit<
     Exercicio,
     'respostaCorreta'
   > | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
   const [players, setPlayers] = useState<Player[]>([]);
-  const [feedback, setFeedback] = useState<string>('');
   const [hasAnswered, setHasAnswered] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
   const [timeLeft, setTimeLeft] = useState(15);
   const { fullTag: myTag } = useProgressStore();
 
+  // Estado para o feedback visual da rodada
+  const [roundResult, setRoundResult] = useState<RoundResult | null>(null);
+
+  // --- Memos para facilitar o acesso aos dados ---
+  const me = useMemo(
+    () => players.find((p) => p.tag === myTag),
+    [players, myTag]
+  );
+  const opponent = useMemo(
+    () => players.find((p) => p.tag !== myTag),
+    [players, myTag]
+  );
+
+  // --- Efeito principal para comunicação com o Socket ---
   useEffect(() => {
-    // --- FUNÇÕES QUE OUVEM O SERVIDOR ---
-    const onTimerTick = ({ timeLeft: newTime }: { timeLeft: number }) => {
+    const onTimerTick = ({ timeLeft: newTime }: { timeLeft: number }) =>
       setTimeLeft(newTime);
-    };
 
     const onNewQuestion = (question: Omit<Exercicio, 'respostaCorreta'>) => {
-      console.log('Nova pergunta recebida:', question);
       setCurrentQuestion(question);
       setSelectedAnswer('');
-      setFeedback('');
       setHasAnswered(false);
-      setTimeLeft(15); // Reseta o timer visual
+      setRoundResult(null); // Limpa o feedback da rodada anterior
     };
 
     const onUpdateScore = (updatedPlayers: Player[]) => {
+      // Lógica para calcular os pontos ganhos e mostrar no feedback
+      const myOldScore = players.find((p) => p.tag === myTag)?.score ?? 0;
+      const myNewData = updatedPlayers.find((p) => p.tag === myTag);
+      if (myNewData && myNewData.score > myOldScore) {
+        const pointsGained = myNewData.score - myOldScore;
+        setRoundResult({ status: 'CERTO!', points: pointsGained });
+      }
       setPlayers(updatedPlayers);
     };
 
@@ -141,30 +90,29 @@ export function MultiplayerLobbyPage({
       playerTag: string;
       isCorrect: boolean;
     }) => {
-      setFeedback(
-        `${playerTag} respondeu... ${isCorrect ? 'CERTO!' : 'ERRADO!'}`
-      );
+      if (playerTag === myTag && !isCorrect) {
+        setRoundResult({ status: 'ERRADO!' });
+      }
       setHasAnswered(true);
     };
 
     const onGameOver = ({ finalScores }: { finalScores: Player[] }) => {
-      setFeedback('FIM DE JOGO!');
       setPlayers(finalScores);
       setIsGameOver(true);
       setCurrentQuestion(null);
     };
 
-    // --- REGISTRA TODOS OS OUVINTES ---
+    // Registra todos os ouvintes
     socket.on('timer_tick', onTimerTick);
     socket.on('new_question', onNewQuestion);
     socket.on('update_score', onUpdateScore);
     socket.on('answer_result', onAnswerResult);
     socket.on('game_over', onGameOver);
 
-    // AVISA O SERVIDOR QUE ESTA TELA CARREGOU E ESTAMOS PRONTOS
+    // Avisa o servidor que estamos prontos
     socket.emit('player_ready', { roomId });
 
-    // --- FUNÇÃO DE LIMPEZA ---
+    // Função de limpeza para remover os ouvintes
     return () => {
       socket.off('timer_tick', onTimerTick);
       socket.off('new_question', onNewQuestion);
@@ -172,8 +120,9 @@ export function MultiplayerLobbyPage({
       socket.off('answer_result', onAnswerResult);
       socket.off('game_over', onGameOver);
     };
-  }, [roomId]);
+  }, [roomId, players, myTag]);
 
+  // --- Lógica para determinar o vencedor no fim do jogo ---
   const winner = useMemo(() => {
     if (!isGameOver) return null;
     const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
@@ -187,16 +136,19 @@ export function MultiplayerLobbyPage({
     return sortedPlayers[0];
   }, [isGameOver, players]);
 
+  // --- Handler para enviar a resposta ---
   const handleAnswerSubmit = () => {
     if (!selectedAnswer) return;
     socket.emit('submit_answer', { roomId, answer: selectedAnswer });
     setHasAnswered(true);
   };
 
+  // --- Renderização da tela de Fim de Jogo ---
   if (isGameOver) {
     return (
-      <LobbyWrapper>
-        <GameOverScreen>
+      <S.LobbyWrapper>
+        {/* Usando S.GameOverScreen do style.ts */}
+        <S.GameOverScreen>
           <Trophy size={64} color="#f1c40f" weight="fill" />
           <Title>
             {winner?.tag === 'Empate!'
@@ -204,97 +156,128 @@ export function MultiplayerLobbyPage({
               : `${winner?.tag} Venceu!`}
           </Title>
           <h2>Placar Final</h2>
-          <Scoreboard style={{ width: '100%' }}>
+          {/* Reutilizando nosso Header para o placar final */}
+          <S.Header style={{ width: '100%' }}>
             {players.map((p) => (
-              <PlayerScore
-                key={p.tag}
-                isWinner={p.tag === winner?.tag}
-                isMe={p.tag === myTag}
-              >
+              <S.PlayerInfo key={p.tag} isMe={p.tag === myTag}>
                 {p.tag === winner?.tag && <Trophy size={24} weight="fill" />}
-                {p.tag}: {p.score}
-              </PlayerScore>
+                <span className="tag">{p.tag}</span>
+                <span className="score">{p.score}</span>
+              </S.PlayerInfo>
             ))}
-          </Scoreboard>
+          </S.Header>
           <BackButton
             onClick={onGoHome}
             style={{ position: 'static', margin: '1rem 0 0 0' }}
           >
             Voltar ao Menu Principal
           </BackButton>
-        </GameOverScreen>
-      </LobbyWrapper>
+        </S.GameOverScreen>
+      </S.LobbyWrapper>
     );
   }
 
+  // --- Renderização da tela principal do Duelo ---
   return (
-    <LobbyWrapper>
+    <S.LobbyWrapper>
       <Title>Duelo Brainstorm!</Title>
 
-      <Scoreboard>
-        {players.map((p) => (
-          <PlayerScore key={p.tag} isMe={p.tag === myTag}>
-            <PlayerTag>{p.tag}</PlayerTag>: {p.score}
-          </PlayerScore>
-        ))}
-      </Scoreboard>
+      <S.Header>
+        <S.PlayerInfo isMe>
+          <span className="tag">{me?.tag ?? 'Você'}</span>
+          <span className="score">{me?.score ?? 0}</span>
+        </S.PlayerInfo>
 
-      {currentQuestion && (
-        <TimerDisplay timeLow={timeLeft <= 5}>
+        <S.CentralTimer
+          timeLow={timeLeft <= 5}
+          key={timeLeft}
+          initial={{ scale: 1 }}
+          animate={{ scale: timeLeft <= 5 ? 1.2 : 1 }}
+          transition={{ duration: 0.2 }}
+        >
           <Timer size={32} />
           {timeLeft}
-        </TimerDisplay>
-      )}
+        </S.CentralTimer>
 
-      <FeedbackText>{feedback}</FeedbackText>
+        <S.PlayerInfo>
+          <span className="tag">{opponent?.tag ?? 'Oponente'}</span>
+          <span className="score">{opponent?.score ?? 0}</span>
+        </S.PlayerInfo>
+      </S.Header>
 
-      {!currentQuestion ? (
-        <h2>Aguardando jogadores ficarem prontos...</h2>
-      ) : (
-        <ExerciseBox>
-          <QuestionText>{currentQuestion.pergunta}</QuestionText>
-          {currentQuestion.tipo === 'multipla_escolha' && (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.75rem',
-              }}
+      <div style={{ position: 'relative', minHeight: '300px' }}>
+        <AnimatePresence>
+          {roundResult && (
+            <S.FeedbackOverlay
+              $isCorrect={roundResult.status === 'CERTO!'}
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.5 }}
+              transition={{ duration: 0.3 }}
             >
-              {currentQuestion.opcoes?.map((option) => (
-                <OptionLabel key={option}>
-                  <RadioInput
-                    type="radio"
-                    name={`ex-${currentQuestion.id}`}
-                    value={option}
-                    checked={selectedAnswer === option}
-                    onChange={(e) => setSelectedAnswer(e.target.value)}
-                    disabled={hasAnswered}
-                  />
-                  <span>{option}</span>
-                </OptionLabel>
-              ))}
-            </div>
+              <span className="status">{roundResult.status}</span>
+              {roundResult.points && (
+                <span className="points">+{roundResult.points} XP!</span>
+              )}
+            </S.FeedbackOverlay>
           )}
-          {currentQuestion.tipo === 'preenchimento' && (
-            <TextInput
-              type="text"
-              value={selectedAnswer}
-              onChange={(e) => setSelectedAnswer(e.target.value)}
-              placeholder="Digite sua resposta aqui"
-              disabled={hasAnswered}
-              autoFocus
-            />
+        </AnimatePresence>
+
+        <AnimatePresence mode="wait">
+          {!currentQuestion ? (
+            <S.WaitingText key="waiting">
+              Aguardando o duelo começar...
+            </S.WaitingText>
+          ) : (
+            <S.QuestionCard
+              key={currentQuestion.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <QuestionText>{currentQuestion.pergunta}</QuestionText>
+
+              {currentQuestion.tipo === 'multipla_escolha' && (
+                <S.OptionsContainer>
+                  {currentQuestion.opcoes?.map((option) => (
+                    <S.StyledFormControlLabel
+                      key={option}
+                      value={option}
+                      control={<Radio />}
+                      label={option}
+                      checked={selectedAnswer === option}
+                      onChange={(e) =>
+                        setSelectedAnswer((e.target as HTMLInputElement).value)
+                      }
+                      disabled={hasAnswered}
+                      $selected={selectedAnswer === option}
+                    />
+                  ))}
+                </S.OptionsContainer>
+              )}
+
+              {currentQuestion.tipo === 'preenchimento' && (
+                <TextInput
+                  type="text"
+                  value={selectedAnswer}
+                  onChange={(e) => setSelectedAnswer(e.target.value)}
+                  placeholder="Digite sua resposta aqui"
+                  disabled={hasAnswered}
+                  autoFocus
+                />
+              )}
+
+              <SubmitButton
+                onClick={handleAnswerSubmit}
+                disabled={!selectedAnswer || hasAnswered}
+                style={{ marginTop: '1.5rem' }}
+              >
+                Confirmar Resposta
+              </SubmitButton>
+            </S.QuestionCard>
           )}
-          <SubmitButton
-            onClick={handleAnswerSubmit}
-            disabled={!selectedAnswer || hasAnswered}
-            style={{ marginTop: '1.5rem' }}
-          >
-            Confirmar Resposta
-          </SubmitButton>
-        </ExerciseBox>
-      )}
-    </LobbyWrapper>
+        </AnimatePresence>
+      </div>
+    </S.LobbyWrapper>
   );
 }
