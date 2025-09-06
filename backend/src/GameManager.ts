@@ -2,27 +2,61 @@ import fs from "fs";
 import path from "path";
 import { Exercicio, Materia } from "./interfaces";
 
+interface SubjectInfo {
+  id: string;
+}
+
 let allExercises: Exercicio[] = [];
 
-const dataDir = path.join(__dirname, "data");
 try {
-  const subjectFiles = fs
-    .readdirSync(dataDir)
-    .filter((file) => file.endsWith(".json"));
+  console.log("Iniciando carregamento de perguntas...");
 
-  for (const file of subjectFiles) {
-    const filePath = path.join(dataDir, file);
-    const fileContent = fs.readFileSync(filePath, "utf-8");
-    const subject: Materia = JSON.parse(fileContent);
-    subject.niveis.forEach((level) => {
-      allExercises.push(...level.exercicios);
-    });
+  // Caminho para o arquivo "mestre"
+  const indexPath = path.join(__dirname, "data", "materias.json");
+
+  if (fs.existsSync(indexPath)) {
+    const indexFileContent = fs.readFileSync(indexPath, "utf-8");
+    const subjects: SubjectInfo[] = JSON.parse(indexFileContent);
+
+    // Agora, para cada matéria listada, a gente carrega o arquivo completo dela
+    for (const subjectInfo of subjects) {
+      const subjectFileName = `${subjectInfo.id}.json`;
+      const subjectFilePath = path.join(__dirname, "data", subjectFileName);
+
+      if (fs.existsSync(subjectFilePath)) {
+        const subjectFileContent = fs.readFileSync(subjectFilePath, "utf-8");
+        const subjectData: Materia = JSON.parse(subjectFileContent);
+
+        if (subjectData.niveis) {
+          subjectData.niveis.forEach((level) => {
+            if (level.exercicios) {
+              allExercises.push(...level.exercicios);
+            }
+          });
+        }
+      } else {
+        console.warn(
+          `AVISO: Arquivo da matéria "${subjectFileName}" não encontrado.`
+        );
+      }
+    }
+  } else {
+    console.error(
+      '❌ ERRO CRÍTICO: Arquivo "materias.json" não encontrado na pasta src/data.'
+    );
   }
-  console.log(
-    `✅ Carregadas ${allExercises.length} perguntas para o GameManager.`
-  );
+
+  if (allExercises.length > 0) {
+    console.log(
+      `✅ Carregadas ${allExercises.length} perguntas para o GameManager.`
+    );
+  } else {
+    console.error(
+      "❌ NENHUMA PERGUNTA FOI CARREGADA. Verifique os arquivos JSON e o materias.json."
+    );
+  }
 } catch (error) {
-  console.error("❌ Erro ao carregar os dados das perguntas:", error);
+  console.error("❌ Erro crítico ao carregar os dados das perguntas:", error);
 }
 
 export const getRandomQuestion = (): Exercicio | null => {

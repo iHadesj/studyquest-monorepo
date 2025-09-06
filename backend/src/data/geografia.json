@@ -1,0 +1,110 @@
+{
+  "id": "geografia",
+  "nome": "Geografia",
+  "cor": { "bg": "#06b6d4", "hover": "#0891b2", "ring": "rgba(6, 182, 212, 0.5)" },
+  "niveis": [
+    {
+      "id": "iniciante",
+      "nome": "Iniciante",
+      "xpPorAcerto": 15,
+      "minAcertosParaDesbloquearProximo": 3,
+      "conteudo": {
+        "titulo": "Continentes e Oceanos",
+        "resumo": "A superfície do nosso planeta é dividida em grandes massas de terra, chamadas **continentes**, e vastas extensões de água salgada, os **oceanos**.\n\n**Os Continentes**\nExistem seis continentes principais, cada um com características únicas:\n- **Ásia:** O maior e mais populoso, onde ficam países como China e Japão.\n- **América:** Dividida em América do Norte, Central e do Sul.\n- **África:** O segundo mais populoso, conhecido por sua imensa diversidade cultural e natural.\n- **Europa:** Berço de muitas civilizações ocidentais.\n- **Oceania:** Formada pela Austrália e por milhares de ilhas no Oceano Pacífico.\n- **Antártida:** O continente gelado, localizado no Polo Sul.\n\n**Os Oceanos**\nCerca de 71% da Terra é coberta por oceanos, que são todos interligados. Os principais são:\n- **Oceano Pacífico:** O maior e mais profundo.\n- **Oceano Atlântico:** O segundo maior, que banha a costa do Brasil.\n- **Oceano Índico:** O terceiro maior, localizado entre a África, Ásia e Oceania."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é o maior continente do mundo em área territorial?",
+          "opcoes": ["África", "América", "Ásia"],
+          "respostaCorreta": "Ásia"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual oceano banha a costa leste do Brasil?",
+          "opcoes": ["Pacífico", "Índico", "Atlântico"],
+          "respostaCorreta": "Atlântico"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "O continente conhecido como 'continente gelado' é a ___.",
+          "respostaCorreta": "Antártida"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "Em qual continente está localizado o Egito?",
+          "opcoes": ["Europa", "África", "Oceania"],
+          "respostaCorreta": "África"
+        }
+      ]
+    },
+    {
+      "id": "intermediario",
+      "nome": "Intermediário",
+      "xpPorAcerto": 25,
+      "minAcertosParaDesbloquearProximo": 2,
+      "conteudo": {
+        "titulo": "Climas e Biomas",
+        "resumo": "O clima de uma região define o tipo de vida que pode existir ali. Vamos entender os principais climas e os grandes ecossistemas que eles formam, os biomas.\n\n**Climas do Mundo**\nO clima é o padrão de tempo de um lugar ao longo de muitos anos. Alguns dos principais tipos são:\n- **Clima Polar:** Temperaturas extremamente baixas, encontrado nos polos.\n- **Clima Temperado:** Estações bem definidas (verão quente, inverno frio), comum na Europa e América do Norte.\n- **Clima Tropical:** Temperaturas altas o ano todo, com uma estação seca e outra chuvosa.\n\n**Biomas**\nSão grandes áreas com fauna e flora características, adaptadas ao clima local.\n- **Floresta Equatorial:** Como a **Amazônia**, é quente e úmida, com a maior biodiversidade do planeta.\n- **Savana:** Grandes planícies com árvores esparsas, típicas da África, com animais como leões e elefantes.\n- **Deserto:** Regiões muito secas, com pouca chuva e vegetação adaptada à falta de água."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual bioma é conhecido por suas vastas florestas tropicais e grande biodiversidade, como a Amazônia?",
+          "opcoes": ["Savana", "Floresta Temperada", "Floresta Equatorial"],
+          "respostaCorreta": "Floresta Equatorial"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "O clima caracterizado por temperaturas muito baixas durante todo o ano é o clima ___.",
+          "opcoes": ["Polar", "Desértico", "Tropical"],
+          "respostaCorreta": "Polar"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "As grandes planícies com poucas árvores e vegetação rasteira, comuns na África, formam o bioma ___.",
+          "respostaCorreta": "Savana"
+        }
+      ]
+    },
+    {
+      "id": "avancado",
+      "nome": "Avançado",
+      "xpPorAcerto": 40,
+      "minAcertosParaDesbloquearProximo": null,
+      "conteudo": {
+        "titulo": "Geopolítica e Globalização",
+        "resumo": "A Geografia também estuda como os países se relacionam e como o mundo está cada vez mais conectado.\n\n**Geopolítica**\nÉ o estudo das relações de poder e das estratégias dos países no cenário mundial. Envolve disputas por territórios, recursos naturais e influência. Organizações como a **ONU (Organização das Nações Unidas)** foram criadas para mediar conflitos e promover a paz.\n\n**Blocos Econômicos**\nSão grupos de países que se unem para facilitar o comércio entre si, reduzindo ou eliminando impostos de importação. Exemplos famosos são a **União Europeia** e o **Mercosul** (do qual o Brasil faz parte).\n\n**Globalização**\nÉ o processo de intensificação da integração mundial nos campos econômico, social, cultural e político. A internet, as grandes empresas multinacionais e a facilidade de viajar são grandes símbolos da **globalização**."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual organização internacional foi criada após a Segunda Guerra Mundial para promover a paz e a segurança entre as nações?",
+          "opcoes": ["OMC", "ONU", "OTAN"],
+          "respostaCorreta": "ONU"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "O que são blocos econômicos, como o Mercosul e a União Europeia?",
+          "opcoes": ["Alianças militares", "Grupos de países que facilitam o comércio entre si", "Organizações culturais"],
+          "respostaCorreta": "Grupos de países que facilitam o comércio entre si"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "A intensificação das trocas (comerciais, culturais, de informação) em nível mundial é conhecida como ___.",
+          "respostaCorreta": "Globalização"
+        }
+      ]
+    }
+  ]
+}

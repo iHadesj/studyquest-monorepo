@@ -1,0 +1,110 @@
+{
+  "id": "ingles",
+  "nome": "Inglês",
+  "cor": { "bg": "#ec4899", "hover": "#db2777", "ring": "rgba(236, 72, 153, 0.5)" },
+  "niveis": [
+    {
+      "id": "iniciante",
+      "nome": "Iniciante",
+      "xpPorAcerto": 15,
+      "minAcertosParaDesbloquearProximo": 3,
+      "conteudo": {
+        "titulo": "Vocabulário Básico e Verbo To Be",
+        "resumo": "Welcome! Vamos começar nossa jornada no inglês com o verbo mais importante de todos e algumas palavras essenciais.\n\n**Verbo To Be (Ser/Estar)**\nEste verbo muda de forma dependendo de quem está falando. É a base para se apresentar e descrever coisas.\n- **I am** (Eu sou/estou)\n- **You are** (Você é/está)\n- **He is** (Ele é/está)\n- **She is** (Ela é/está)\n- **It is** (É/está - para coisas e animais)\n- **We are** (Nós somos/estamos)\n- **They are** (Eles/Elas são/estão)\n\n**Vocabulário Essencial**\nConhecer algumas palavras básicas é fundamental para começar a se comunicar:\n- **Saudações:** `Hello` (Olá), `Good morning` (Bom dia), `Goodbye` (Adeus).\n- **Cores:** `Red` (vermelho), `Green` (verde), `Blue` (azul).\n- **Frutas:** `Apple` (maçã), `Banana` (banana), `Orange` (laranja)."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Como se diz 'maçã' em inglês?",
+          "opcoes": ["Banana", "Apple", "Orange"],
+          "respostaCorreta": "Apple"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "Complete a frase: 'She ___ a doctor.'",
+          "opcoes": ["am", "are", "is"],
+          "respostaCorreta": "is"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "A cor do céu em inglês é ___.",
+          "respostaCorreta": "blue"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual a tradução de 'Good morning'?",
+          "opcoes": ["Boa noite", "Boa tarde", "Bom dia"],
+          "respostaCorreta": "Bom dia"
+        }
+      ]
+    },
+    {
+      "id": "intermediario",
+      "nome": "Intermediário",
+      "xpPorAcerto": 25,
+      "minAcertosParaDesbloquearProximo": 2,
+      "conteudo": {
+        "titulo": "Tempos Verbais (Passado e Futuro)",
+        "resumo": "Agora vamos aprender a viajar no tempo com as palavras!\n\n**Simple Past (Passado Simples)**\nUsado para falar de ações que começaram e terminaram no passado. Para a maioria dos verbos, adicionamos '-ed' no final (ex: play -> played). Mas existem os verbos irregulares, que mudam completamente, como **go -> went**.\nPara fazer perguntas, usamos o verbo auxiliar **did**. Ex: `Did you play yesterday?`\n\n**Future (Futuro)**\nExistem duas formas principais de falar do futuro:\n- **Will:** Usado para decisões espontâneas ou previsões. Ex: `I think it will rain tomorrow.` (Eu acho que vai chover amanhã.)\n- **Going to:** Usado para planos já decididos. Ex: `I am going to travel next month.` (Eu vou viajar no próximo mês.)"
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é o passado do verbo 'go' (ir)?",
+          "opcoes": ["goed", "went", "gone"],
+          "respostaCorreta": "went"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "Complete a frase: 'I ___ visit my grandmother tomorrow.'",
+          "opcoes": ["will", "was", "did"],
+          "respostaCorreta": "will"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "Para fazer uma pergunta no passado simples com o verbo 'play', usamos o auxiliar ___.",
+          "respostaCorreta": "did"
+        }
+      ]
+    },
+    {
+      "id": "avancado",
+      "nome": "Avançado",
+      "xpPorAcerto": 40,
+      "minAcertosParaDesbloquearProximo": null,
+      "conteudo": {
+        "titulo": "Phrasal Verbs e Expressões",
+        "resumo": "Para soar como um nativo, é essencial conhecer as expressões e os 'phrasal verbs'.\n\n**Phrasal Verbs**\nSão verbos compostos por duas ou mais palavras (um verbo + uma preposição ou advérbio) que, juntos, ganham um novo significado. O significado geralmente não pode ser deduzido pelas palavras separadas.\nEx: `look for` (procurar), `turn on` (ligar), `give up` (desistir).\n\n**Expressões Idiomáticas (Idioms)**\nSão frases cujo significado não é literal. Elas são uma parte muito importante da cultura de uma língua.\nEx: `It's raining cats and dogs` significa que está chovendo muito, e não que animais estão caindo do céu.\nOutro exemplo famoso é `a piece of cake`, usado para dizer que algo é muito fácil de fazer."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "O que significa o phrasal verb 'give up'?",
+          "opcoes": ["Presentear", "Desistir", "Levantar"],
+          "respostaCorreta": "Desistir"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual o significado da expressão 'It's raining cats and dogs'?",
+          "opcoes": ["Está chovendo animais", "Está chovendo muito forte", "O tempo está bom"],
+          "respostaCorreta": "Está chovendo muito forte"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "Para dizer que algo é 'muito fácil', em inglês, podemos dizer que é 'a piece of ___'.",
+          "respostaCorreta": "cake"
+        }
+      ]
+    }
+  ]
+}

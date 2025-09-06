@@ -1,0 +1,110 @@
+{
+  "id": "fisica",
+  "nome": "Física",
+  "cor": { "bg": "#f97316", "hover": "#ea580c", "ring": "rgba(249, 115, 22, 0.5)" },
+  "niveis": [
+    {
+      "id": "iniciante",
+      "nome": "Iniciante",
+      "xpPorAcerto": 15,
+      "minAcertosParaDesbloquearProximo": 3,
+      "conteudo": {
+        "titulo": "Leis de Newton e Movimento",
+        "resumo": "A mecânica clássica, que descreve o movimento dos objetos, foi revolucionada por Isaac Newton e suas três leis fundamentais.\n\n**1ª Lei de Newton (Lei da Inércia)**\nUm corpo em repouso tende a ficar em repouso, e um corpo em movimento tende a continuar em movimento com velocidade constante, a menos que uma força externa atue sobre ele. É por isso que você é 'jogado para frente' quando um ônibus freia bruscamente.\n\n**2ª Lei de Newton (Princípio Fundamental da Dinâmica)**\nA famosa equação F = m . a. Ela diz que a força (F) aplicada a um objeto é igual à sua massa (m) multiplicada pela sua aceleração (a). A unidade de força é o **Newton (N)**.\n\n**3ª Lei de Newton (Ação e Reação)**\nPara toda ação, existe uma reação de mesma intensidade, mesma direção e sentido oposto. Quando você empurra uma parede, a parede 'empurra' você de volta com a mesma força."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é a Primeira Lei de Newton, também conhecida como Lei da Inércia?",
+          "opcoes": ["A força é igual à massa vezes a aceleração", "Um corpo em repouso tende a permanecer em repouso", "Toda ação tem uma reação igual e oposta"],
+          "respostaCorreta": "Um corpo em repouso tende a permanecer em repouso"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "A aceleração da gravidade na Terra é de aproximadamente:",
+          "opcoes": ["5.2 m/s²", "9.8 m/s²", "12.1 m/s²"],
+          "respostaCorreta": "9.8 m/s²"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "A unidade de medida para Força no Sistema Internacional é o ___.",
+          "respostaCorreta": "Newton"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "Se um carro viaja a 60 km/h por 2 horas, qual distância ele percorre?",
+          "opcoes": ["60 km", "100 km", "120 km"],
+          "respostaCorreta": "120 km"
+        }
+      ]
+    },
+    {
+      "id": "intermediario",
+      "nome": "Intermediário",
+      "xpPorAcerto": 25,
+      "minAcertosParaDesbloquearProximo": 2,
+      "conteudo": {
+        "titulo": "Termodinâmica e Ondas",
+        "resumo": "Vamos explorar o mundo da energia térmica e das vibrações que se propagam pelo espaço.\n\n**Termodinâmica**\nÉ o estudo do calor e da temperatura. O calor é a transferência de energia térmica entre corpos. Existem três formas de transferência de calor:\n- **Condução:** Transferência por contato direto. Ex: segurar uma xícara quente.\n- **Convecção:** Transferência em fluidos (líquidos e gases), onde o fluido quente sobe e o frio desce. Ex: água fervendo em uma panela.\n- **Irradiação:** Transferência por ondas eletromagnéticas, que não precisa de um meio. Ex: o calor do Sol chegando à Terra.\n\n**Ondas**\nSão perturbações que se propagam, transportando energia. Existem dois tipos principais:\n- **Ondas Mecânicas:** Precisam de um meio material para se propagar. O **som** é o melhor exemplo.\n- **Ondas Eletromagnéticas:** Não precisam de um meio. A luz, as ondas de rádio e os raios-X são exemplos."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "A transferência de calor através do contato direto entre corpos é chamada de:",
+          "opcoes": ["Convecção", "Irradiação", "Condução"],
+          "respostaCorreta": "Condução"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "O som é um exemplo de qual tipo de onda?",
+          "opcoes": ["Onda mecânica", "Onda eletromagnética", "Onda de rádio"],
+          "respostaCorreta": "Onda mecânica"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "A temperatura em que a água ferve ao nível do mar é de 100 graus ___.",
+          "respostaCorreta": "Celsius"
+        }
+      ]
+    },
+    {
+      "id": "avancado",
+      "nome": "Avançado",
+      "xpPorAcerto": 40,
+      "minAcertosParaDesbloquearProximo": null,
+      "conteudo": {
+        "titulo": "Eletromagnetismo",
+        "resumo": "O eletromagnetismo é a área da física que une os fenômenos elétricos e magnéticos, mostrando que são duas faces da mesma moeda.\n\n**Cargas Elétricas**\nA matéria é formada por átomos, que contêm partículas com carga elétrica:\n- **Prótons:** Carga positiva.\n- **Elétrons:** Carga negativa.\nCargas opostas se atraem, e cargas iguais se repelem. A força entre elas é descrita pela **Lei de Coulomb**.\n\n**Corrente Elétrica**\nÉ o movimento ordenado de elétrons. Materiais que permitem esse movimento facilmente são chamados de **condutores** (ex: metais). Materiais que dificultam muito esse movimento são os **isolantes** (ex: borracha, plástico).\n\n**Magnetismo**\nUma corrente elétrica em movimento gera um campo magnético ao seu redor. Da mesma forma, a variação de um campo magnético pode gerar uma corrente elétrica. Essa relação é a base para o funcionamento de motores elétricos, geradores e transformadores."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual partícula subatômica possui carga elétrica negativa?",
+          "opcoes": ["Próton", "Nêutron", "Elétron"],
+          "respostaCorreta": "Elétron"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "Materiais que não permitem a passagem de corrente elétrica são chamados de:",
+          "opcoes": ["Condutores", "Semicondutores", "Isolantes"],
+          "respostaCorreta": "Isolantes"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "A lei que descreve a força entre duas cargas elétricas é a Lei de ___.",
+          "respostaCorreta": "Coulomb"
+        }
+      ]
+    }
+  ]
+}

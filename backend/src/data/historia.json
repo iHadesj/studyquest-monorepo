@@ -1,0 +1,110 @@
+{
+  "id": "historia",
+  "nome": "História",
+  "cor": { "bg": "#8b5cf6", "hover": "#7c3aed", "ring": "rgba(139, 92, 246, 0.5)" },
+  "niveis": [
+    {
+      "id": "iniciante",
+      "nome": "Iniciante",
+      "xpPorAcerto": 15,
+      "minAcertosParaDesbloquearProximo": 2,
+      "conteudo": {
+        "titulo": "Grandes Navegações",
+        "resumo": "Entre os séculos XV e XVI, as nações europeias, com **Portugal** e **Espanha** na liderança, lançaram-se ao mar em uma era de exploração conhecida como as **Grandes Navegações**.\n\nO principal objetivo era encontrar uma nova rota marítima para as Índias, de onde vinham as valiosas **especiarias** (como pimenta e cravo), contornando o monopólio comercial das cidades italianas.\n\nNessas viagens, os navegadores enfrentaram perigos e o desconhecido, resultando em feitos históricos como a chegada de Cristóvão Colombo à América em 1492 e a de **Pedro Álvares Cabral** ao Brasil em 1500. Para evitar conflitos, Portugal e Espanha assinaram o **Tratado de Tordesilhas**, que dividia as terras recém-descobertas entre os dois reinos."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual navegador português foi o primeiro a chegar ao Brasil em 1500?",
+          "opcoes": ["Vasco da Gama", "Pedro Álvares Cabral", "Cristóvão Colombo"],
+          "respostaCorreta": "Pedro Álvares Cabral"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual era o principal objetivo dos europeus ao buscar novas rotas marítimas?",
+          "opcoes": ["Fazer turismo", "Encontrar especiarias na Índia", "Procurar por ouro na América"],
+          "respostaCorreta": "Encontrar especiarias na Índia"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "O Tratado de Tordesilhas dividiu as novas terras entre Portugal e ___.",
+          "respostaCorreta": "Espanha"
+        }
+      ]
+    },
+    {
+      "id": "intermediario",
+      "nome": "Intermediário",
+      "xpPorAcerto": 25,
+      "minAcertosParaDesbloquearProximo": 2,
+      "conteudo": {
+        "titulo": "Revolução Francesa",
+        "resumo": "A **Revolução Francesa**, iniciada em 1789, foi um dos eventos mais importantes da história, pondo fim à monarquia absolutista na França e espalhando ideais iluministas pelo mundo.\n\nO marco inicial foi a **Queda da Bastilha**, uma prisão que simbolizava o poder do rei. A revolução foi impulsionada pela insatisfação do povo com a desigualdade social e a crise econômica.\n\nSeu lema era **'Liberdade, Igualdade e Fraternidade'**, e ela resultou na Declaração dos Direitos do Homem e do Cidadão. A revolução teve fases turbulentas, como o **Período do Terror**, liderado por **Maximilien Robespierre**, onde milhares de pessoas foram executadas na guilhotina."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual evento marcou o início da Revolução Francesa em 1789?",
+          "opcoes": ["A coroação de Napoleão", "A Queda da Bastilha", "A invenção da guilhotina"],
+          "respostaCorreta": "A Queda da Bastilha"
+        },
+        {
+          "id": 2,
+          "tipo": "preenchimento",
+          "pergunta": "O lema da Revolução Francesa era 'Liberdade, Igualdade e ___'.",
+          "respostaCorreta": "Fraternidade"
+        },
+        {
+            "id": 3,
+            "tipo": "multipla_escolha",
+            "pergunta": "Quem foi uma figura central durante o Período do Terror?",
+            "opcoes": ["Luís XVI", "Napoleão Bonaparte", "Maximilien Robespierre"],
+            "respostaCorreta": "Maximilien Robespierre"
+        }
+      ]
+    },
+    {
+      "id": "avancado",
+      "nome": "Avançado",
+      "xpPorAcerto": 40,
+      "minAcertosParaDesbloquearProximo": null,
+      "conteudo": {
+        "titulo": "Segunda Guerra Mundial",
+        "resumo": "A **Segunda Guerra Mundial** (1939-1945) foi o conflito mais mortal da história, envolvendo duas grandes alianças militares:\n- **Eixo:** Liderado por **Alemanha**, **Itália** e **Japão**.\n- **Aliados:** Liderados por Reino Unido, União Soviética e **Estados Unidos**.\n\nO estopim da guerra na Europa foi a invasão da **Polônia** pela Alemanha nazista em 1939. Um evento crucial foi o ataque japonês à base naval de **Pearl Harbor** em 1941, que levou os Estados Unidos a entrarem oficialmente no conflito.\n\nUm dos momentos decisivos foi o **Dia D**, em 1944, quando as forças aliadas desembarcaram na Normandia (França), iniciando a libertação da Europa Ocidental. A guerra terminou em 1945 com a derrota das potências do Eixo."
+      },
+      "exercicios": [
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "A Segunda Guerra Mundial começou com a invasão de qual país pela Alemanha?",
+          "opcoes": ["França", "Rússia", "Polônia"],
+          "respostaCorreta": "Polônia"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "O ataque a Pearl Harbor levou qual país a entrar oficialmente na guerra?",
+          "opcoes": ["Brasil", "Estados Unidos", "Canadá"],
+          "respostaCorreta": "Estados Unidos"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "O desembarque das forças aliadas na Normandia em 1944 é conhecido como o Dia ___.",
+          "respostaCorreta": "D"
+        },
+        {
+            "id": 4,
+            "tipo": "multipla_escolha",
+            "pergunta": "Quais eram os três principais países do Eixo?",
+            "opcoes": ["Alemanha, Itália e Japão", "Alemanha, Rússia e China", "Itália, França e Espanha"],
+            "respostaCorreta": "Alemanha, Itália e Japão"
+        }
+      ]
+    }
+  ]
+}
