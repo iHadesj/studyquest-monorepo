@@ -4,6 +4,7 @@
     // File Layout
     // "rootDir": "./src",
     // "outDir": "./dist",
+    "outDir": "./dist",
     "target": "es2020", // Garante que o código final é moderno
     "module": "commonjs", // Diz pra ele gerar código no formato que o Node entende por padrão
     "esModuleInterop": true, // ESSA É A MÁGICA: Permite usar 'import' em arquivos 'require'
