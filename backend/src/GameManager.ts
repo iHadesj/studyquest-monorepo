@@ -1,47 +1,66 @@
-import fs from "fs";
-import path from "path";
 import { Exercicio, Materia } from "./interfaces";
 
-interface SubjectInfo {
-  id: string;
-}
+// A gente importa o "índice" de matérias primeiro
+import materiasIndex from "./data/materias.json";
+
+// Agora, importamos o conteúdo de cada arquivo de matéria individualmente
+// e usamos "as Materia" para dar um voto de confiança ao TypeScript.
+import biologiaDataRaw from "./data/biologia.json";
+import cienciasDataRaw from "./data/ciencias.json";
+import filosofiaDataRaw from "./data/filosofia.json";
+import fisicaDataRaw from "./data/fisica.json";
+import geografiaDataRaw from "./data/geografia.json";
+import historiaDataRaw from "./data/historia.json";
+import inglesDataRaw from "./data/ingles.json";
+import matematicaDataRaw from "./data/matematica.json";
+import musicaDataRaw from "./data/musica.json";
+import programacaoDataRaw from "./data/programacao.json";
+import quimicaDataRaw from "./data/quimica.json";
+
+const biologiaData = biologiaDataRaw as unknown as Materia;
+const cienciasData = cienciasDataRaw as unknown as Materia;
+const filosofiaData = filosofiaDataRaw as unknown as Materia;
+const fisicaData = fisicaDataRaw as unknown as Materia;
+const geografiaData = geografiaDataRaw as unknown as Materia;
+const historiaData = historiaDataRaw as unknown as Materia;
+const inglesData = inglesDataRaw as unknown as Materia;
+const matematicaData = matematicaDataRaw as unknown as Materia;
+const musicaData = musicaDataRaw as unknown as Materia;
+const programacaoData = programacaoDataRaw as unknown as Materia;
+const quimicaData = quimicaDataRaw as unknown as Materia;
+
+// Criamos um "mapa" para acessar facilmente os dados de cada matéria pela sua ID
+const subjectDataMap: { [key: string]: Materia } = {
+  biologia: biologiaData,
+  ciencias: cienciasData,
+  filosofia: filosofiaData,
+  fisica: fisicaData,
+  geografia: geografiaData,
+  historia: historiaData,
+  ingles: inglesData,
+  matematica: matematicaData,
+  musica: musicaData,
+  programacao: programacaoData,
+  quimica: quimicaData,
+};
 
 let allExercises: Exercicio[] = [];
 
 try {
-  console.log("Iniciando carregamento de perguntas...");
+  console.log("Carregando perguntas a partir dos módulos JSON importados...");
 
-  const indexPath = path.join(__dirname, "data", "materias.json");
+  // Iteramos sobre o nosso "índice" (materias.json)
+  for (const subjectInfo of materiasIndex) {
+    // Usamos o mapa para pegar os dados completos da matéria
+    const subjectData = subjectDataMap[subjectInfo.id];
 
-  if (fs.existsSync(indexPath)) {
-    const indexFileContent = fs.readFileSync(indexPath, "utf-8");
-    const subjects: SubjectInfo[] = JSON.parse(indexFileContent);
-
-    for (const subjectInfo of subjects) {
-      const subjectFileName = `${subjectInfo.id}.json`;
-      const subjectFilePath = path.join(__dirname, "data", subjectFileName);
-
-      if (fs.existsSync(subjectFilePath)) {
-        const subjectFileContent = fs.readFileSync(subjectFilePath, "utf-8");
-        const subjectData: Materia = JSON.parse(subjectFileContent);
-
-        if (subjectData.niveis) {
-          subjectData.niveis.forEach((level) => {
-            if (level.exercicios) {
-              allExercises.push(...level.exercicios);
-            }
-          });
+    if (subjectData && subjectData.niveis) {
+      subjectData.niveis.forEach((level) => {
+        if (level.exercicios) {
+          allExercises.push(...level.exercicios);
         }
-      } else {
-        console.warn(
-          `AVISO: Arquivo da matéria "${subjectFileName}" não encontrado.`
-        );
-      }
+      });
     }
-  } else {
-    console.error(
-      '❌ ERRO CRÍTICO: Arquivo "materias.json" não encontrado na pasta src/data.'
-    );
   }
 
   if (allExercises.length > 0) {
@@ -50,11 +69,11 @@ try {
     );
   } else {
     console.error(
-      "❌ NENHUMA PERGUNTA FOI CARREGADA. Verifique os arquivos JSON e o materias.json."
+      "❌ NENHUMA PERGUNTA FOI CARREGADA. Verifique os imports e os arquivos JSON."
     );
   }
 } catch (error) {
-  console.error("❌ Erro crítico ao carregar os dados das perguntas:", error);
+  console.error("❌ Erro crítico ao processar os dados das perguntas:", error);
 }
 
 export const getRandomQuestion = (): Exercicio | null => {
