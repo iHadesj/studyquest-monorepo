@@ -16,6 +16,12 @@ export interface Nivel {
 export interface Materia {
   id: string;
   nome: string;
+  categoria: string;
+  iconName: string;
+  cor: {
+    bg: string;
+    hover: string;
+    ring: string;
+  };
   niveis: readonly Nivel[];
-  // Adicione outros campos se precisar
 }
