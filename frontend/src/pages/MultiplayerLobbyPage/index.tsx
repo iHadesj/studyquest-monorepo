@@ -106,12 +106,9 @@ export function MultiplayerLobbyPage({
 
   useEffect(() => {
     // --- FUNÇÕES QUE OUVEM O SERVIDOR ---
-
     const onTimerTick = ({ timeLeft: newTime }: { timeLeft: number }) => {
       setTimeLeft(newTime);
     };
-
-    socket.on('timer_tick', onTimerTick);
 
     const onNewQuestion = (question: Omit<Exercicio, 'respostaCorreta'>) => {
       console.log('Nova pergunta recebida:', question);
@@ -119,6 +116,7 @@ export function MultiplayerLobbyPage({
       setSelectedAnswer('');
       setFeedback('');
       setHasAnswered(false);
+      setTimeLeft(15); // Reseta o timer visual
     };
 
     const onUpdateScore = (updatedPlayers: Player[]) => {
@@ -152,6 +150,9 @@ export function MultiplayerLobbyPage({
     socket.on('answer_result', onAnswerResult);
     socket.on('game_over', onGameOver);
 
+    // AVISA O SERVIDOR QUE ESTA TELA CARREGOU E ESTAMOS PRONTOS
+    socket.emit('player_ready', { roomId });
+
     // --- FUNÇÃO DE LIMPEZA ---
     return () => {
       socket.off('timer_tick', onTimerTick);
@@ -160,9 +161,8 @@ export function MultiplayerLobbyPage({
       socket.off('answer_result', onAnswerResult);
       socket.off('game_over', onGameOver);
     };
-  }, []);
+  }, [roomId]);
 
-  // Lógica para determinar o vencedor
   const winner = useMemo(() => {
     if (!isGameOver) return null;
     const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
@@ -182,7 +182,6 @@ export function MultiplayerLobbyPage({
     setHasAnswered(true);
   };
 
-  // Se o jogo acabou, mostra a tela de resultados
   if (isGameOver) {
     return (
       <LobbyWrapper>
@@ -217,7 +216,6 @@ export function MultiplayerLobbyPage({
     );
   }
 
-  // Se o jogo ainda está rolando, mostra a tela normal
   return (
     <LobbyWrapper>
       <Title>Duelo Brainstorm!</Title>
@@ -240,7 +238,7 @@ export function MultiplayerLobbyPage({
       <FeedbackText>{feedback}</FeedbackText>
 
       {!currentQuestion ? (
-        <h2>Aguardando a próxima pergunta...</h2>
+        <h2>Aguardando jogadores ficarem prontos...</h2>
       ) : (
         <ExerciseBox>
           <QuestionText>{currentQuestion.pergunta}</QuestionText>
