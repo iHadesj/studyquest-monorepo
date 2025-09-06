@@ -31,59 +31,57 @@ interface GameRoom {
   players: { tag: string; score: number; ready: boolean }[];
   currentQuestion: Exercicio | null;
   questionTimer: NodeJS.Timeout | null;
-  questionStartTime: number | null; // <-- Para guardar quando a pergunta começou
+  questionStartTime: number | null;
+  questionAnswered: boolean; // <<< MUDANÇA 1: Nosso novo cadeado de segurança
 }
 const gameRooms = new Map<string, GameRoom>();
 
 const QUESTION_TIME_LIMIT_S = 15;
 const NEXT_QUESTION_DELAY_MS = 3000;
-const BASE_SCORE = 50; // Pontos base por acertar
-const TIME_BONUS_MULTIPLIER = 10; // Pontos extras por cada segundo restante
+const BASE_SCORE = 50;
+const TIME_BONUS_MULTIPLIER = 10;
 
 const sendNextQuestion = (roomId: string) => {
   const room = gameRooms.get(roomId);
   if (!room) return;
 
-  // Limpa qualquer timer antigo pra não dar B.O.
   if (room.questionTimer) {
-    clearInterval(room.questionTimer); // MUDANÇA AQUI: de clearTimeout para clearInterval
+    clearInterval(room.questionTimer);
   }
 
   const nextQuestion = getRandomQuestion();
   if (nextQuestion) {
     room.currentQuestion = nextQuestion;
     room.questionStartTime = Date.now();
+    room.questionAnswered = false; // <<< MUDANÇA 2: Destranca o cadeado para a nova rodada
     const { respostaCorreta, ...questionForPlayers } = nextQuestion;
 
     io.to(roomId).emit("new_question", questionForPlayers);
     console.log(`Enviando nova pergunta para a sala ${roomId}`);
 
-    // ==========================================================
-    // >>>>> AQUI ESTÁ A MÁGICA DO CRONÔMETRO <<<<<
-    // ==========================================================
     let timeLeft = QUESTION_TIME_LIMIT_S;
-    io.to(roomId).emit("timer_tick", { timeLeft }); // Envia o tempo inicial
+    io.to(roomId).emit("timer_tick", { timeLeft });
 
-    // Inicia um cronômetro que roda a cada 1 segundo
     room.questionTimer = setInterval(() => {
       timeLeft -= 1;
-      io.to(roomId).emit("timer_tick", { timeLeft }); // Envia o tempo atualizado
+      io.to(roomId).emit("timer_tick", { timeLeft });
 
-      // Se o tempo acabar...
       if (timeLeft <= 0) {
-        clearInterval(room.questionTimer!); // Para o cronômetro
+        clearInterval(room.questionTimer!);
 
-        io.to(roomId).emit("answer_result", {
-          playerTag: "O TEMPO",
-          isCorrect: false,
-        });
-
-        // Espera um pouco e manda a próxima pergunta
-        setTimeout(() => sendNextQuestion(roomId), NEXT_QUESTION_DELAY_MS);
+        // Só emite o resultado de tempo esgotado se a pergunta não tiver sido respondida ainda
+        if (!room.questionAnswered) {
+          room.questionAnswered = true; // Tranca pra evitar qualquer outra resposta
+          io.to(roomId).emit("answer_result", {
+            playerTag: "O TEMPO",
+            isCorrect: false,
+          });
+          // Espera um pouco e manda a próxima pergunta
+          setTimeout(() => sendNextQuestion(roomId), NEXT_QUESTION_DELAY_MS);
+        }
       }
-    }, 1000); // Roda a cada 1000ms = 1 segundo
+    }, 1000);
   } else {
-    // Fim de jogo
     io.to(roomId).emit("game_over", { finalScores: room.players });
     gameRooms.delete(roomId);
   }
@@ -138,7 +136,8 @@ io.on("connection", (socket) => {
           ],
           currentQuestion: null,
           questionTimer: null,
-          questionStartTime: null, // <-- Inicializa o novo campo
+          questionStartTime: null,
+          questionAnswered: true, // <<< MUDANÇA 3: Começa trancado até a primeira pergunta ser enviada
         });
 
         socket.join(roomId);
@@ -179,27 +178,30 @@ io.on("connection", (socket) => {
     }
   });
 
-  // ==========================================================
-  // >>>>> OUVINTE submit_answer COM PONTUAÇÃO DINÂMICA <<<<<
-  // ==========================================================
   socket.on(
     "submit_answer",
     ({ roomId, answer }: { roomId: string; answer: string }) => {
       const room = gameRooms.get(roomId);
-      // Trava para evitar respostas duplas na mesma pergunta
-      if (!room || !room.currentQuestion || !room.questionStartTime) return;
 
-      // Para o timer de "tempo esgotado" assim que a primeira resposta chega
+      // <<< MUDANÇA 4: A NOVA LÓGICA DE TRAVA ANTI-RACE CONDITION >>>
+      // Se a sala não existe ou a pergunta JÁ FOI RESPONDIDA, ignora.
+      if (!room || room.questionAnswered) {
+        return;
+      }
+      // Se a checagem passou, a primeira coisa que a gente faz é TRANCAR A PORTA.
+      room.questionAnswered = true;
+
+      // Agora a lógica do jogo pode rodar segura
       if (room.questionTimer) {
-        clearInterval(room.questionTimer); // CORRETO
+        clearInterval(room.questionTimer);
         room.questionTimer = null;
       }
 
+      // Checagem de segurança pra garantir que os dados existem
+      if (!room.currentQuestion || !room.questionStartTime) return;
+
       const timeTakenMs = Date.now() - room.questionStartTime;
       const timeTakenS = Math.floor(timeTakenMs / 1000);
-
-      // Trava a pergunta para que não possa ser respondida de novo
-      room.questionStartTime = null;
 
       let playerTag = "";
       for (const [tag, id] of onlineUsers.entries()) {
@@ -228,7 +230,7 @@ io.on("connection", (socket) => {
       io.to(roomId).emit("answer_result", { playerTag, isCorrect });
       io.to(roomId).emit("update_score", room.players);
 
-      // Inicia o ciclo para a próxima pergunta
+      // Inicia o ciclo para a próxima pergunta (só o primeiro que respondeu vai chegar aqui)
       setTimeout(() => sendNextQuestion(roomId), NEXT_QUESTION_DELAY_MS);
     }
   );
