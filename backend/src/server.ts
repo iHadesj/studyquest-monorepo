@@ -5,7 +5,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { getRandomQuestion } from "./GameManager";
 import { Exercicio } from "./interfaces";
-import routes from "./routes";
+import routes from "./routes/index.tsx";
 
 dotenv.config();
 const app = express();
@@ -73,7 +73,30 @@ const sendNextQuestion = (roomId: string) => {
 };
 
 io.on("connection", (socket) => {
-  // ... (register, invite_player, e disconnect continuam iguais)
+  console.log("✅ Novo jogador conectado! ID:", socket.id);
+
+  socket.on("register", (fullTag: string) => {
+    console.log(`Registrando jogador: ${fullTag} com o ID: ${socket.id}`);
+    onlineUsers.set(fullTag, socket.id);
+  });
+
+  socket.on("invite_player", ({ inviteeTag }: { inviteeTag: string }) => {
+    let inviterTag = "";
+    for (const [tag, id] of onlineUsers.entries()) {
+      if (id === socket.id) {
+        inviterTag = tag;
+        break;
+      }
+    }
+    const inviteeSocketId = onlineUsers.get(inviteeTag);
+    if (inviteeSocketId) {
+      io.to(inviteeSocketId).emit("incoming_invite", { from: inviterTag });
+    } else {
+      socket.emit("invite_error", {
+        message: `Jogador ${inviteeTag} não encontrado ou está offline.`,
+      });
+    }
+  });
 
   socket.on(
     "invite_response",
@@ -194,7 +217,15 @@ io.on("connection", (socket) => {
   );
 
   socket.on("disconnect", () => {
-    // ... (lógica do disconnect continua a mesma)
+    console.log("❌ Jogador desconectou. ID:", socket.id);
+    for (const [tag, id] of onlineUsers.entries()) {
+      if (id === socket.id) {
+        onlineUsers.delete(tag);
+        console.log(`Jogador ${tag} removido dos online.`);
+        // Futuramente: Adicionar lógica para encerrar a sala se um jogador desconectar no meio da partida.
+        break;
+      }
+    }
   });
 });
 
