@@ -1,34 +1,45 @@
 import { useState, useEffect } from 'react';
-import styled, { createGlobalStyle, keyframes } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './config/firebase';
-import { ExercisePage } from './pages/ExercisePage';
-import { LevelSelector } from './pages/LevelSelector';
-import { SubjectSelector } from './components/SubjectSelector';
 import {
   useProgressStore,
   type FirestoreUserData,
 } from './hooks/useProgressStore';
 import type { Materia, Nivel } from './interfaces';
+
+// Import das Páginas e Componentes
+import { ExercisePage } from './pages/ExercisePage';
+import { LevelSelector } from './pages/LevelSelector';
+import { SubjectSelector } from './components/SubjectSelector';
 import { LevelHubPage } from './pages/LevelHubPage';
 import { ContentPage } from './pages/ContentPage';
+import { ProfileSetup } from './components/ProfileSetup';
+import { TopBar } from './components/TopBar';
+import { AuthPage } from './pages/AuthPage';
+import { RankingPage } from './pages/Ranking';
+import { BrainStorm } from './pages/BrainStorm';
+import { MultiplayerLobbyPage } from './pages/MultiplayerLobbyPage';
+import { ModalUserPerfil } from './components/ModalUserPerfil';
+import { InviteModal } from './components/InviteModal';
+
+// Import dos Estilos e Utilitários
 import {
   AppContainer,
   Footer,
   MainContent,
   BarWrapper,
+  FooterWrapper,
+  RankingButton,
+  HomeButton,
+  LoadingContainer,
+  LoadingSpinner,
 } from './style/globalStyle';
-import { ProfileSetup } from './components/ProfileSetup';
-import { TopBar } from './components/TopBar';
 import { House, Trophy } from 'phosphor-react';
-import { AuthPage } from './pages/AuthPage';
-import { RankingPage } from './pages/Ranking';
-import { ModalUserPerfil } from './components/ModalUserPerfil';
-import { BrainStorm } from './pages/BrainStorm';
 import { socket } from './services/socket';
-import { InviteModal } from './components/InviteModal';
-// --- ESTILOS GLOBAIS ---
+import { IncomingInviteModal } from './components/IncomingInviteModal';
+
 const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
@@ -40,208 +51,99 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-// --- TIPOS ---
 type SubjectInfo = Omit<Materia, 'niveis'> & {
   categoria: string;
   iconName: string;
 };
 
-// --- COMPONENTES ESTILIZADOS ---
-const FooterWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-  position: relative;
-  p {
-    margin: 0;
-    font-size: 0.875rem;
-  }
-  a {
-    color: #5865f2;
-    text-decoration: none;
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
-  @media (max-width: 480px) {
-    justify-content: center;
-    gap: 1rem;
-    p {
-      display: none;
-    }
-  }
-`;
-
-const HomeButton = styled.button`
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #5865f2;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-
-  &:hover {
-    background-color: #4f5bd5;
-  }
-
-  @media (max-width: 480px) {
-    position: static;
-    transform: none;
-    margin: 0 1rem;
-  }
-`;
-
-const RankingButton = styled.button`
-  background: none;
-  border: none;
-  color: #b9bbbe;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-family: 'Fira Code', monospace;
-  font-size: 0.875rem;
-  &:hover {
-    color: #ffffff;
-  }
-`;
-
-const spin = keyframes`
-  to {
-    transform: rotate(360deg);
-  }
-`;
-
-const LoadingSpinner = styled.div`
-  border: 4px solid rgba(255, 255, 255, 0.2);
-  border-left-color: #5865f2;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: ${spin} 1s linear infinite;
-`;
-
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: 100%;
-  background-color: #36393f;
-`;
-
 export default function App() {
+  // --- Estados de Navegação e Conteúdo ---
   const [screen, setScreen] = useState('subject');
   const [isInitializing, setIsInitializing] = useState(true);
   const [subjectsList, setSubjectsList] = useState<SubjectInfo[]>([]);
   const [selectedSubject, setSelectedSubject] = useState<Materia | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<Nivel | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [allSubjectsData, setAllSubjectsData] = useState<Materia[]>([]);
+
+  // --- Estados de Modais e Multiplayer ---
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isIncomingInviteModalOpen, setIsIncomingInviteModalOpen] =
+    useState(false);
+  const [inviterTag, setInviterTag] = useState<string | null>(null);
+  const [gameRoomId, setGameRoomId] = useState<string | null>(null);
 
-  const [isLoading, setIsLoading] = useState(true);
+  // --- Estados de Usuário ---
+  const { fullTag, username, hydrateFromFirestore, resetLocalStore } =
+    useProgressStore();
+  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
 
-  const { fullTag } = useProgressStore();
-
+  // --- EFEITO PARA GERENCIAR O SOCKET ---
   useEffect(() => {
-    // --- 2. LIGA A CONEXÃO QUANDO O APP CARREGAR ---
     socket.connect();
 
-    // Isso aqui é uma boa prática: quando o componente "morrer"
-    // (o usuário fechar a aba, por exemplo), a gente desliga a conexão.
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
-    // Listener pra quando a conexão for estabelecida
-    socket.on('connect', () => {
+    const onConnect = () => {
       console.log('Conectado ao servidor! ID:', socket.id);
-      // Se já temos a tag do usuário, vamos nos registrar
       if (fullTag) {
         socket.emit('register', fullTag);
       }
-    });
+    };
 
-    socket.connect();
+    const onIncomingInvite = ({ from }: { from: string }) => {
+      setInviterTag(from);
+      setIsIncomingInviteModalOpen(true);
+    };
 
-    // Listener para o convite chegando (por enquanto, só um console.log)
-    socket.on('incoming_invite', ({ from }) => {
-      alert(`Você recebeu um convite de ${from} para jogar!`);
-      // No futuro, aqui a gente mostra um modal de aceite/recusa
-    });
-
-    // Listener para erros de convite
-    socket.on('invite_error', ({ message }) => {
+    const onInviteError = ({ message }: { message: string }) => {
       alert(`Erro no convite: ${message}`);
-    });
+    };
+
+    const onGameStarted = ({ roomId }: { roomId: string }) => {
+      setIsInviteModalOpen(false);
+      setIsIncomingInviteModalOpen(false);
+      setGameRoomId(roomId);
+      setScreen('multiplayer_lobby');
+    };
+
+    const onInviteDeclined = ({ from }: { from: string }) => {
+      alert(`O jogador ${from} recusou seu convite.`);
+      setIsIncomingInviteModalOpen(false);
+    };
+
+    socket.on('connect', onConnect);
+    socket.on('incoming_invite', onIncomingInvite);
+    socket.on('invite_error', onInviteError);
+    socket.on('game_started', onGameStarted);
+    socket.on('invite_declined', onInviteDeclined);
 
     return () => {
-      socket.off('connect');
-      socket.off('incoming_invite');
-      socket.off('invite_error');
+      socket.off('connect', onConnect);
+      socket.off('incoming_invite', onIncomingInvite);
+      socket.off('invite_error', onInviteError);
+      socket.off('game_started', onGameStarted);
+      socket.off('invite_declined', onInviteDeclined);
       socket.disconnect();
     };
   }, [fullTag]);
 
-  console.log(isLoading);
-
-  const { username, hydrateFromFirestore, resetLocalStore } =
-    useProgressStore();
-  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
-
+  // --- EFEITOS PARA AUTENTICAÇÃO E DADOS ---
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setFirebaseUser(user);
-
       if (!user) {
         resetLocalStore();
-        setIsInitializing(false); // <-- CHANGE THIS
+        setIsInitializing(false);
         return;
       }
-
       const userDocRef = doc(db, 'users', user.uid);
-
-      const unsubscribeFirestore = onSnapshot(
-        userDocRef,
-        (doc) => {
-          if (doc.exists()) {
-            const userData = doc.data() as FirestoreUserData;
-            hydrateFromFirestore(userData);
-          } else {
-            hydrateFromFirestore({
-              username: null,
-              xp: 0,
-              progress: {},
-              avatarSeed: Math.random().toString(36).substring(7),
-            });
-          }
-          setIsInitializing(false); // <-- CHANGE THIS
-        },
-        (error) => {
-          console.error('Erro ao buscar dados do usuário:', error);
-          setIsInitializing(false); // <-- AND CHANGE THIS
+      const unsubscribeFirestore = onSnapshot(userDocRef, (doc) => {
+        if (doc.exists()) {
+          hydrateFromFirestore(doc.data() as FirestoreUserData);
         }
-      );
-
+        setIsInitializing(false);
+      });
       return () => unsubscribeFirestore();
     });
-
     return () => unsubscribeAuth();
   }, [hydrateFromFirestore, resetLocalStore]);
 
@@ -262,8 +164,8 @@ export default function App() {
     window.scrollTo(0, 0);
   }, [screen]);
 
+  // --- FUNÇÕES DE NAVEGAÇÃO E HANDLERS ---
   const handleSelectSubject = async (subjectInfo: SubjectInfo) => {
-    setIsLoading(true);
     try {
       const response = await fetch(`/data/${subjectInfo.id}.json`);
       const subjectDetails: Materia = await response.json();
@@ -271,8 +173,6 @@ export default function App() {
       setScreen('level');
     } catch (error) {
       console.error(`Falha ao carregar a matéria ${subjectInfo.nome}:`, error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -281,21 +181,15 @@ export default function App() {
       setScreen('brainstorm');
       return;
     }
-
-    setIsLoading(true);
     try {
       const subjectPromises = subjectsList.map((subjectInfo) =>
         fetch(`/data/${subjectInfo.id}.json`).then((res) => res.json())
       );
-
       const allSubjects = await Promise.all(subjectPromises);
-
       setAllSubjectsData(allSubjects as Materia[]);
       setScreen('brainstorm');
     } catch (error) {
       console.error('Falha ao carregar dados para o modo Brainstorm:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -308,6 +202,7 @@ export default function App() {
     setSelectedSubject(null);
     setSelectedLevel(null);
     setScreen('subject');
+    setGameRoomId(null);
   };
 
   const backToLevels = () => {
@@ -318,6 +213,7 @@ export default function App() {
     setScreen('hub');
   };
 
+  // --- RENDERIZAÇÃO ---
   if (isInitializing) {
     return (
       <LoadingContainer>
@@ -325,16 +221,17 @@ export default function App() {
       </LoadingContainer>
     );
   }
-
   if (!firebaseUser) {
     return <AuthPage />;
   }
-
   if (!username) {
     return <ProfileSetup />;
   }
 
   const renderScreen = () => {
+    if (screen === 'multiplayer_lobby' && gameRoomId) {
+      return <MultiplayerLobbyPage roomId={gameRoomId} onGoHome={backToHome} />;
+    }
     if (screen === 'ranking') {
       return <RankingPage onBack={backToHome} />;
     }
@@ -358,11 +255,9 @@ export default function App() {
         />
       );
     }
-
     if (screen === 'brainstorm') {
       return <BrainStorm subjects={allSubjectsData} onBack={backToHome} />;
     }
-
     if (screen === 'exercise' && selectedSubject && selectedLevel) {
       return (
         <ExercisePage
@@ -395,7 +290,7 @@ export default function App() {
     <>
       <GlobalStyle />
       <BarWrapper>
-        <TopBar onClick={() => setIsModalOpen(true)} />
+        <TopBar onClick={() => setIsUserModalOpen(true)} />
       </BarWrapper>
 
       <AppContainer>
@@ -413,13 +308,20 @@ export default function App() {
             </HomeButton>
           )}
         </FooterWrapper>
+
+        {/* RENDERIZAÇÃO DOS MODAIS */}
         <ModalUserPerfil
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={isUserModalOpen}
+          onClose={() => setIsUserModalOpen(false)}
         />
         <InviteModal
           isOpen={isInviteModalOpen}
           onClose={() => setIsInviteModalOpen(false)}
+        />
+        <IncomingInviteModal
+          isOpen={isIncomingInviteModalOpen}
+          inviterTag={inviterTag}
+          onClose={() => setIsIncomingInviteModalOpen(false)}
         />
       </Footer>
     </>

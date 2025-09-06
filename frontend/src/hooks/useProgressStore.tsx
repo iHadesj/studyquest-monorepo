@@ -7,7 +7,7 @@ export type FirestoreUserData = {
   xp: number;
   progress: UserProgress;
   userTag?: number;
-  fullTag?: number;
+  fullTag?: string;
 };
 
 type LevelProgress = {

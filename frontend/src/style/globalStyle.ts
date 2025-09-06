@@ -43,6 +43,102 @@ export const AppContainer = styled.div`
   }
 `;
 
+export const FooterWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+  a {
+    color: #5865f2;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  @media (max-width: 480px) {
+    justify-content: center;
+    gap: 1rem;
+    p {
+      display: none;
+    }
+  }
+`;
+
+export const HomeButton = styled.button`
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #5865f2;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: #4f5bd5;
+  }
+
+  @media (max-width: 480px) {
+    position: static;
+    transform: none;
+    margin: 0 1rem;
+  }
+`;
+
+export const RankingButton = styled.button`
+  background: none;
+  border: none;
+  color: #b9bbbe;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.875rem;
+  &:hover {
+    color: #ffffff;
+  }
+`;
+
+export const spin = keyframes`
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+export const LoadingSpinner = styled.div`
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-left-color: #5865f2;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: ${spin} 1s linear infinite;
+`;
+
+export const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  background-color: #36393f;
+`;
+
 export const MainContent = styled.div`
   max-width: 1280px;
   margin: 0 auto;
