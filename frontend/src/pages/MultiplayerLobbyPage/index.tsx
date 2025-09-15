@@ -62,6 +62,8 @@ export function MultiplayerLobbyPage({
 
   // --- Efeito principal para comunicação com o Socket ---
   useEffect(() => {
+    // NOTE: removi `players` das deps para evitar re-registrar listeners sempre que o placar muda
+
     const onTimerTick = ({ timeLeft: newTime }: { timeLeft: number }) =>
       setTimeLeft(newTime);
 
@@ -69,18 +71,21 @@ export function MultiplayerLobbyPage({
       setCurrentQuestion(question);
       setSelectedAnswer('');
       setHasAnswered(false);
-      setRoundResult(null); // Limpa o feedback da rodada anterior
+      setRoundResult(null);
     };
 
+    // agora usamos functional update pra comparar com o estado anterior com segurança
     const onUpdateScore = (updatedPlayers: Player[]) => {
-      // Lógica para calcular os pontos ganhos e mostrar no feedback
-      const myOldScore = players.find((p) => p.tag === myTag)?.score ?? 0;
-      const myNewData = updatedPlayers.find((p) => p.tag === myTag);
-      if (myNewData && myNewData.score > myOldScore) {
-        const pointsGained = myNewData.score - myOldScore;
-        setRoundResult({ status: 'CERTO!', points: pointsGained });
-      }
-      setPlayers(updatedPlayers);
+      setPlayers((prevPlayers) => {
+        const myOldScore = prevPlayers.find((p) => p.tag === myTag)?.score ?? 0;
+        const myNewData = updatedPlayers.find((p) => p.tag === myTag);
+        if (myNewData && myNewData.score > myOldScore) {
+          const pointsGained = myNewData.score - myOldScore;
+          setRoundResult({ status: 'CERTO!', points: pointsGained });
+        }
+        // substitui todo o array de players pelo que veio do servidor (padrão)
+        return updatedPlayers;
+      });
     };
 
     const onAnswerResult = ({
@@ -90,9 +95,11 @@ export function MultiplayerLobbyPage({
       playerTag: string;
       isCorrect: boolean;
     }) => {
+      // Se chegou resultado e for nosso, e for errado, mostra ERRADO
       if (playerTag === myTag && !isCorrect) {
         setRoundResult({ status: 'ERRADO!' });
       }
+      // Quando qualquer um responder (o server trava a pergunta), já bloqueia UI pra todo mundo
       setHasAnswered(true);
     };
 
@@ -102,14 +109,20 @@ export function MultiplayerLobbyPage({
       setCurrentQuestion(null);
     };
 
-    // Registra todos os ouvintes
+    const onPlayerDisconnected = ({ tag }: { tag?: string }) => {
+      // opcional: mostra mensagem, volta pra home, etc. Aqui só um console.
+      console.warn('player disconnected:', tag);
+    };
+
+    // Registra todos os ouvintes (uma vez)
     socket.on('timer_tick', onTimerTick);
     socket.on('new_question', onNewQuestion);
     socket.on('update_score', onUpdateScore);
     socket.on('answer_result', onAnswerResult);
     socket.on('game_over', onGameOver);
+    socket.on('player_disconnected', onPlayerDisconnected);
 
-    // Avisa o servidor que estamos prontos
+    // Avisa o servidor que estamos prontos (apenas quando componente monta / roomId muda)
     socket.emit('player_ready', { roomId });
 
     // Função de limpeza para remover os ouvintes
@@ -119,8 +132,10 @@ export function MultiplayerLobbyPage({
       socket.off('update_score', onUpdateScore);
       socket.off('answer_result', onAnswerResult);
       socket.off('game_over', onGameOver);
+      socket.off('player_disconnected', onPlayerDisconnected);
     };
-  }, [roomId, players, myTag]);
+    // dependências intencionais: re-executa se mudar de sala ou se meu tag mudar
+  }, [roomId, myTag]);
 
   // --- Lógica para determinar o vencedor no fim do jogo ---
   const winner = useMemo(() => {
@@ -147,7 +162,6 @@ export function MultiplayerLobbyPage({
   if (isGameOver) {
     return (
       <S.LobbyWrapper>
-        {/* Usando S.GameOverScreen do style.ts */}
         <S.GameOverScreen>
           <Trophy size={64} color="#f1c40f" weight="fill" />
           <Title>
@@ -156,7 +170,6 @@ export function MultiplayerLobbyPage({
               : `${winner?.tag} Venceu!`}
           </Title>
           <h2>Placar Final</h2>
-          {/* Reutilizando nosso Header para o placar final */}
           <S.Header style={{ width: '100%' }}>
             {players.map((p) => (
               <S.PlayerInfo key={p.tag} isMe={p.tag === myTag}>
@@ -177,7 +190,6 @@ export function MultiplayerLobbyPage({
     );
   }
 
-  // --- Renderização da tela principal do Duelo ---
   return (
     <S.LobbyWrapper>
       <Title>Duelo Brainstorm!</Title>

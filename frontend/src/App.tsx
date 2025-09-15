@@ -1,7 +1,8 @@
+// App.tsx (substitui o teu)
 import { useState, useEffect } from 'react';
 import { createGlobalStyle } from 'styled-components';
 import { onAuthStateChanged, type User } from 'firebase/auth';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, getDoc } from 'firebase/firestore';
 import { auth, db } from './config/firebase';
 import {
   useProgressStore,
@@ -73,80 +74,117 @@ export default function App() {
     useProgressStore();
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
 
+  // --- SOCKET: centraliza conexão quando fullTag existe ---
   useEffect(() => {
-    // A gente só faz qualquer coisa se o usuário estiver logado e tiver uma fullTag
-    if (fullTag) {
-      // --- Define o que fazer em cada evento ---
-      const onConnect = () => {
-        console.log('Conectado ao servidor! Registrando como:', fullTag);
-        socket.emit('register', fullTag); // Avisa o servidor quem nós somos
-      };
-
-      const onIncomingInvite = ({ from }: { from: string }) => {
-        setInviterTag(from);
-        setIsIncomingInviteModalOpen(true);
-      };
-
-      const onInviteError = ({ message }: { message: string }) => {
-        alert(`Erro no convite: ${message}`);
-      };
-
-      const onGameStarted = ({ roomId }: { roomId: string }) => {
-        setIsInviteModalOpen(false);
-        setIsIncomingInviteModalOpen(false);
-        setGameRoomId(roomId);
-        setScreen('multiplayer_lobby');
-      };
-
-      const onInviteDeclined = ({ from }: { from: string }) => {
-        alert(`O jogador ${from} recusou seu convite.`);
-        setIsIncomingInviteModalOpen(false);
-      };
-
-      // --- Registra todos os "ouvintes" ---
-      socket.on('connect', onConnect);
-      socket.on('incoming_invite', onIncomingInvite);
-      socket.on('invite_error', onInviteError);
-      socket.on('game_started', onGameStarted);
-      socket.on('invite_declined', onInviteDeclined);
-
-      // --- Conecta ao servidor ---
-      socket.connect();
-
-      // --- Função de limpeza ---
-      // Roda quando o usuário deslogar (fullTag mudar para null)
-      return () => {
-        console.log('Limpando listeners e desconectando o socket...');
-        socket.off('connect', onConnect);
-        socket.off('incoming_invite', onIncomingInvite);
-        socket.off('invite_error', onInviteError);
-        socket.off('game_started', onGameStarted);
-        socket.off('invite_declined', onInviteDeclined);
-        socket.disconnect();
-      };
+    if (!fullTag) {
+      // se não tem tag, garante desconexão limpa
+      if (socket.connected) socket.disconnect();
+      return;
     }
+
+    // handlers
+    const onConnect = () => {
+      console.log('Conectado ao servidor! Registrando como:', fullTag);
+      socket.emit('register', fullTag);
+    };
+
+    const onIncomingInvite = ({ from }: { from: string }) => {
+      setInviterTag(from);
+      setIsIncomingInviteModalOpen(true);
+    };
+
+    const onInviteError = ({ message }: { message: string }) => {
+      alert(`Erro no convite: ${message}`);
+    };
+
+    const onGameStarted = ({ roomId }: { roomId: string }) => {
+      setIsInviteModalOpen(false);
+      setIsIncomingInviteModalOpen(false);
+      setGameRoomId(roomId);
+      setScreen('multiplayer_lobby');
+    };
+
+    const onInviteDeclined = ({ from }: { from: string }) => {
+      alert(`O jogador ${from} recusou seu convite.`);
+      setIsIncomingInviteModalOpen(false);
+    };
+
+    socket.on('connect', onConnect);
+    socket.on('incoming_invite', onIncomingInvite);
+    socket.on('invite_error', onInviteError);
+    socket.on('game_started', onGameStarted);
+    socket.on('invite_declined', onInviteDeclined);
+
+    // conecta só se ainda não conectado
+    if (!socket.connected) socket.connect();
+
+    return () => {
+      console.log('Limpando listeners e desconectando o socket...');
+      socket.off('connect', onConnect);
+      socket.off('incoming_invite', onIncomingInvite);
+      socket.off('invite_error', onInviteError);
+      socket.off('game_started', onGameStarted);
+      socket.off('invite_declined', onInviteDeclined);
+      if (socket.connected) socket.disconnect();
+    };
   }, [fullTag]);
 
+  // --- AUTH + FIRESTORE: checagem imediata com getDoc + subscribe realtime com onSnapshot ---
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+    let unsubscribeFirestore: (() => void) | null = null;
+    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       setFirebaseUser(user);
       if (!user) {
+        // não logado: reseta store e marca init como pronto
         resetLocalStore();
         setIsInitializing(false);
         return;
       }
+
       const userDocRef = doc(db, 'users', user.uid);
-      const unsubscribeFirestore = onSnapshot(userDocRef, (doc) => {
-        if (doc.exists()) {
-          hydrateFromFirestore(doc.data() as FirestoreUserData);
+
+      try {
+        // pega o documento uma vez pro initial render (evita "stuck" esperando snapshot)
+        const snap = await getDoc(userDocRef);
+        if (snap.exists()) {
+          hydrateFromFirestore(snap.data() as FirestoreUserData);
+        } else {
+          // documento não existe — vamos prosseguir pra que o ProfileSetup possa criar
+          console.log('Usuário novo (sem doc). abrindo ProfileSetup...');
         }
+      } catch (err) {
+        console.error('Erro ao buscar doc do usuário:', err);
+      } finally {
+        // independente do resultado, o app já pode parar de inicializar
         setIsInitializing(false);
+      }
+
+      // depois registra o snapshot para atualizações em tempo real
+      unsubscribeFirestore = onSnapshot(userDocRef, (d) => {
+        try {
+          if (d.exists()) {
+            hydrateFromFirestore(d.data() as FirestoreUserData);
+          } else {
+            // se o doc foi removido por algum motivo, reset local store
+            // (a lógica depende do seu app; aqui só deixamos um log)
+            console.warn('Doc do usuário não existe (onSnapshot).');
+          }
+        } catch (err) {
+          console.error('Erro no snapshot do usuário:', err);
+        }
       });
-      return () => unsubscribeFirestore();
     });
-    return () => unsubscribeAuth();
+
+    // cleanup do effect: cancela subscrições
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeFirestore) unsubscribeFirestore();
+    };
+    // hydrateFromFirestore e resetLocalStore são funções estáveis da store (Zustand),
+    // mas se não forem, tu pode memoizá-las ou ajustar deps.
   }, [hydrateFromFirestore, resetLocalStore]);
 
+  // --- RESTO DO APP (fetch materias, navegação) ---
   useEffect(() => {
     const fetchSubjectsList = async () => {
       try {
@@ -212,6 +250,7 @@ export default function App() {
     setScreen('hub');
   };
 
+  // --- RENDERS E FALLBACKS ---
   if (isInitializing) {
     return (
       <LoadingContainer>
@@ -222,6 +261,7 @@ export default function App() {
   if (!firebaseUser) {
     return <AuthPage />;
   }
+  // Se username indefinido -> ProfileSetup (o usuário precisa criar)
   if (!username) {
     return <ProfileSetup />;
   }

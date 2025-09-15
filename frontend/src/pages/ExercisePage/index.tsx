@@ -78,7 +78,6 @@ const EncouragementText = styled.div`
 
 type WrongAnswer = Exercicio & { userAnswer?: string };
 
-// --- COMPONENTE PRINCIPAL ---
 export const ExercisePage = ({
   subject,
   level,
@@ -104,9 +103,7 @@ export const ExercisePage = ({
   const currentProgress = progress[subject.id]?.[level.id];
   const currentAttempts = currentProgress?.tentativas || 0;
 
-  // This effect runs once to shuffle and select 10 exercises.
   useEffect(() => {
-    // Check if there are more than 10 exercises to shuffle from
     if (level.exercicios.length > 10) {
       const shuffled = [...level.exercicios].sort(() => 0.5 - Math.random());
       setShuffledExercises(shuffled.slice(0, 10));
@@ -126,7 +123,6 @@ export const ExercisePage = ({
     let correctCount = 0;
     const wrongAnswersList: WrongAnswer[] = [];
 
-    // Evaluate answers against the 10 shuffled questions
     shuffledExercises.forEach((ex) => {
       const userAnswer = answers[ex.id]?.trim().toLowerCase();
       const correctAnswer = ex.respostaCorreta.trim().toLowerCase();
@@ -206,7 +202,6 @@ export const ExercisePage = ({
     setShowResults(true);
   };
 
-  // Check if all *displayed* questions have been answered
   const allAnswered = Object.keys(answers).length === shuffledExercises.length;
 
   if (showResults) {

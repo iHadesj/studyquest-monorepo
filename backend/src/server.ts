@@ -1,8 +1,10 @@
+// server.ts (arquivo único)
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { v4 as uuidv4 } from "uuid";
 import { getRandomQuestion } from "./GameManager";
 import { Exercicio } from "./interfaces";
 import routes from "./routes/index";
@@ -25,14 +27,21 @@ app.use(
 app.use(express.json());
 app.use(routes);
 
-const onlineUsers = new Map<string, string>();
+const onlineUsers = new Map<string, string>(); // tag -> socketId
+
+interface Player {
+  tag: string;
+  score: number;
+  ready: boolean;
+  socketId: string;
+}
 
 interface GameRoom {
-  players: { tag: string; score: number; ready: boolean }[];
+  players: Player[];
   currentQuestion: Exercicio | null;
   questionTimer: NodeJS.Timeout | null;
   questionStartTime: number | null;
-  questionAnswered: boolean; // <<< MUDANÇA 1: Nosso novo cadeado de segurança
+  questionAnswered: boolean; // lock anti-race
 }
 const gameRooms = new Map<string, GameRoom>();
 
@@ -41,58 +50,81 @@ const NEXT_QUESTION_DELAY_MS = 3000;
 const BASE_SCORE = 50;
 const TIME_BONUS_MULTIPLIER = 10;
 
+// utils
+const normalizeAnswer = (s: string) =>
+  s
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, ""); // remove acentos
+
+const safeClearTimer = (room: GameRoom) => {
+  if (room.questionTimer) {
+    clearInterval(room.questionTimer);
+    room.questionTimer = null;
+  }
+};
+
 const sendNextQuestion = (roomId: string) => {
   const room = gameRooms.get(roomId);
   if (!room) return;
 
-  if (room.questionTimer) {
-    clearInterval(room.questionTimer);
-  }
+  // garante limpeza do timer anterior
+  safeClearTimer(room);
 
   const nextQuestion = getRandomQuestion();
-  if (nextQuestion) {
-    room.currentQuestion = nextQuestion;
-    room.questionStartTime = Date.now();
-    room.questionAnswered = false; // <<< MUDANÇA 2: Destranca o cadeado para a nova rodada
-    const { respostaCorreta, ...questionForPlayers } = nextQuestion;
-
-    io.to(roomId).emit("new_question", questionForPlayers);
-    console.log(`Enviando nova pergunta para a sala ${roomId}`);
-
-    let timeLeft = QUESTION_TIME_LIMIT_S;
-    io.to(roomId).emit("timer_tick", { timeLeft });
-
-    room.questionTimer = setInterval(() => {
-      timeLeft -= 1;
-      io.to(roomId).emit("timer_tick", { timeLeft });
-
-      if (timeLeft <= 0) {
-        clearInterval(room.questionTimer!);
-
-        // Só emite o resultado de tempo esgotado se a pergunta não tiver sido respondida ainda
-        if (!room.questionAnswered) {
-          room.questionAnswered = true; // Tranca pra evitar qualquer outra resposta
-          io.to(roomId).emit("answer_result", {
-            playerTag: "O TEMPO",
-            isCorrect: false,
-          });
-          // Espera um pouco e manda a próxima pergunta
-          setTimeout(() => sendNextQuestion(roomId), NEXT_QUESTION_DELAY_MS);
-        }
-      }
-    }, 1000);
-  } else {
+  if (!nextQuestion) {
+    // cleanup e fim do jogo
+    safeClearTimer(room);
     io.to(roomId).emit("game_over", { finalScores: room.players });
     gameRooms.delete(roomId);
+    console.log(`Sala ${roomId} finalizada — sem mais perguntas.`);
+    return;
   }
+
+  room.currentQuestion = nextQuestion;
+  room.questionStartTime = Date.now();
+  room.questionAnswered = false;
+
+  // não enviar resposta correta pros players
+  const { respostaCorreta, ...questionForPlayers } = nextQuestion as any;
+
+  io.to(roomId).emit("new_question", questionForPlayers);
+  console.log(`Enviando nova pergunta para a sala ${roomId}`);
+
+  let timeLeft = QUESTION_TIME_LIMIT_S;
+  io.to(roomId).emit("timer_tick", { timeLeft });
+
+  room.questionTimer = setInterval(() => {
+    timeLeft -= 1;
+    io.to(roomId).emit("timer_tick", { timeLeft });
+
+    if (timeLeft <= 0) {
+      // timeout: ninguém respondeu a tempo
+      safeClearTimer(room);
+      if (!room.questionAnswered) {
+        room.questionAnswered = true;
+        io.to(roomId).emit("answer_result", {
+          playerTag: "O TEMPO",
+          isCorrect: false,
+        });
+        setTimeout(() => sendNextQuestion(roomId), NEXT_QUESTION_DELAY_MS);
+      }
+    }
+  }, 1000);
 };
 
 io.on("connection", (socket) => {
   console.log("✅ Novo jogador conectado! ID:", socket.id);
 
   socket.on("register", (fullTag: string) => {
-    console.log(`Registrando jogador: ${fullTag} com o ID: ${socket.id}`);
+    // Se já existia o tag, atualiza socketId (reconexão)
+    const prev = onlineUsers.get(fullTag);
+    if (prev && prev !== socket.id) {
+      console.log(`Tag ${fullTag} reconectou. Atualizando socketId.`);
+    }
     onlineUsers.set(fullTag, socket.id);
+    socket.emit("registered", { tag: fullTag });
   });
 
   socket.on("invite_player", ({ inviteeTag }: { inviteeTag: string }) => {
@@ -128,18 +160,34 @@ io.on("connection", (socket) => {
       }
 
       if (accepted) {
-        const roomId = `game-${inviterSocketId}-${socket.id}`;
+        const roomId = `game-${uuidv4()}`;
+        const inviterSocket = inviterSocketId;
+        const inviteeSocket = socket.id;
+
+        const players: Player[] = [
+          {
+            tag: inviterTag,
+            score: 0,
+            ready: false,
+            socketId: inviterSocket,
+          },
+          {
+            tag: inviteeTag,
+            score: 0,
+            ready: false,
+            socketId: inviteeSocket,
+          },
+        ];
+
         gameRooms.set(roomId, {
-          players: [
-            { tag: inviterTag, score: 0, ready: false },
-            { tag: inviteeTag, score: 0, ready: false },
-          ],
+          players,
           currentQuestion: null,
           questionTimer: null,
           questionStartTime: null,
-          questionAnswered: true, // <<< MUDANÇA 3: Começa trancado até a primeira pergunta ser enviada
+          questionAnswered: true, // começa trancado até a primeira pergunta ser enviada
         });
 
+        // juntar sockets na room
         socket.join(roomId);
         io.sockets.sockets.get(inviterSocketId)?.join(roomId);
 
@@ -147,6 +195,10 @@ io.on("connection", (socket) => {
           roomId,
           players: gameRooms.get(roomId)?.players,
         });
+
+        console.log(
+          `Sala criada ${roomId} entre ${inviterTag} (${inviterSocketId}) e ${inviteeTag} (${socket.id})`
+        );
       } else {
         io.to(inviterSocketId).emit("invite_declined", { from: inviteeTag });
       }
@@ -168,12 +220,15 @@ io.on("connection", (socket) => {
     const player = room.players.find((p) => p.tag === playerTag);
     if (player) {
       player.ready = true;
+      // também atualiza socketId caso o player tenha reconectado com outro socket
+      player.socketId = socket.id;
       console.log(`Jogador ${playerTag} está pronto na sala ${roomId}.`);
     }
 
     const allReady = room.players.every((p) => p.ready);
     if (allReady) {
       console.log(`Todos prontos na sala ${roomId}. Começando o jogo...`);
+      // destrava a primeira pergunta e manda
       sendNextQuestion(roomId);
     }
   });
@@ -183,19 +238,15 @@ io.on("connection", (socket) => {
     ({ roomId, answer }: { roomId: string; answer: string }) => {
       const room = gameRooms.get(roomId);
 
-      // <<< MUDANÇA 4: A NOVA LÓGICA DE TRAVA ANTI-RACE CONDITION >>>
       // Se a sala não existe ou a pergunta JÁ FOI RESPONDIDA, ignora.
       if (!room || room.questionAnswered) {
         return;
       }
-      // Se a checagem passou, a primeira coisa que a gente faz é TRANCAR A PORTA.
+      // TRANCAR A PORTA imediatamente
       room.questionAnswered = true;
 
-      // Agora a lógica do jogo pode rodar segura
-      if (room.questionTimer) {
-        clearInterval(room.questionTimer);
-        room.questionTimer = null;
-      }
+      // limpa timer
+      safeClearTimer(room);
 
       // Checagem de segurança pra garantir que os dados existem
       if (!room.currentQuestion || !room.questionStartTime) return;
@@ -211,9 +262,10 @@ io.on("connection", (socket) => {
         }
       }
 
-      const isCorrect =
-        room.currentQuestion.respostaCorreta.toLowerCase() ===
-        answer.toLowerCase();
+      const correct = normalizeAnswer(room.currentQuestion.respostaCorreta);
+      const given = normalizeAnswer(answer || "");
+
+      const isCorrect = correct === given;
 
       if (isCorrect) {
         const player = room.players.find((p) => p.tag === playerTag);
@@ -225,6 +277,10 @@ io.on("connection", (socket) => {
             `Jogador ${playerTag} acertou! +${BASE_SCORE} base, +${timeBonus} bônus.`
           );
         }
+      } else {
+        console.log(
+          `Jogador ${playerTag} errou. Resp correta: ${room.currentQuestion.respostaCorreta}`
+        );
       }
 
       io.to(roomId).emit("answer_result", { playerTag, isCorrect });
@@ -237,12 +293,34 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("❌ Jogador desconectou. ID:", socket.id);
-    for (const [tag, id] of onlineUsers.entries()) {
+
+    // remove do onlineUsers (se existir)
+    for (const [tag, id] of [...onlineUsers.entries()]) {
       if (id === socket.id) {
         onlineUsers.delete(tag);
         console.log(`Jogador ${tag} removido dos online.`);
-        // Futuramente: Adicionar lógica para encerrar a sala se um jogador desconectar no meio da partida.
         break;
+      }
+    }
+
+    // procurar salas que contenham esse socket e encerrar/limpar
+    for (const [roomId, room] of [...gameRooms.entries()]) {
+      const idx = room.players.findIndex((p) => p.socketId === socket.id);
+      if (idx !== -1) {
+        const disconnectedPlayer = room.players[idx];
+        // notifica a sala
+        io.to(roomId).emit("player_disconnected", {
+          tag: disconnectedPlayer?.tag,
+        });
+
+        // limpa timer
+        safeClearTimer(room);
+
+        // Remove sala por enquanto (você pode implementar reconexão/pausa depois)
+        gameRooms.delete(roomId);
+        console.log(
+          `Sala ${roomId} encerrada por desconexão (${disconnectedPlayer?.tag}).`
+        );
       }
     }
   });
