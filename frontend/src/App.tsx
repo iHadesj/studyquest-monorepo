@@ -74,10 +74,8 @@ export default function App() {
     useProgressStore();
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
 
-  // --- SOCKET: centraliza conexão quando fullTag existe ---
   useEffect(() => {
     if (!fullTag) {
-      // se não tem tag, garante desconexão limpa
       if (socket.connected) socket.disconnect();
       return;
     }
@@ -129,13 +127,11 @@ export default function App() {
     };
   }, [fullTag]);
 
-  // --- AUTH + FIRESTORE: checagem imediata com getDoc + subscribe realtime com onSnapshot ---
   useEffect(() => {
     let unsubscribeFirestore: (() => void) | null = null;
     const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       setFirebaseUser(user);
       if (!user) {
-        // não logado: reseta store e marca init como pronto
         resetLocalStore();
         setIsInitializing(false);
         return;
@@ -144,29 +140,23 @@ export default function App() {
       const userDocRef = doc(db, 'users', user.uid);
 
       try {
-        // pega o documento uma vez pro initial render (evita "stuck" esperando snapshot)
         const snap = await getDoc(userDocRef);
         if (snap.exists()) {
           hydrateFromFirestore(snap.data() as FirestoreUserData);
         } else {
-          // documento não existe — vamos prosseguir pra que o ProfileSetup possa criar
           console.log('Usuário novo (sem doc). abrindo ProfileSetup...');
         }
       } catch (err) {
         console.error('Erro ao buscar doc do usuário:', err);
       } finally {
-        // independente do resultado, o app já pode parar de inicializar
         setIsInitializing(false);
       }
 
-      // depois registra o snapshot para atualizações em tempo real
       unsubscribeFirestore = onSnapshot(userDocRef, (d) => {
         try {
           if (d.exists()) {
             hydrateFromFirestore(d.data() as FirestoreUserData);
           } else {
-            // se o doc foi removido por algum motivo, reset local store
-            // (a lógica depende do seu app; aqui só deixamos um log)
             console.warn('Doc do usuário não existe (onSnapshot).');
           }
         } catch (err) {
@@ -175,16 +165,12 @@ export default function App() {
       });
     });
 
-    // cleanup do effect: cancela subscrições
     return () => {
       unsubscribeAuth();
       if (unsubscribeFirestore) unsubscribeFirestore();
     };
-    // hydrateFromFirestore e resetLocalStore são funções estáveis da store (Zustand),
-    // mas se não forem, tu pode memoizá-las ou ajustar deps.
   }, [hydrateFromFirestore, resetLocalStore]);
 
-  // --- RESTO DO APP (fetch materias, navegação) ---
   useEffect(() => {
     const fetchSubjectsList = async () => {
       try {
@@ -250,7 +236,6 @@ export default function App() {
     setScreen('hub');
   };
 
-  // --- RENDERS E FALLBACKS ---
   if (isInitializing) {
     return (
       <LoadingContainer>
@@ -261,7 +246,6 @@ export default function App() {
   if (!firebaseUser) {
     return <AuthPage />;
   }
-  // Se username indefinido -> ProfileSetup (o usuário precisa criar)
   if (!username) {
     return <ProfileSetup />;
   }
