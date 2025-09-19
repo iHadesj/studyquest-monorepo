@@ -131,6 +131,7 @@ export default function App() {
     let unsubscribeFirestore: (() => void) | null = null;
     const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       setFirebaseUser(user);
+
       if (!user) {
         resetLocalStore();
         setIsInitializing(false);
@@ -140,29 +141,74 @@ export default function App() {
       const userDocRef = doc(db, 'users', user.uid);
 
       try {
+        // garante token fresco — evita casos de token expirado que geram permission-denied
+        await user.getIdToken(true);
+
+        // tenta buscar doc uma vez (getDoc) - isso falhará se as regras negarem
         const snap = await getDoc(userDocRef);
         if (snap.exists()) {
           hydrateFromFirestore(snap.data() as FirestoreUserData);
         } else {
           console.log('Usuário novo (sem doc). abrindo ProfileSetup...');
+          // mantém ProfileSetup aberto (username vazio) — UX ok
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Erro ao buscar doc do usuário:', err);
+        // Tratamento específico para permissão negada:
+        if (
+          typeof err === 'object' &&
+          err !== null &&
+          ('code' in err || 'message' in err)
+        ) {
+          const code = (err as { code?: string }).code;
+          const message = (err as { message?: string }).message;
+          if (
+            code === 'permission-denied' ||
+            (typeof message === 'string' &&
+              message.includes('permission-denied'))
+          ) {
+            // Ação segura: limpa store local e mostra ProfileSetup (ou força logout se preferir)
+            resetLocalStore();
+            // opcional: desloga o usuário forçando um novo sign-in
+            // await auth.signOut();
+          }
+        }
       } finally {
         setIsInitializing(false);
       }
 
-      unsubscribeFirestore = onSnapshot(userDocRef, (d) => {
-        try {
-          if (d.exists()) {
-            hydrateFromFirestore(d.data() as FirestoreUserData);
-          } else {
-            console.warn('Doc do usuário não existe (onSnapshot).');
+      // Subscribes no snapshot com handler de erro pra evitar 'Uncaught Error in snapshot listener'
+      unsubscribeFirestore = onSnapshot(
+        userDocRef,
+        (d) => {
+          try {
+            if (d.exists()) {
+              hydrateFromFirestore(d.data() as FirestoreUserData);
+            } else {
+              console.warn('Doc do usuário não existe (onSnapshot).');
+            }
+          } catch (err) {
+            console.error('Erro no snapshot do usuário (handler):', err);
           }
-        } catch (err) {
-          console.error('Erro no snapshot do usuário:', err);
+        },
+        (snapshotErr: unknown) => {
+          console.error('Erro no snapshot listener:', snapshotErr);
+          if (
+            typeof snapshotErr === 'object' &&
+            snapshotErr !== null &&
+            'code' in snapshotErr &&
+            (snapshotErr as { code?: string }).code === 'permission-denied'
+          ) {
+            // evita crash no console — trata de forma user-friendly
+            console.warn(
+              'Sem permissão para escutar o doc do usuário. Abrindo setup.'
+            );
+            resetLocalStore();
+            // opcional: desloga ou mostra mensagem ao usuário
+            // auth.signOut();
+          }
         }
-      });
+      );
     });
 
     return () => {
