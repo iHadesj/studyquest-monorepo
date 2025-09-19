@@ -4,6 +4,7 @@ import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db, auth } from '../../config/firebase';
 import { BackButton, Title } from '../../style/globalStyle';
 import { Crown } from 'phosphor-react';
+import { calculateLevelInfo } from '../../style/level';
 
 // --- TIPOS ---
 type UserData = {
@@ -15,7 +16,6 @@ type UserData = {
 };
 
 // --- ANIMAÇÕES DE NEON ---
-// Keyframes para a animação de brilho pulsante
 const neonGold = keyframes`
   0%, 100% { box-shadow: 0 0 3px #f1c40f, 0 0 6px #f1c40f, 0 0 9px #f1c40f; }
   50% { box-shadow: 0 0 6px #f1c40f, 0 0 18px #f1c40f, 0 0 6px #f1c40f; }
@@ -45,7 +45,6 @@ const UserRow = styled.div<{ rank: number; isCurrentUser: boolean }>`
   border-radius: 8px;
   margin-bottom: 0.75rem;
   transition: transform 0.2s ease-in-out;
-
   border: 2px solid
     ${(props) => (props.isCurrentUser ? '#5865f2' : 'transparent')};
 
@@ -124,20 +123,6 @@ const CenteredContainer = styled.div`
   color: #b9bbbe;
 `;
 
-// --- LÓGICA UTILITÁRIA ---
-const calculateLevel = (xp: number) => {
-  let level = 1;
-  let requiredXp = 200;
-  let totalXpForNext = 200;
-
-  while (xp >= totalXpForNext) {
-    level++;
-    requiredXp += 100;
-    totalXpForNext += requiredXp;
-  }
-  return level;
-};
-
 // --- COMPONENTE PRINCIPAL ---
 export const RankingPage = ({ onBack }: { onBack: () => void }) => {
   const [ranking, setRanking] = useState<UserData[]>([]);
@@ -154,21 +139,33 @@ export const RankingPage = ({ onBack }: { onBack: () => void }) => {
         const querySnapshot = await getDocs(q);
 
         const usersData: UserData[] = [];
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.username) {
-            usersData.push({
-              uid: doc.id,
-              username: data.username,
-              avatarSeed: data.avatarSeed,
-              xp: data.xp,
-              level: calculateLevel(data.xp),
-            });
-          }
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data() as any;
+
+          // segurança: garante tipos e defaults
+          const xp = Number(data?.xp ?? 0);
+          const avatarSeed =
+            typeof data?.avatarSeed === 'string'
+              ? data.avatarSeed
+              : String(docSnap.id);
+          const username =
+            typeof data?.username === 'string' ? data.username : 'Usuário';
+
+          // usa util centralizada pra calcular level
+          const { level } = calculateLevelInfo(xp);
+
+          usersData.push({
+            uid: docSnap.id,
+            username,
+            avatarSeed,
+            xp,
+            level,
+          });
         });
+
         setRanking(usersData);
-      } catch (error) {
-        console.error('Erro ao buscar o ranking:', error);
+      } catch (err) {
+        console.error('Erro ao buscar o ranking:', err);
         setError(
           'Não foi possível carregar o ranking. Tente novamente mais tarde.'
         );

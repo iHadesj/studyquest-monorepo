@@ -3,6 +3,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import { useProgressStore } from '../../hooks/useProgressStore';
 import { SignOut, Gear } from 'phosphor-react';
+import { calculateLevelInfo } from '../../style/level';
 
 // --- COMPONENTES ESTILIZADOS ---
 export const TopBarContainer = styled.div`
@@ -136,22 +137,6 @@ export const LogoutButton = styled.button`
     background-color: #40444b;
   }
 `;
-
-const calculateLevelInfo = (xp: number) => {
-  let level = 1;
-  let xpForCurrentLevel = 0;
-  let xpForNextLevel = 150;
-  while (xp >= xpForNextLevel) {
-    level++;
-    xpForCurrentLevel = xpForNextLevel;
-    xpForNextLevel += 150 * level;
-  }
-  const xpInCurrentLevel = xp - xpForCurrentLevel;
-  const xpNeededForLevel = xpForNextLevel - xpForCurrentLevel;
-  const progress =
-    xpNeededForLevel > 0 ? (xpInCurrentLevel / xpNeededForLevel) * 100 : 0;
-  return { level, progress, xpInCurrentLevel, xpNeededForLevel };
-};
 
 type TopBarProps = {
   onClick?: () => void;
