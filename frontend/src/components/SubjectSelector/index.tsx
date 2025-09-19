@@ -55,7 +55,7 @@ const SubjectGrid = styled.div`
 `;
 
 const SubjectCard = styled.button<{ color: Materia['cor'] }>`
-  padding: 1.25rem;
+  padding: 1rem 1.25rem;
   border-radius: 8px;
   border: none;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.18);
