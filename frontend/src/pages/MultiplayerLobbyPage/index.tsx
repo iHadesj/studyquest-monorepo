@@ -44,8 +44,11 @@ export function MultiplayerLobbyPage({
   const [players, setPlayers] = useState<Player[]>([]);
   const [hasAnswered, setHasAnswered] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(15);
+  const [timeLeft, setTimeLeft] = useState(15); // timer da pergunta (server -> timer_tick)
   const { fullTag: myTag } = useProgressStore();
+
+  // --- Novo: tempo do modo vindo do servidor (mode_tick / mode_started)
+  const [modeTimeLeft, setModeTimeLeft] = useState<number | null>(null);
 
   // Estado para o feedback visual da rodada
   const [roundResult, setRoundResult] = useState<RoundResult | null>(null);
@@ -62,8 +65,7 @@ export function MultiplayerLobbyPage({
 
   // --- Efeito principal para comunicação com o Socket ---
   useEffect(() => {
-    // NOTE: removi `players` das deps para evitar re-registrar listeners sempre que o placar muda
-
+    // handlers
     const onTimerTick = ({ timeLeft: newTime }: { timeLeft: number }) =>
       setTimeLeft(newTime);
 
@@ -74,7 +76,6 @@ export function MultiplayerLobbyPage({
       setRoundResult(null);
     };
 
-    // agora usamos functional update pra comparar com o estado anterior com segurança
     const onUpdateScore = (updatedPlayers: Player[]) => {
       setPlayers((prevPlayers) => {
         const myOldScore = prevPlayers.find((p) => p.tag === myTag)?.score ?? 0;
@@ -83,7 +84,6 @@ export function MultiplayerLobbyPage({
           const pointsGained = myNewData.score - myOldScore;
           setRoundResult({ status: 'CERTO!', points: pointsGained });
         }
-        // substitui todo o array de players pelo que veio do servidor (padrão)
         return updatedPlayers;
       });
     };
@@ -95,11 +95,10 @@ export function MultiplayerLobbyPage({
       playerTag: string;
       isCorrect: boolean;
     }) => {
-      // Se chegou resultado e for nosso, e for errado, mostra ERRADO
       if (playerTag === myTag && !isCorrect) {
         setRoundResult({ status: 'ERRADO!' });
       }
-      // Quando qualquer um responder (o server trava a pergunta), já bloqueia UI pra todo mundo
+      // bloqueia UI pra todo mundo quando server confirma resultado
       setHasAnswered(true);
     };
 
@@ -107,14 +106,38 @@ export function MultiplayerLobbyPage({
       setPlayers(finalScores);
       setIsGameOver(true);
       setCurrentQuestion(null);
+      // garante que modo mostre 0 (UI)
+      setModeTimeLeft(0);
     };
 
     const onPlayerDisconnected = ({ tag }: { tag?: string }) => {
-      // opcional: mostra mensagem, volta pra home, etc. Aqui só um console.
       console.warn('player disconnected:', tag);
     };
 
-    // Registra todos os ouvintes (uma vez)
+    // novos handlers do modo (servidor)
+    const onModeStarted = ({ duration }: { duration: number }) => {
+      setModeTimeLeft(duration);
+      setIsGameOver(false); // reinicia status se necessário
+    };
+
+    const onModeTick = ({ timeLeft: newTime }: { timeLeft: number }) => {
+      setModeTimeLeft(newTime);
+    };
+
+    const onGameStarted = ({
+      roomId: rid,
+      players: initialPlayers,
+    }: {
+      roomId: string;
+      players: Player[];
+    }) => {
+      // atualiza lista de players caso o servidor envie
+      if (rid === roomId && Array.isArray(initialPlayers)) {
+        setPlayers(initialPlayers);
+      }
+    };
+
+    // registra listeners (uma vez por roomId / myTag)
     socket.on('timer_tick', onTimerTick);
     socket.on('new_question', onNewQuestion);
     socket.on('update_score', onUpdateScore);
@@ -122,10 +145,14 @@ export function MultiplayerLobbyPage({
     socket.on('game_over', onGameOver);
     socket.on('player_disconnected', onPlayerDisconnected);
 
-    // Avisa o servidor que estamos prontos (apenas quando componente monta / roomId muda)
+    socket.on('mode_started', onModeStarted);
+    socket.on('mode_tick', onModeTick);
+    socket.on('game_started', onGameStarted);
+
+    // avisar ao servidor que estamos prontos (igual ao seu fluxo original)
     socket.emit('player_ready', { roomId });
 
-    // Função de limpeza para remover os ouvintes
+    // cleanup: remove todos os listeners
     return () => {
       socket.off('timer_tick', onTimerTick);
       socket.off('new_question', onNewQuestion);
@@ -133,6 +160,10 @@ export function MultiplayerLobbyPage({
       socket.off('answer_result', onAnswerResult);
       socket.off('game_over', onGameOver);
       socket.off('player_disconnected', onPlayerDisconnected);
+
+      socket.off('mode_started', onModeStarted);
+      socket.off('mode_tick', onModeTick);
+      socket.off('game_started', onGameStarted);
     };
     // dependências intencionais: re-executa se mudar de sala ou se meu tag mudar
   }, [roomId, myTag]);
@@ -190,9 +221,44 @@ export function MultiplayerLobbyPage({
     );
   }
 
+  // --- UI do jogo ---
   return (
     <S.LobbyWrapper>
-      <Title>Duelo Brainstorm!</Title>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: '100%',
+        }}
+      >
+        <Title>Duelo Brainstorm!</Title>
+
+        {/* Mostrador do tempo do modo (controlado pelo servidor). Pisca/pula quando <=5s */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Timer size={20} />
+          <strong
+            style={{
+              display: 'inline-block',
+              transform:
+                modeTimeLeft !== null && modeTimeLeft <= 5
+                  ? 'scale(1.15)'
+                  : 'scale(1)',
+              transition: 'transform 140ms linear, color 140ms linear',
+              color:
+                modeTimeLeft !== null && modeTimeLeft <= 5
+                  ? '#ed4245'
+                  : 'inherit',
+              minWidth: '36px',
+              textAlign: 'right',
+            }}
+            // key opcional: força reflow visual se necessário
+            key={modeTimeLeft ?? 'mode-null'}
+          >
+            {modeTimeLeft ?? '-'}s
+          </strong>
+        </div>
+      </div>
 
       <S.Header>
         <S.PlayerInfo isMe>

@@ -1,4 +1,4 @@
-// server.ts (arquivo único)
+// server.ts (refatorado)
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -41,7 +41,10 @@ interface GameRoom {
   currentQuestion: Exercicio | null;
   questionTimer: NodeJS.Timeout | null;
   questionStartTime: number | null;
-  questionAnswered: boolean; // lock anti-race
+  questionAnswered: boolean;
+  modeTimer?: NodeJS.Timeout | null;
+  modeTimeLeft?: number | null;
+  nextQuestionTimeout?: NodeJS.Timeout | null;
 }
 const gameRooms = new Map<string, GameRoom>();
 
@@ -49,6 +52,7 @@ const QUESTION_TIME_LIMIT_S = 15;
 const NEXT_QUESTION_DELAY_MS = 3000;
 const BASE_SCORE = 50;
 const TIME_BONUS_MULTIPLIER = 10;
+const MODE_DURATION_S = 60;
 
 // utils
 const normalizeAnswer = (s: string) =>
@@ -58,10 +62,19 @@ const normalizeAnswer = (s: string) =>
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, ""); // remove acentos
 
-const safeClearTimer = (room: GameRoom) => {
+// Limpa todos os timers de uma sala (question, mode e nextQuestion timeout)
+const safeClearAllTimers = (room: GameRoom) => {
   if (room.questionTimer) {
     clearInterval(room.questionTimer);
     room.questionTimer = null;
+  }
+  if (room.modeTimer) {
+    clearInterval(room.modeTimer);
+    room.modeTimer = null;
+  }
+  if (room.nextQuestionTimeout) {
+    clearTimeout(room.nextQuestionTimeout);
+    room.nextQuestionTimeout = null;
   }
 };
 
@@ -69,13 +82,21 @@ const sendNextQuestion = (roomId: string) => {
   const room = gameRooms.get(roomId);
   if (!room) return;
 
-  // garante limpeza do timer anterior
-  safeClearTimer(room);
+  // Se o modo já acabou, não tenta enviar nada
+  if (typeof room.modeTimeLeft === "number" && room.modeTimeLeft <= 0) {
+    return;
+  }
+
+  // garante limpeza do timer anterior de pergunta
+  if (room.questionTimer) {
+    clearInterval(room.questionTimer);
+    room.questionTimer = null;
+  }
 
   const nextQuestion = getRandomQuestion();
   if (!nextQuestion) {
-    // cleanup e fim do jogo
-    safeClearTimer(room);
+    // sem mais perguntas => fim de jogo
+    safeClearAllTimers(room);
     io.to(roomId).emit("game_over", { finalScores: room.players });
     gameRooms.delete(roomId);
     console.log(`Sala ${roomId} finalizada — sem mais perguntas.`);
@@ -86,9 +107,8 @@ const sendNextQuestion = (roomId: string) => {
   room.questionStartTime = Date.now();
   room.questionAnswered = false;
 
-  // não enviar resposta correta pros players
+  // envia pergunta sem resposta correta
   const { respostaCorreta, ...questionForPlayers } = nextQuestion as any;
-
   io.to(roomId).emit("new_question", questionForPlayers);
   console.log(`Enviando nova pergunta para a sala ${roomId}`);
 
@@ -101,14 +121,23 @@ const sendNextQuestion = (roomId: string) => {
 
     if (timeLeft <= 0) {
       // timeout: ninguém respondeu a tempo
-      safeClearTimer(room);
+      if (room.questionTimer) {
+        clearInterval(room.questionTimer);
+        room.questionTimer = null;
+      }
+
       if (!room.questionAnswered) {
         room.questionAnswered = true;
         io.to(roomId).emit("answer_result", {
           playerTag: "O TEMPO",
           isCorrect: false,
         });
-        setTimeout(() => sendNextQuestion(roomId), NEXT_QUESTION_DELAY_MS);
+
+        // agenda próxima pergunta (guardando o timeout para limpar se necessário)
+        room.nextQuestionTimeout = setTimeout(() => {
+          room.nextQuestionTimeout = null;
+          sendNextQuestion(roomId);
+        }, NEXT_QUESTION_DELAY_MS);
       }
     }
   }, 1000);
@@ -118,7 +147,6 @@ io.on("connection", (socket) => {
   console.log("✅ Novo jogador conectado! ID:", socket.id);
 
   socket.on("register", (fullTag: string) => {
-    // Se já existia o tag, atualiza socketId (reconexão)
     const prev = onlineUsers.get(fullTag);
     if (prev && prev !== socket.id) {
       console.log(`Tag ${fullTag} reconectou. Atualizando socketId.`);
@@ -185,6 +213,9 @@ io.on("connection", (socket) => {
           questionTimer: null,
           questionStartTime: null,
           questionAnswered: true, // começa trancado até a primeira pergunta ser enviada
+          modeTimer: null,
+          modeTimeLeft: null,
+          nextQuestionTimeout: null,
         });
 
         // juntar sockets na room
@@ -227,8 +258,32 @@ io.on("connection", (socket) => {
 
     const allReady = room.players.every((p) => p.ready);
     if (allReady) {
-      console.log(`Todos prontos na sala ${roomId}. Começando o jogo...`);
-      // destrava a primeira pergunta e manda
+      // proteção: se já existe um modeTimer, limpa antes de recriar
+      if (room.modeTimer) {
+        clearInterval(room.modeTimer);
+        room.modeTimer = null;
+      }
+
+      room.modeTimeLeft = MODE_DURATION_S;
+      io.to(roomId).emit("mode_started", { duration: MODE_DURATION_S });
+
+      // emitir ticks do modo e finalizar a sala quando acabar
+      room.modeTimer = setInterval(() => {
+        if (typeof room.modeTimeLeft !== "number") return;
+        room.modeTimeLeft!--;
+        io.to(roomId).emit("mode_tick", { timeLeft: room.modeTimeLeft });
+
+        if (room.modeTimeLeft! <= 0) {
+          // finalizar jogo por tempo
+          // limpa todos os timers associados à sala
+          safeClearAllTimers(room);
+          io.to(roomId).emit("game_over", { finalScores: room.players });
+          gameRooms.delete(roomId);
+          console.log(`Sala ${roomId} finalizada por tempo esgotado.`);
+        }
+      }, 1000);
+
+      // manda a primeira pergunta
       sendNextQuestion(roomId);
     }
   });
@@ -245,8 +300,11 @@ io.on("connection", (socket) => {
       // TRANCAR A PORTA imediatamente
       room.questionAnswered = true;
 
-      // limpa timer
-      safeClearTimer(room);
+      // limpa timer da pergunta
+      if (room.questionTimer) {
+        clearInterval(room.questionTimer);
+        room.questionTimer = null;
+      }
 
       // Checagem de segurança pra garantir que os dados existem
       if (!room.currentQuestion || !room.questionStartTime) return;
@@ -287,7 +345,17 @@ io.on("connection", (socket) => {
       io.to(roomId).emit("update_score", room.players);
 
       // Inicia o ciclo para a próxima pergunta (só o primeiro que respondeu vai chegar aqui)
-      setTimeout(() => sendNextQuestion(roomId), NEXT_QUESTION_DELAY_MS);
+      if (room) {
+        // garante que não acumule timeouts duplicados
+        if (room.nextQuestionTimeout) {
+          clearTimeout(room.nextQuestionTimeout);
+          room.nextQuestionTimeout = null;
+        }
+        room.nextQuestionTimeout = setTimeout(() => {
+          room.nextQuestionTimeout = null;
+          sendNextQuestion(roomId);
+        }, NEXT_QUESTION_DELAY_MS);
+      }
     }
   );
 
@@ -313,10 +381,8 @@ io.on("connection", (socket) => {
           tag: disconnectedPlayer?.tag,
         });
 
-        // limpa timer
-        safeClearTimer(room);
-
-        // Remove sala por enquanto (você pode implementar reconexão/pausa depois)
+        // limpa todos os timers e remove a sala
+        safeClearAllTimers(room);
         gameRooms.delete(roomId);
         console.log(
           `Sala ${roomId} encerrada por desconexão (${disconnectedPlayer?.tag}).`
