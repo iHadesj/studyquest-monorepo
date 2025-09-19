@@ -17,6 +17,7 @@ import {
 } from 'phosphor-react';
 import { Subtitle, Title } from '../../style/globalStyle';
 import type { Materia } from '../../interfaces';
+import { useProgressStore } from '../../hooks/useProgressStore';
 
 // --- TIPOS ---
 type SubjectInfo = Omit<Materia, 'niveis'> & {
@@ -25,7 +26,6 @@ type SubjectInfo = Omit<Materia, 'niveis'> & {
 };
 
 // --- COMPONENTES ESTILIZADOS ---
-
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -55,35 +55,74 @@ const SubjectGrid = styled.div`
 `;
 
 const SubjectCard = styled.button<{ color: Materia['cor'] }>`
-  padding: 1.5rem;
+  padding: 1.25rem;
   border-radius: 8px;
   border: none;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.18);
+  transition: all 0.18s;
   cursor: pointer;
   background-color: ${(props) => props.color.bg};
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  min-height: 140px;
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.28);
+  }
+
+  .icon-row {
+    display: flex;
+    justify-content: center;
   }
 
   h3 {
     font-family: 'Fira Code', monospace;
-    font-size: 1.25rem;
-    font-weight: bold;
+    font-size: 1.15rem;
+    font-weight: 700;
     color: white;
-    margin: 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    margin: 0.25rem 0 0.5rem 0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.18);
+    text-align: center;
   }
 `;
 
-// --- NOVOS COMPONENTES ESTILIZADOS PARA O BRAINSTORM ---
+const ProgressBarContainer = styled.div`
+  height: 10px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.14);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.12);
+`;
+
+const ProgressBarFill = styled.div<{ percent: number }>`
+  width: ${(p) => Math.max(0, Math.min(100, p.percent))}%;
+  height: 100%;
+  /*  background: linear-gradient(
+    90deg,
+    rgba(67, 181, 129, 1),
+    rgba(88, 101, 242, 1)
+  ); */
+  background: white;
+  transition: width 400ms cubic-bezier(0.2, 0.9, 0.2, 1);
+`;
+
+/* PROGRESS LABEL ROW */
+const ProgressRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.45rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+`;
+
 const BrainstormSection = styled.section`
   margin-top: 2rem;
   padding-top: 2.5rem;
@@ -173,7 +212,7 @@ export const TitleBrainStorm = styled.h1`
   }
 `;
 
-// --- LÓGICA DE ÍCONES ---
+// --- ICON MAP (mantive) ---
 const iconMap: { [key: string]: React.ReactNode } = {
   Divide: <Divide size={48} color="white" weight="light" />,
   Code: <Code size={48} color="white" weight="light" />,
@@ -215,31 +254,56 @@ export const SubjectSelector = ({
     return acc;
   }, {} as { [key: string]: SubjectInfo[] });
 
+  const progress = useProgressStore((s) => s.progress);
+
+  const computeSubjectPercent = (subjectId: string) => {
+    const subjectProgress = progress?.[subjectId] ?? {};
+    const levelEntries = Object.values(subjectProgress);
+
+    if (levelEntries.length === 0) return 0;
+
+    const completed = levelEntries.filter((lvl: any) => lvl?.concluido).length;
+    const percent = Math.round((completed / levelEntries.length) * 100);
+    return percent;
+  };
+
   return (
     <div>
       <Title>Bem-vindo ao StudyQuest!</Title>
       <Subtitle style={{ marginBottom: '5rem' }}>
         Escolha uma matéria para começar sua jornada.
       </Subtitle>
+
       {Object.entries(groupedSubjects).map(([category, subjectsInCategory]) => (
         <section key={category}>
           <CategoryTitle>{category}</CategoryTitle>
           <SubjectGrid>
-            {subjectsInCategory.map((subject) => (
-              <SubjectCard
-                key={subject.id}
-                onClick={() => onSelect(subject)}
-                color={subject.cor}
-              >
-                {getIcon(subject.iconName)}
-                <h3>{subject.nome}</h3>
-              </SubjectCard>
-            ))}
+            {subjectsInCategory.map((subject) => {
+              const percent = computeSubjectPercent(subject.id);
+              return (
+                <SubjectCard
+                  key={subject.id}
+                  onClick={() => onSelect(subject)}
+                  color={subject.cor}
+                  aria-label={`${subject.nome} - ${percent}% completo`}
+                >
+                  <div className="icon-row">{getIcon(subject.iconName)}</div>
+                  <h3>{subject.nome}</h3>
+
+                  <ProgressBarContainer>
+                    <ProgressBarFill percent={percent} />
+                  </ProgressBarContainer>
+
+                  <ProgressRow>
+                    <span style={{ opacity: 0.95 }}>{percent}%</span>
+                  </ProgressRow>
+                </SubjectCard>
+              );
+            })}
           </SubjectGrid>
         </section>
       ))}
 
-      {/* --- 3. NOVA SEÇÃO ADICIONADA ABAIXO --- */}
       <BrainstormSection>
         <TitleBrainStorm>Brainstorm</TitleBrainStorm>
         <BrainstormInfoCard

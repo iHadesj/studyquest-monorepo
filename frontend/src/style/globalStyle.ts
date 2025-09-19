@@ -300,6 +300,7 @@ export const ExerciseBox = styled.div`
 export const QuestionText = styled.p`
   font-size: 1rem;
   font-weight: bold;
+  user-select: none;
   margin: 0 0 1rem 0;
   line-height: 1.5;
   color: #ffffff;
@@ -316,6 +317,7 @@ export const OptionLabel = styled.label`
   background-color: #36393f;
   border-radius: 4px;
   font-size: 0.8rem;
+  user-select: none;
   border: 1px solid #40444b;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
@@ -328,6 +330,7 @@ export const RadioInput = styled.input`
   margin-right: 0.75rem;
   width: 1rem;
   height: 1rem;
+  user-select: none;
   accent-color: #5865f2;
   @media (max-width: 480px) {
     font-size: 0.7rem;
