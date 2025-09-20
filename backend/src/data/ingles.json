@@ -7,7 +7,7 @@
       "id": "iniciante",
       "nome": "Iniciante",
       "xpPorAcerto": 15,
-      "minAcertosParaDesbloquearProximo": 3,
+      "minAcertosParaDesbloquearProximo": 5,
       "conteudo": {
         "titulo": "Vocabulário Básico e Verbo To Be",
         "resumo": "Welcome! Vamos começar nossa jornada no inglês com o verbo mais importante de todos e algumas palavras essenciais.\n\n**Verbo To Be (Ser/Estar)**\nEste verbo muda de forma dependendo de quem está falando. É a base para se apresentar e descrever coisas.\n- **I am** (Eu sou/estou)\n- **You are** (Você é/está)\n- **He is** (Ele é/está)\n- **She is** (Ela é/está)\n- **It is** (É/está - para coisas e animais)\n- **We are** (Nós somos/estamos)\n- **They are** (Eles/Elas são/estão)\n\n**Vocabulário Essencial**\nConhecer algumas palavras básicas é fundamental para começar a se comunicar:\n- **Saudações:** `Hello` (Olá), `Good morning` (Bom dia), `Goodbye` (Adeus).\n- **Cores:** `Red` (vermelho), `Green` (verde), `Blue` (azul).\n- **Frutas:** `Apple` (maçã), `Banana` (banana), `Orange` (laranja)."
@@ -39,6 +39,139 @@
           "pergunta": "Qual a tradução de 'Good morning'?",
           "opcoes": ["Boa noite", "Boa tarde", "Bom dia"],
           "respostaCorreta": "Bom dia"
+        },
+        {
+          "id": 5,
+          "tipo": "multipla_escolha",
+          "pergunta": "Como se diz 'olá' em inglês (informal)?",
+          "opcoes": ["Hi", "Bye", "Thanks"],
+          "respostaCorreta": "Hi"
+        },
+        {
+          "id": 6,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual a tradução de 'Thank you'?",
+          "opcoes": ["Por favor", "Obrigado", "Desculpe"],
+          "respostaCorreta": "Obrigado"
+        },
+        {
+          "id": 7,
+          "tipo": "preenchimento",
+          "pergunta": "Como se escreve o número 7 em inglês? ___.",
+          "respostaCorreta": "seven"
+        },
+        {
+          "id": 8,
+          "tipo": "multipla_escolha",
+          "pergunta": "Complete: 'I ___ happy.'",
+          "opcoes": ["am", "is", "are"],
+          "respostaCorreta": "am"
+        },
+        {
+          "id": 9,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual palavra significa 'livro' em inglês?",
+          "opcoes": ["Book", "Chair", "Table"],
+          "respostaCorreta": "Book"
+        },
+        {
+          "id": 10,
+          "tipo": "preenchimento",
+          "pergunta": "Como se diz 'azul' em inglês? ___.",
+          "respostaCorreta": "blue"
+        },
+        {
+          "id": 11,
+          "tipo": "multipla_escolha",
+          "pergunta": "Como se pergunta 'Como você está?' em inglês (mais comum)?",
+          "opcoes": ["Where are you?", "How are you?", "What is your name?"],
+          "respostaCorreta": "How are you?"
+        },
+        {
+          "id": 12,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é a forma plural de 'cat'?",
+          "opcoes": ["Cats", "Catss", "Cates"],
+          "respostaCorreta": "Cats"
+        },
+        {
+          "id": 13,
+          "tipo": "preenchimento",
+          "pergunta": "Complete: 'They ___ at home.' ___.",
+          "respostaCorreta": "are"
+        },
+        {
+          "id": 14,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual tradução de 'Goodbye'?",
+          "opcoes": ["Olá", "Adeus", "Obrigado"],
+          "respostaCorreta": "Adeus"
+        },
+        {
+          "id": 15,
+          "tipo": "multipla_escolha",
+          "pergunta": "Como se diz 'vermelho' em inglês?",
+          "opcoes": ["Red", "Pink", "Brown"],
+          "respostaCorreta": "Red"
+        },
+        {
+          "id": 16,
+          "tipo": "preenchimento",
+          "pergunta": "Como se pergunta 'Qual é o seu nome?' em inglês? ___.",
+          "respostaCorreta": "What is your name?"
+        },
+        {
+          "id": 17,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual destas palavras é um pronome pessoal?",
+          "opcoes": ["Table", "He", "Run"],
+          "respostaCorreta": "He"
+        },
+        {
+          "id": 18,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual o artigo indefinido correto antes de 'apple'?",
+          "opcoes": ["A", "An", "The"],
+          "respostaCorreta": "An"
+        },
+        {
+          "id": 19,
+          "tipo": "preenchimento",
+          "pergunta": "Como se diz 'por favor' em inglês? ___.",
+          "respostaCorreta": "Please"
+        },
+        {
+          "id": 20,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual a forma correta da frase: 'Eu sou estudante'?",
+          "opcoes": ["I am student", "I am a student", "I are a student"],
+          "respostaCorreta": "I am a student"
+        },
+        {
+          "id": 21,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual destas palavras significa 'família' em inglês?",
+          "opcoes": ["Family", "Familiar", "Famille"],
+          "respostaCorreta": "Family"
+        },
+        {
+          "id": 22,
+          "tipo": "preenchimento",
+          "pergunta": "Traduza para inglês: 'Boa noite' ___.",
+          "respostaCorreta": "Good night"
+        },
+        {
+          "id": 23,
+          "tipo": "multipla_escolha",
+          "pergunta": "Como se diz 'água' em inglês?",
+          "opcoes": ["Wine", "Water", "Milk"],
+          "respostaCorreta": "Water"
+        },
+        {
+          "id": 24,
+          "tipo": "preenchimento",
+          "pergunta": "Complete: 'He ___ not a teacher.' ___.",
+          "respostaCorreta": "is"
         }
       ]
     },
@@ -46,7 +179,7 @@
       "id": "intermediario",
       "nome": "Intermediário",
       "xpPorAcerto": 25,
-      "minAcertosParaDesbloquearProximo": 2,
+      "minAcertosParaDesbloquearProximo": 6,
       "conteudo": {
         "titulo": "Tempos Verbais (Passado e Futuro)",
         "resumo": "Agora vamos aprender a viajar no tempo com as palavras!\n\n**Simple Past (Passado Simples)**\nUsado para falar de ações que começaram e terminaram no passado. Para a maioria dos verbos, adicionamos '-ed' no final (ex: play -> played). Mas existem os verbos irregulares, que mudam completamente, como **go -> went**.\nPara fazer perguntas, usamos o verbo auxiliar **did**. Ex: `Did you play yesterday?`\n\n**Future (Futuro)**\nExistem duas formas principais de falar do futuro:\n- **Will:** Usado para decisões espontâneas ou previsões. Ex: `I think it will rain tomorrow.` (Eu acho que vai chover amanhã.)\n- **Going to:** Usado para planos já decididos. Ex: `I am going to travel next month.` (Eu vou viajar no próximo mês.)"
@@ -71,6 +204,139 @@
           "tipo": "preenchimento",
           "pergunta": "Para fazer uma pergunta no passado simples com o verbo 'play', usamos o auxiliar ___.",
           "respostaCorreta": "did"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "Escolha a forma correta no passado: 'She (eat) dinner yesterday.'",
+          "opcoes": ["ate", "eated", "eaten"],
+          "respostaCorreta": "ate"
+        },
+        {
+          "id": 5,
+          "tipo": "multipla_escolha",
+          "pergunta": "Complete: 'They are going to ___ a party tonight.'",
+          "opcoes": ["have", "has", "had"],
+          "respostaCorreta": "have"
+        },
+        {
+          "id": 6,
+          "tipo": "preenchimento",
+          "pergunta": "O passado de 'buy' é ___.",
+          "respostaCorreta": "bought"
+        },
+        {
+          "id": 7,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual frase está no futuro com 'going to'?",
+          "opcoes": ["I am going to study", "I studied", "I will studied"],
+          "respostaCorreta": "I am going to study"
+        },
+        {
+          "id": 8,
+          "tipo": "multipla_escolha",
+          "pergunta": "Como formamos perguntas no past simple com o verbo 'to be'?",
+          "opcoes": ["Did he was?", "Was he?", "He was?"],
+          "respostaCorreta": "Was he?"
+        },
+        {
+          "id": 9,
+          "tipo": "preenchimento",
+          "pergunta": "Complete: 'I ___ (not) go to the cinema yesterday.' ___.",
+          "respostaCorreta": "did not / didn't"
+        },
+        {
+          "id": 10,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é a forma certa: 'She ___ already left.' (present perfect)",
+          "opcoes": ["has", "have", "had"],
+          "respostaCorreta": "has"
+        },
+        {
+          "id": 11,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual destas frases usa modal para obrigação?",
+          "opcoes": ["You must study", "You can study", "You may study"],
+          "respostaCorreta": "You must study"
+        },
+        {
+          "id": 12,
+          "tipo": "preenchimento",
+          "pergunta": "Transforme para passado: 'He writes a letter.' → 'He ___ a letter.'",
+          "respostaCorreta": "wrote"
+        },
+        {
+          "id": 13,
+          "tipo": "multipla_escolha",
+          "pergunta": "Complete: 'If it ___ (rain), I will stay home.'",
+          "opcoes": ["rains", "rained", "rain"],
+          "respostaCorreta": "rains"
+        },
+        {
+          "id": 14,
+          "tipo": "multipla_escolha",
+          "pergunta": "Escolha a frase correta para pedir permissão (formal):",
+          "opcoes": ["May I come in?", "I may come in?", "I can coming in?"],
+          "respostaCorreta": "May I come in?"
+        },
+        {
+          "id": 15,
+          "tipo": "preenchimento",
+          "pergunta": "O particípio passado de 'see' é ___.",
+          "respostaCorreta": "seen"
+        },
+        {
+          "id": 16,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é a forma correta no passado contínuo: 'I ___ (study) when you called.'",
+          "opcoes": ["was studying", "were studying", "am studying"],
+          "respostaCorreta": "was studying"
+        },
+        {
+          "id": 17,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual a forma correta do futuro simples com 'will' para 'they'?",
+          "opcoes": ["They will go", "They will goes", "They will going"],
+          "respostaCorreta": "They will go"
+        },
+        {
+          "id": 18,
+          "tipo": "preenchimento",
+          "pergunta": "Complete com a forma correta: 'She has ___ (finish) her homework.'",
+          "respostaCorreta": "finished"
+        },
+        {
+          "id": 19,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual alternativa está em reported speech (discurso indireto)? 'He said: \"I am tired\"' →",
+          "opcoes": ["He said he was tired.", "He said he is tired.", "He told he is tired."],
+          "respostaCorreta": "He said he was tired."
+        },
+        {
+          "id": 20,
+          "tipo": "multipla_escolha",
+          "pergunta": "Escolha a forma correta do comparativo: 'Fast' → ___.",
+          "opcoes": ["Faster", "More fast", "Fastest"],
+          "respostaCorreta": "Faster"
+        },
+        {
+          "id": 21,
+          "tipo": "preenchimento",
+          "pergunta": "Complete: 'I would like ___ coffee, please.' ___.",
+          "respostaCorreta": "some"
+        },
+        {
+          "id": 22,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual destas formas expressa habilidade no passado?",
+          "opcoes": ["I could swim when I was five.", "I can swim when I was five.", "I will can swim."],
+          "respostaCorreta": "I could swim when I was five."
+        },
+        {
+          "id": 23,
+          "tipo": "preenchimento",
+          "pergunta": "Complete: 'They ___ (never) been to Paris.' ___.",
+          "respostaCorreta": "have never / 've never"
         }
       ]
     },
@@ -78,7 +344,7 @@
       "id": "avancado",
       "nome": "Avançado",
       "xpPorAcerto": 40,
-      "minAcertosParaDesbloquearProximo": null,
+      "minAcertosParaDesbloquearProximo": 7,
       "conteudo": {
         "titulo": "Phrasal Verbs e Expressões",
         "resumo": "Para soar como um nativo, é essencial conhecer as expressões e os 'phrasal verbs'.\n\n**Phrasal Verbs**\nSão verbos compostos por duas ou mais palavras (um verbo + uma preposição ou advérbio) que, juntos, ganham um novo significado. O significado geralmente não pode ser deduzido pelas palavras separadas.\nEx: `look for` (procurar), `turn on` (ligar), `give up` (desistir).\n\n**Expressões Idiomáticas (Idioms)**\nSão frases cujo significado não é literal. Elas são uma parte muito importante da cultura de uma língua.\nEx: `It's raining cats and dogs` significa que está chovendo muito, e não que animais estão caindo do céu.\nOutro exemplo famoso é `a piece of cake`, usado para dizer que algo é muito fácil de fazer."
@@ -103,6 +369,139 @@
           "tipo": "preenchimento",
           "pergunta": "Para dizer que algo é 'muito fácil', em inglês, podemos dizer que é 'a piece of ___'.",
           "respostaCorreta": "cake"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é a voz passiva de 'They will finish the project next week'?",
+          "opcoes": ["The project will be finished next week.", "The project will finish next week.", "The project is finished next week."],
+          "respostaCorreta": "The project will be finished next week."
+        },
+        {
+          "id": 5,
+          "tipo": "multipla_escolha",
+          "pergunta": "Em reported speech: 'She said, \"I have seen it.\"' →",
+          "opcoes": ["She said she had seen it.", "She said she has seen it.", "She told she had seen it."],
+          "respostaCorreta": "She said she had seen it."
+        },
+        {
+          "id": 6,
+          "tipo": "preenchimento",
+          "pergunta": "Complete o phrasal verb: 'to look ___' (procurar).",
+          "respostaCorreta": "for"
+        },
+        {
+          "id": 7,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual destas é uma expressão que significa 'adiar'?",
+          "opcoes": ["Put off", "Put on", "Put away"],
+          "respostaCorreta": "Put off"
+        },
+        {
+          "id": 8,
+          "tipo": "multipla_escolha",
+          "pergunta": "Escolha a opção com a preposição correta (dependente de): 'dependent ___'",
+          "opcoes": ["on", "in", "at"],
+          "respostaCorreta": "on"
+        },
+        {
+          "id": 9,
+          "tipo": "preenchimento",
+          "pergunta": "Transforme para passive: 'They make cars in that factory.' → 'Cars ___ in that factory.'",
+          "respostaCorreta": "are made"
+        },
+        {
+          "id": 10,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual a diferença principal entre 'since' e 'for' no present perfect?",
+          "opcoes": ["Since indica ponto inicial; for indica duração", "For indica ponto inicial; since indica duração", "São sinônimos exatos"],
+          "respostaCorreta": "Since indica ponto inicial; for indica duração"
+        },
+        {
+          "id": 11,
+          "tipo": "preenchimento",
+          "pergunta": "Complete com a forma correta do condicional: 'If I ___ (be) you, I would study more.'",
+          "respostaCorreta": "were"
+        },
+        {
+          "id": 12,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é o significado de 'to break the ice'?",
+          "opcoes": ["Quebrar algo", "Quebrar a tensão social/começar conversas", "Congelar água"],
+          "respostaCorreta": "Quebrar a tensão social/começar conversas"
+        },
+        {
+          "id": 13,
+          "tipo": "multipla_escolha",
+          "pergunta": "Escolha a forma correta de 'wish' para expressar arrependimento no passado:",
+          "opcoes": ["I wish I had studied", "I wish I have studied", "I wish I studied"],
+          "respostaCorreta": "I wish I had studied"
+        },
+        {
+          "id": 14,
+          "tipo": "preenchimento",
+          "pergunta": "Preencha: 'By the time we arrived, the film ___ (start).' ___.",
+          "respostaCorreta": "had started"
+        },
+        {
+          "id": 15,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual phrasal verb significa 'desligar' (um aparelho)?",
+          "opcoes": ["Turn off", "Turn up", "Turn in"],
+          "respostaCorreta": "Turn off"
+        },
+        {
+          "id": 16,
+          "tipo": "multipla_escolha",
+          "pergunta": "Escolha a alternativa correta para formar um question tag: 'You like coffee, ___?'",
+          "opcoes": ["do you", "don't you", "doesn't you"],
+          "respostaCorreta": "don't you"
+        },
+        {
+          "id": 17,
+          "tipo": "preenchimento",
+          "pergunta": "Complete: 'If he ___ (study) harder, he would have passed the exam.' ___.",
+          "respostaCorreta": "had studied"
+        },
+        {
+          "id": 18,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual estrutura é usada para enfatizar algo (cleft sentence)?",
+          "opcoes": ["It was + X + who/that + ...", "X + does + ...", "Does + X + ..."],
+          "respostaCorreta": "It was + X + who/that + ..."
+        },
+        {
+          "id": 19,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é a preposição correta: 'I'm looking forward ___ seeing you.'",
+          "opcoes": ["to", "for", "at"],
+          "respostaCorreta": "to"
+        },
+        {
+          "id": 20,
+          "tipo": "preenchimento",
+          "pergunta": "Complete o idiom: 'to hit the ___' (atingir o ponto alto).",
+          "respostaCorreta": "spot"
+        },
+        {
+          "id": 21,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é a forma correta em voz passiva do presente perfeito: 'They have completed the work.'?",
+          "opcoes": ["The work has been completed.", "The work have been completed.", "The work is completed."],
+          "respostaCorreta": "The work has been completed."
+        },
+        {
+          "id": 22,
+          "tipo": "preenchimento",
+          "pergunta": "Complete: 'She suggested that he ___ (go) to the doctor.' (subjunctive) ___.",
+          "respostaCorreta": "go"
+        },
+        {
+          "id": 23,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual phrasal verb significa 'descobrir (uma informação)'?",
+          "opcoes": ["Find out", "Find in", "Find up"],
+          "respostaCorreta": "Find out"
         }
       ]
     }

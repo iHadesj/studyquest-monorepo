@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { AnimatePresence } from 'framer-motion';
 
-// Componentes globais que ainda usamos
 import {
   Title,
   SubmitButton,
@@ -10,10 +9,8 @@ import {
   QuestionText,
 } from '../../style/globalStyle';
 
-// Nossos novos componentes estilizados
 import * as S from './style';
 
-// Hooks e Serviços
 import { socket } from '../../services/socket';
 import { useProgressStore } from '../../hooks/useProgressStore';
 
@@ -22,7 +19,6 @@ import { Timer, Trophy } from 'phosphor-react';
 import type { Exercicio } from '../../interfaces';
 import { Radio } from '@mui/material';
 
-// --- Tipagens locais para o componente ---
 type Player = { tag: string; score: number };
 type RoundResult = { status: 'CERTO!' | 'ERRADO!'; points?: number };
 
@@ -35,7 +31,6 @@ export function MultiplayerLobbyPage({
   roomId,
   onGoHome,
 }: MultiplayerLobbyPageProps) {
-  // --- Estados do Componente ---
   const [currentQuestion, setCurrentQuestion] = useState<Omit<
     Exercicio,
     'respostaCorreta'
@@ -47,13 +42,10 @@ export function MultiplayerLobbyPage({
   const [timeLeft, setTimeLeft] = useState(15); // timer da pergunta (server -> timer_tick)
   const { fullTag: myTag } = useProgressStore();
 
-  // --- Novo: tempo do modo vindo do servidor (mode_tick / mode_started)
   const [modeTimeLeft, setModeTimeLeft] = useState<number | null>(null);
 
-  // Estado para o feedback visual da rodada
   const [roundResult, setRoundResult] = useState<RoundResult | null>(null);
 
-  // --- Memos para facilitar o acesso aos dados ---
   const me = useMemo(
     () => players.find((p) => p.tag === myTag),
     [players, myTag]
@@ -63,7 +55,6 @@ export function MultiplayerLobbyPage({
     [players, myTag]
   );
 
-  // --- Efeito principal para comunicação com o Socket ---
   useEffect(() => {
     // handlers
     const onTimerTick = ({ timeLeft: newTime }: { timeLeft: number }) =>
@@ -98,7 +89,6 @@ export function MultiplayerLobbyPage({
       if (playerTag === myTag && !isCorrect) {
         setRoundResult({ status: 'ERRADO!' });
       }
-      // bloqueia UI pra todo mundo quando server confirma resultado
       setHasAnswered(true);
     };
 
@@ -106,7 +96,6 @@ export function MultiplayerLobbyPage({
       setPlayers(finalScores);
       setIsGameOver(true);
       setCurrentQuestion(null);
-      // garante que modo mostre 0 (UI)
       setModeTimeLeft(0);
     };
 
@@ -114,10 +103,9 @@ export function MultiplayerLobbyPage({
       console.warn('player disconnected:', tag);
     };
 
-    // novos handlers do modo (servidor)
     const onModeStarted = ({ duration }: { duration: number }) => {
       setModeTimeLeft(duration);
-      setIsGameOver(false); // reinicia status se necessário
+      setIsGameOver(false);
     };
 
     const onModeTick = ({ timeLeft: newTime }: { timeLeft: number }) => {
@@ -131,13 +119,11 @@ export function MultiplayerLobbyPage({
       roomId: string;
       players: Player[];
     }) => {
-      // atualiza lista de players caso o servidor envie
       if (rid === roomId && Array.isArray(initialPlayers)) {
         setPlayers(initialPlayers);
       }
     };
 
-    // registra listeners (uma vez por roomId / myTag)
     socket.on('timer_tick', onTimerTick);
     socket.on('new_question', onNewQuestion);
     socket.on('update_score', onUpdateScore);
@@ -149,10 +135,8 @@ export function MultiplayerLobbyPage({
     socket.on('mode_tick', onModeTick);
     socket.on('game_started', onGameStarted);
 
-    // avisar ao servidor que estamos prontos (igual ao seu fluxo original)
     socket.emit('player_ready', { roomId });
 
-    // cleanup: remove todos os listeners
     return () => {
       socket.off('timer_tick', onTimerTick);
       socket.off('new_question', onNewQuestion);
@@ -165,10 +149,8 @@ export function MultiplayerLobbyPage({
       socket.off('mode_tick', onModeTick);
       socket.off('game_started', onGameStarted);
     };
-    // dependências intencionais: re-executa se mudar de sala ou se meu tag mudar
   }, [roomId, myTag]);
 
-  // --- Lógica para determinar o vencedor no fim do jogo ---
   const winner = useMemo(() => {
     if (!isGameOver) return null;
     const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
@@ -182,14 +164,12 @@ export function MultiplayerLobbyPage({
     return sortedPlayers[0];
   }, [isGameOver, players]);
 
-  // --- Handler para enviar a resposta ---
   const handleAnswerSubmit = () => {
     if (!selectedAnswer) return;
     socket.emit('submit_answer', { roomId, answer: selectedAnswer });
     setHasAnswered(true);
   };
 
-  // --- Renderização da tela de Fim de Jogo ---
   if (isGameOver) {
     return (
       <S.LobbyWrapper>
@@ -221,7 +201,6 @@ export function MultiplayerLobbyPage({
     );
   }
 
-  // --- UI do jogo ---
   return (
     <S.LobbyWrapper>
       <div
@@ -234,7 +213,6 @@ export function MultiplayerLobbyPage({
       >
         <Title>Duelo Brainstorm!</Title>
 
-        {/* Mostrador do tempo do modo (controlado pelo servidor). Pisca/pula quando <=5s */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Timer size={20} />
           <strong
@@ -252,7 +230,6 @@ export function MultiplayerLobbyPage({
               minWidth: '36px',
               textAlign: 'right',
             }}
-            // key opcional: força reflow visual se necessário
             key={modeTimeLeft ?? 'mode-null'}
           >
             {modeTimeLeft ?? '-'}s

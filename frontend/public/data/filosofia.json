@@ -7,96 +7,436 @@
       "id": "iniciante",
       "nome": "Iniciante",
       "xpPorAcerto": 15,
-      "minAcertosParaDesbloquearProximo": 15,
+      "minAcertosParaDesbloquearProximo": 5,
       "conteudo": {
-        "titulo": "Os Gigantes da Grécia Antiga",
-        "resumo": "A jornada da filosofia ocidental começa na Grécia Antiga, berço de pensadores que moldaram nossa forma de ver o mundo. Vamos explorar os três pilares fundamentais:\n\n**Sócrates: O Sábio Humilde**\nImagine um homem que, em vez de dar respostas, fazia perguntas. Esse era Sócrates. Ele acreditava que a verdadeira sabedoria nasce do reconhecimento da própria ignorância, encapsulado em sua famosa frase: 'Só sei que nada sei'. Seu método, a **Maiêutica** (ou 'parto de ideias'), consistia em um diálogo habilidoso que levava as pessoas a descobrirem a verdade por si mesmas, como se estivessem dando à luz ao próprio conhecimento.\n\n**Platão: O Idealista**\nDiscípulo de Sócrates, Platão nos levou a questionar a própria realidade. Para ele, o mundo que percebemos com nossos sentidos é apenas uma cópia imperfeita de um **'Mundo das Ideias'**, uma realidade superior, perfeita e eterna. Sua **Alegoria da Caverna** é uma metáfora poderosa sobre a jornada do filósofo: sair da escuridão da ignorância (as sombras na parede) em direção à luz do conhecimento verdadeiro (o mundo exterior).\n\n**Aristóteles: O Realista**\nAluno de Platão, Aristóteles trouxe a filosofia de volta à Terra. Ele valorizava a experiência e a observação do mundo concreto como fontes primárias do conhecimento. Em sua ética, o objetivo final é a **Eudaimonia** (geralmente traduzida como felicidade ou florescimento humano), que é alcançada através da prática da virtude. A virtude, para Aristóteles, está no **'meio-termo'**, o equilíbrio perfeito entre dois extremos viciosos (por exemplo, a coragem é o meio-termo entre a covardia e a imprudência)."
+        "titulo": "Filósofos Gregos",
+        "resumo": "A filosofia ocidental nasceu na Grécia Antiga. Vamos conhecer seus três maiores pensadores:\n\n**Sócrates**\nFamoso por andar pelas ruas de Atenas questionando as pessoas. Ele acreditava que o verdadeiro conhecimento vem do reconhecimento da própria ignorância, daí sua famosa frase: 'Só sei que nada sei'. Seu método, a **Maiêutica**, consistia em fazer perguntas sucessivas para que a própria pessoa chegasse à verdade.\n\n**Platão**\nDiscípulo de Sócrates, Platão acreditava que o mundo que percebemos com nossos sentidos é apenas uma sombra de um 'Mundo das Ideias', perfeito e imutável. Sua **Alegoria da Caverna** é uma metáfora poderosa sobre como a filosofia pode nos libertar da ignorância (as sombras) e nos levar à luz do conhecimento verdadeiro.\n\n**Aristóteles**\nDiscípulo de Platão, Aristóteles tinha uma visão mais prática. Ele acreditava que o conhecimento é adquirido através da experiência e da observação do mundo real. Para ele, a ética estava ligada à busca pela felicidade, que seria alcançada através da virtude, encontrando sempre o **meio-termo** entre os extremos (por exemplo, a coragem é o meio-termo entre a covardia e a temeridade)."
       },
       "exercicios": [
-        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Qual filósofo é famoso pela frase 'Só sei que nada sei'?", "opcoes": ["Platão", "Aristóteles", "Sócrates"], "respostaCorreta": "Sócrates" },
-        { "id": 2, "tipo": "multipla_escolha", "pergunta": "A 'Alegoria da Caverna' é uma famosa passagem da obra de qual pensador?", "opcoes": ["Heráclito", "Platão", "Diógenes"], "respostaCorreta": "Platão" },
-        { "id": 3, "tipo": "preenchimento", "pergunta": "Para Aristóteles, o caminho para a felicidade era através da virtude e da busca pelo 'meio-___'.", "respostaCorreta": "termo" },
-        { "id": 4, "tipo": "multipla_escolha", "pergunta": "O método de Sócrates para chegar ao conhecimento através de perguntas e respostas é chamado de:", "opcoes": ["Dialética", "Sofismo", "Maiêutica"], "respostaCorreta": "Maiêutica" },
-        { "id": 5, "tipo": "multipla_escolha", "pergunta": "Qual filósofo acreditava que o mundo sensível é uma cópia imperfeita do 'Mundo das Ideias'?", "opcoes": ["Sócrates", "Platão", "Aristóteles"], "respostaCorreta": "Platão" },
-        { "id": 6, "tipo": "preenchimento", "pergunta": "Aristóteles foi discípulo de ___.", "respostaCorreta": "Platão" },
-        { "id": 7, "tipo": "multipla_escolha", "pergunta": "A ética aristotélica busca a felicidade, também conhecida como:", "opcoes": ["Ataraxia", "Eudaimonia", "Hedonismo"], "respostaCorreta": "Eudaimonia" },
-        { "id": 8, "tipo": "multipla_escolha", "pergunta": "Segundo Platão, como as pessoas na caverna veem a realidade?", "opcoes": ["Como ela realmente é", "Como sombras projetadas na parede", "Como ideias perfeitas"], "respostaCorreta": "Como sombras projetadas na parede" },
-        { "id": 9, "tipo": "preenchimento", "pergunta": "O método socrático também é conhecido como o 'parto de ___'.", "respostaCorreta": "ideias" },
-        { "id": 10, "tipo": "multipla_escolha", "pergunta": "Qual destes filósofos foi o preceptor de Alexandre, o Grande?", "opcoes": ["Platão", "Sócrates", "Aristóteles"], "respostaCorreta": "Aristóteles" },
-        { "id": 11, "tipo": "multipla_escolha", "pergunta": "Para Sócrates, o primeiro passo para o conhecimento é:", "opcoes": ["Ler muitos livros", "Aceitar as tradições", "Reconhecer a própria ignorância"], "respostaCorreta": "Reconhecer a própria ignorância" },
-        { "id": 12, "tipo": "preenchimento", "pergunta": "A coragem, para Aristóteles, é o meio-termo entre a covardia e a ___.", "respostaCorreta": "temeridade" },
-        { "id": 13, "tipo": "multipla_escolha", "pergunta": "Quem foi o mestre de Platão?", "opcoes": ["Aristóteles", "Sócrates", "Parmênides"], "respostaCorreta": "Sócrates" },
-        { "id": 14, "tipo": "multipla_escolha", "pergunta": "Qual filósofo focou seus estudos na observação da natureza e do mundo material?", "opcoes": ["Platão", "Aristóteles", "Sócrates"], "respostaCorreta": "Aristóteles" },
-        { "id": 15, "tipo": "preenchimento", "pergunta": "Na Alegoria da Caverna, o sol representa o ___.", "respostaCorreta": "conhecimento" },
-        { "id": 16, "tipo": "multipla_escolha", "pergunta": "Sócrates foi condenado à morte em Atenas sob a acusação de:", "opcoes": ["Roubo", "Corromper a juventude", "Traição"], "respostaCorreta": "Corromper a juventude" },
-        { "id": 17, "tipo": "multipla_escolha", "pergunta": "A teoria das 'quatro causas' (material, formal, eficiente e final) foi desenvolvida por:", "opcoes": ["Platão", "Sócrates", "Aristóteles"], "respostaCorreta": "Aristóteles" },
-        { "id": 18, "tipo": "preenchimento", "pergunta": "A obra mais famosa de Platão, onde se encontra a Alegoria da Caverna, chama-se 'A ___'.", "respostaCorreta": "República" },
-        { "id": 19, "tipo": "multipla_escolha", "pergunta": "O que significa 'Maiêutica'?", "opcoes": ["A arte de ensinar", "A arte de dar à luz ideias", "A arte de governar"], "respostaCorreta": "A arte de dar à luz ideias" },
-        { "id": 20, "tipo": "multipla_escolha", "pergunta": "Para Aristóteles, a virtude é um(a):", "opcoes": ["Sentimento inato", "Hábito adquirido pela prática", "Dom divino"], "respostaCorreta": "Hábito adquirido pela prática" }
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual filósofo é famoso pela frase 'Só sei que nada sei'?",
+          "opcoes": ["Platão", "Aristóteles", "Sócrates"],
+          "respostaCorreta": "Sócrates"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "A 'Alegoria da Caverna' é uma famosa passagem da obra de qual pensador?",
+          "opcoes": ["Heráclito", "Platão", "Diógenes"],
+          "respostaCorreta": "Platão"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "Para Aristóteles, o caminho para a felicidade era através da virtude e da busca pelo 'meio-___'.",
+          "respostaCorreta": "termo"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "O método de Sócrates para chegar ao conhecimento através de perguntas e respostas é chamado de:",
+          "opcoes": ["Dialética", "Sofismo", "Maiêutica"],
+          "respostaCorreta": "Maiêutica"
+        },
+        {
+          "id": 5,
+          "tipo": "multipla_escolha",
+          "pergunta": "Quem foi aluno de Sócrates e autor de 'A República'?",
+          "opcoes": ["Aristóteles", "Platão", "Epicuro"],
+          "respostaCorreta": "Platão"
+        },
+        {
+          "id": 6,
+          "tipo": "multipla_escolha",
+          "pergunta": "Aristóteles fundou qual escola filosófica/prática?",
+          "opcoes": ["Liceu", "Academia", "Jardins Epicuristas"],
+          "respostaCorreta": "Liceu"
+        },
+        {
+          "id": 7,
+          "tipo": "preenchimento",
+          "pergunta": "O método que questiona pressupostos e busca contradições para encontrar a verdade é a ___.",
+          "respostaCorreta": "maiêutica"
+        },
+        {
+          "id": 8,
+          "tipo": "multipla_escolha",
+          "pergunta": "Quem defendia que a alma e as ideias existem em um mundo perfeito separado do mundo sensível?",
+          "opcoes": ["Sócrates", "Platão", "Aristóteles"],
+          "respostaCorreta": "Platão"
+        },
+        {
+          "id": 9,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual desses conceitos está mais associado a Aristóteles?",
+          "opcoes": ["Mundo das Ideias", "Causa e finalidade (teleologia)", "Escolas cínicas"],
+          "respostaCorreta": "Causa e finalidade (teleologia)"
+        },
+        {
+          "id": 10,
+          "tipo": "preenchimento",
+          "pergunta": "Platão usou a imagem da ___ para explicar a ignorância humana e a ascensão ao conhecimento.",
+          "respostaCorreta": "caverna"
+        },
+        {
+          "id": 11,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual filósofo grego é conhecido por valorizar a observação empírica e catalogar o conhecimento?",
+          "opcoes": ["Platão", "Sócrates", "Aristóteles"],
+          "respostaCorreta": "Aristóteles"
+        },
+        {
+          "id": 12,
+          "tipo": "multipla_escolha",
+          "pergunta": "Sócrates escreveu muitos livros sobre sua filosofia? (V/F)",
+          "opcoes": ["Verdadeiro", "Falso"],
+          "respostaCorreta": "Falso"
+        },
+        {
+          "id": 13,
+          "tipo": "preenchimento",
+          "pergunta": "O diálogo filosófico escrito por Platão que mostra uma conversa entre Sócrates e outros é chamado de ___.",
+          "respostaCorreta": "diálogo"
+        },
+        {
+          "id": 14,
+          "tipo": "multipla_escolha",
+          "pergunta": "Quem defendia que a virtude é um hábito e precisa ser cultivada pela prática?",
+          "opcoes": ["Aristóteles", "Epicuro", "Parmênides"],
+          "respostaCorreta": "Aristóteles"
+        },
+        {
+          "id": 15,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual escola filosófica grega era conhecida por buscar a autossuficiência e desprezar convenções sociais (ex.: viver com simplicidade extrema)?",
+          "opcoes": ["Estoicos", "Cínicos", "Epicuristas"],
+          "respostaCorreta": "Cínicos"
+        },
+        {
+          "id": 16,
+          "tipo": "preenchimento",
+          "pergunta": "O filósofo que inspirou o método socrático e não deixou obras escritas foi ___.",
+          "respostaCorreta": "Sócrates"
+        },
+        {
+          "id": 17,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual conceito platônico descreve as formas perfeitas e imutáveis por trás dos objetos sensíveis?",
+          "opcoes": ["Alegoria", "Ideias/Formas", "Metafísica do ser"], 
+          "respostaCorreta": "Ideias/Formas"
+        },
+        {
+          "id": 18,
+          "tipo": "multipla_escolha",
+          "pergunta": "Aristóteles dividia o conhecimento em quais áreas? (escolha a melhor opção)",
+          "opcoes": ["Teoria e prática", "Só poesia", "Apenas ética"], 
+          "respostaCorreta": "Teoria e prática"
+        },
+        {
+          "id": 19,
+          "tipo": "preenchimento",
+          "pergunta": "A obra de Platão que imagina uma cidade justa e discute justiça é chamada de ___.",
+          "respostaCorreta": "A República"
+        },
+        {
+          "id": 20,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual figura é frequentemente retratada nas obras de Platão como modelo do filósofo-rei?",
+          "opcoes": ["O cidadão comum", "O governante sábio e filósofo", "O comerciante rico"], 
+          "respostaCorreta": "O governante sábio e filósofo"
+        }
       ]
     },
     {
       "id": "intermediario",
       "nome": "Intermediário",
       "xpPorAcerto": 25,
-      "minAcertosParaDesbloquearProximo": 15,
+      "minAcertosParaDesbloquearProximo": 6,
       "conteudo": {
-        "titulo": "A Grande Disputa: Racionalismo vs. Empirismo",
-        "resumo": "Na filosofia moderna, uma questão central emergiu: qual é a verdadeira fonte do conhecimento humano? Duas grandes correntes de pensamento se formaram para responder a essa pergunta, travando um debate que ecoa até hoje.\n\n**Racionalismo: A Razão no Trono**\nOs racionalistas, liderados por figuras como **René Descartes**, defendiam que o conhecimento autêntico e indubitável provém da razão pura e da lógica. Para eles, os nossos sentidos são fontes não confiáveis, capazes de nos enganar. Em sua busca por uma verdade inabalável, Descartes aplicou a dúvida metódica, questionando tudo, até mesmo sua própria existência. Ele encontrou sua certeza fundamental na própria atividade de pensar, o que o levou à sua célebre conclusão: **'Cogito, ergo sum'** ('Penso, logo existo'). O conhecimento, para os racionalistas, é em grande parte inato, já presente em nossa mente.\n\n**Empirismo: A Experiência como Mestra**\nEm oposição, os empiristas, como **John Locke**, argumentavam que todo o nosso conhecimento se origina da experiência sensorial. Locke propôs que a mente humana ao nascer é uma **'tábula rasa'**, uma folha em branco. Não existem ideias inatas; tudo o que sabemos é escrito nessa folha através de nossas percepções do mundo (visão, audição, tato, etc.). O conhecimento é, portanto, adquirido 'a posteriori', ou seja, após a experiência."
+        "titulo": "Racionalismo vs. Empirismo",
+        "resumo": "De onde vem o nosso conhecimento? Este foi o grande debate da filosofia moderna, que dividiu os pensadores em dois grandes grupos:\n\n**Racionalismo**\nOs racionalistas, como **René Descartes**, acreditavam que o conhecimento verdadeiro é obtido através da razão e da lógica, e não dos nossos sentidos, que podem nos enganar. Descartes duvidou de tudo, até da sua própria existência, mas chegou a uma certeza fundamental: se ele estava duvidando, ele estava pensando. Daí sua famosa conclusão: 'Penso, logo existo'.\n\n**Empirismo**\nOs empiristas, como **John Locke**, defendiam o oposto. Para eles, todo o nosso conhecimento vem da experiência sensorial (visão, audição, tato, etc.). Locke afirmava que a mente humana nasce como uma **'tábula rasa'**, uma folha em branco, que vai sendo preenchida com o conhecimento que adquirimos ao longo da vida através das nossas experiências."
       },
       "exercicios": [
-        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Qual filósofo é o principal representante do Racionalismo, famoso pela frase 'Penso, logo existo'?", "opcoes": ["John Locke", "David Hume", "René Descartes"], "respostaCorreta": "René Descartes" },
-        { "id": 2, "tipo": "multipla_escolha", "pergunta": "A ideia de que a mente humana nasce como uma 'tábula rasa' pertence a qual corrente?", "opcoes": ["Empirismo", "Ceticismo", "Racionalismo"], "respostaCorreta": "Empirismo" },
-        { "id": 3, "tipo": "preenchimento", "pergunta": "O filósofo empirista que acreditava que todo o conhecimento deriva da experiência sensorial foi John ___.", "respostaCorreta": "Locke" },
-        { "id": 4, "tipo": "multipla_escolha", "pergunta": "Para um racionalista, a principal fonte de conhecimento é:", "opcoes": ["A experiência", "A razão", "A tradição"], "respostaCorreta": "A razão" },
-        { "id": 5, "tipo": "multipla_escolha", "pergunta": "Qual corrente filosófica defenderia a afirmação 'Nada está no intelecto que não tenha estado antes nos sentidos'?", "opcoes": ["Racionalismo", "Existencialismo", "Empirismo"], "respostaCorreta": "Empirismo" },
-        { "id": 6, "tipo": "preenchimento", "pergunta": "A frase latina 'Cogito, ergo sum' é a base do pensamento de ___.", "respostaCorreta": "Descartes" },
-        { "id": 7, "tipo": "multipla_escolha", "pergunta": "A 'dúvida metódica' é uma ferramenta filosófica utilizada por qual pensador?", "opcoes": ["John Locke", "René Descartes", "Baruch Spinoza"], "respostaCorreta": "René Descartes" },
-        { "id": 8, "tipo": "multipla_escolha", "pergunta": "A crença em 'ideias inatas' é uma característica fundamental do:", "opcoes": ["Empirismo", "Racionalismo", "Ceticismo"], "respostaCorreta": "Racionalismo" },
-        { "id": 9, "tipo": "preenchimento", "pergunta": "Para os empiristas, o conhecimento é adquirido 'a ___'.", "respostaCorreta": "posteriori" },
-        { "id": 10, "tipo": "multipla_escolha", "pergunta": "Qual das opções a seguir é um exemplo de conhecimento que um racionalista consideraria puro?", "opcoes": ["A grama é verde", "2 + 2 = 4", "O fogo queima"], "respostaCorreta": "2 + 2 = 4" },
-        { "id": 11, "tipo": "multipla_escolha", "pergunta": "O filósofo David Hume, que levou o empirismo a conclusões céticas, era de qual nacionalidade?", "opcoes": ["Francês", "Alemão", "Escocês"], "respostaCorreta": "Escocês" },
-        { "id": 12, "tipo": "preenchimento", "pergunta": "O oposto de ideias inatas são as ideias ___.", "respostaCorreta": "adquiridas" },
-        { "id": 13, "tipo": "multipla_escolha", "pergunta": "René Descartes é considerado o 'pai' da:", "opcoes": ["Filosofia Antiga", "Filosofia Medieval", "Filosofia Moderna"], "respostaCorreta": "Filosofia Moderna" },
-        { "id": 14, "tipo": "multipla_escolha", "pergunta": "Qual filósofo tentou sintetizar o racionalismo e o empirismo?", "opcoes": ["Immanuel Kant", "John Locke", "Gottfried Leibniz"], "respostaCorreta": "Immanuel Kant" },
-        { "id": 15, "tipo": "preenchimento", "pergunta": "O Racionalismo valoriza o conhecimento dedutivo, enquanto o Empirismo valoriza o conhecimento ___.", "respostaCorreta": "indutivo" },
-        { "id": 16, "tipo": "multipla_escolha", "pergunta": "A afirmação 'A mente é uma folha em branco' é a metáfora central para a teoria do conhecimento de:", "opcoes": ["Descartes", "Spinoza", "Locke"], "respostaCorreta": "Locke" },
-        { "id": 17, "tipo": "multipla_escolha", "pergunta": "Para Descartes, a única coisa da qual ele não podia duvidar era:", "opcoes": ["Da existência de Deus", "Da existência do mundo", "Da sua própria existência como ser pensante"], "respostaCorreta": "Da sua própria existência como ser pensante" },
-        { "id": 18, "tipo": "preenchimento", "pergunta": "Gottfried Leibniz e Baruch Spinoza são outros importantes filósofos da corrente ___.", "respostaCorreta": "racionalista" },
-        { "id": 19, "tipo": "multipla_escolha", "pergunta": "Qual é a principal crítica do racionalismo ao empirismo?", "opcoes": ["Ele não valoriza a lógica", "Os sentidos podem nos enganar", "Ele leva ao dogmatismo"], "respostaCorreta": "Os sentidos podem nos enganar" },
-        { "id": 20, "tipo": "multipla_escolha", "pergunta": "Qual é a principal crítica do empirismo ao racionalismo?", "opcoes": ["As ideias inatas não podem ser provadas", "A razão é muito limitada", "A lógica é uma invenção humana"], "respostaCorreta": "As ideias inatas não podem ser provadas" }
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual filósofo é o principal representante do Racionalismo, famoso pela frase 'Penso, logo existo'?",
+          "opcoes": ["John Locke", "David Hume", "René Descartes"],
+          "respostaCorreta": "René Descartes"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "A ideia de que a mente humana nasce como uma 'tábula rasa' (folha em branco) pertence a qual corrente?",
+          "opcoes": ["Empirismo", "Ceticismo", "Racionalismo"],
+          "respostaCorreta": "Empirismo"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "O filósofo empirista que acreditava que todo o conhecimento deriva da experiência sensorial foi John ___.",
+          "respostaCorreta": "Locke"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual filósofo é conhecido por duvidar de tudo sistematicamente até encontrar uma certeza indubitável?",
+          "opcoes": ["Descartes", "Locke", "Hume"],
+          "respostaCorreta": "Descartes"
+        },
+        {
+          "id": 5,
+          "tipo": "multipla_escolha",
+          "pergunta": "David Hume é mais associado a qual postura filosófica sobre conhecimento?",
+          "opcoes": ["Racionalismo rígido", "Ceticismo/Empirismo crítico", "Idealismo extremo"],
+          "respostaCorreta": "Ceticismo/Empirismo crítico"
+        },
+        {
+          "id": 6,
+          "tipo": "preenchimento",
+          "pergunta": "O método cartesiano incentiva a dúvida metódica para alcançar a ___.",
+          "respostaCorreta": "certeza"
+        },
+        {
+          "id": 7,
+          "tipo": "multipla_escolha",
+          "pergunta": "Para os empiristas, a fonte primária do conhecimento é:",
+          "opcoes": ["Intuição racional", "Experiência sensorial", "Revelação divina"],
+          "respostaCorreta": "Experiência sensorial"
+        },
+        {
+          "id": 8,
+          "tipo": "multipla_escolha",
+          "pergunta": "Locke escreveu sobre a tábula rasa no contexto de:",
+          "opcoes": ["Ontologia", "Epistemologia", "Estética"],
+          "respostaCorreta": "Epistemologia"
+        },
+        {
+          "id": 9,
+          "tipo": "preenchimento",
+          "pergunta": "Segundo Descartes, a certeza inicial que ele encontra é '___, logo existo' (em latim: cogito ergo sum).",
+          "respostaCorreta": "Penso"
+        },
+        {
+          "id": 10,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual problema Hume apontou sobre inferência causal (nossa crença em causas)?",
+          "opcoes": ["Que a causalidade é logicamente demonstrável", "Que esperamos regularidade mas não temos justificativa racional para a necessidade causal", "Que causas são sempre visíveis"], 
+          "respostaCorreta": "Que esperamos regularidade mas não temos justificativa racional para a necessidade causal"
+        },
+        {
+          "id": 11,
+          "tipo": "multipla_escolha",
+          "pergunta": "Descartes tentou provar a existência de Deus para resolver qual problema em sua filosofia?",
+          "opcoes": ["Fundamentar a confiança nas ideias distintas e claras", "Explicar a tábua rasa", "Negar a razão"], 
+          "respostaCorreta": "Fundamentar a confiança nas ideias distintas e claras"
+        },
+        {
+          "id": 12,
+          "tipo": "preenchimento",
+          "pergunta": "A discussão entre razão e experiência sobre a origem do conhecimento é chamada de ___.",
+          "respostaCorreta": "debate racionalismo vs empirismo"
+        },
+        {
+          "id": 13,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual autor é famoso por criticar tanto racionalismo quanto empirismo, propondo que percepções são construções associativas?",
+          "opcoes": ["Kant", "Hume", "Platon"], 
+          "respostaCorreta": "Hume"
+        },
+        {
+          "id": 14,
+          "tipo": "multipla_escolha",
+          "pergunta": "Kant tentou conciliar racionalismo e empirismo. Como ele chamou a síntese?",
+          "opcoes": ["Idealismo transcendental", "Realismo puro", "Ceticismo absoluto"], 
+          "respostaCorreta": "Idealismo transcendental"
+        },
+        {
+          "id": 15,
+          "tipo": "preenchimento",
+          "pergunta": "A expressão 'cogito, ergo sum' traduzida para o português é '___.'.",
+          "respostaCorreta": "Penso, logo existo"
+        },
+        {
+          "id": 16,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual dos seguintes é um argumento típico empirista sobre origem das ideias simples?",
+          "opcoes": ["Ideias inatas", "Derivam de impressões sensoriais", "Vêm da razão pura"], 
+          "respostaCorreta": "Derivam de impressões sensoriais"
+        },
+        {
+          "id": 17,
+          "tipo": "multipla_escolha",
+          "pergunta": "O que Locke considerava como 'qualidade secundária' (ex.: cor, cheiro) em relação à realidade externa?",
+          "opcoes": ["Propriedades objetivas da matéria", "Resultados da interação entre objetos e observador", "Provas lógicas"], 
+          "respostaCorreta": "Resultados da interação entre objetos e observador"
+        },
+        {
+          "id": 18,
+          "tipo": "preenchimento",
+          "pergunta": "O autor do 'Discurso do Método' é René ___.",
+          "respostaCorreta": "Descartes"
+        },
+        {
+          "id": 19,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual postura filosófica defende suspender o juízo diante de argumentos conflitantes (ex.: Pirro)?",
+          "opcoes": ["Ceticismo", "Dogmatismo", "Racionalismo"], 
+          "respostaCorreta": "Ceticismo"
+        },
+        {
+          "id": 20,
+          "tipo": "preenchimento",
+          "pergunta": "A teoria que tenta explicar como o entendimento impõe formas (espaço/tempo) antes da experiência sensível é associada a ___.",
+          "respostaCorreta": "Kant"
+        }
       ]
     },
     {
       "id": "avancado",
       "nome": "Avançado",
       "xpPorAcerto": 40,
-      "minAcertosParaDesbloquearProximo": null,
+      "minAcertosParaDesbloquearProximo": 7,
       "conteudo": {
-        "titulo": "A Condição Humana: Existencialismo",
-        "resumo": "Em um mundo abalado por guerras e pela perda de certezas tradicionais, o existencialismo emergiu no século XX como uma filosofia focada na condição humana. Ele coloca ênfase radical na liberdade, na responsabilidade e na busca individual por sentido em um universo aparentemente sem propósito.\n\n**Jean-Paul Sartre: A Liberdade Absoluta**\nSartre é a figura central do existencialismo ateu. Sua ideia fundamental é que **'a existência precede a essência'**. Isso inverte a lógica tradicional: não nascemos com uma natureza ou um propósito pré-definido. Primeiro, simplesmente existimos, somos 'lançados' no mundo. Depois, através de nossas escolhas e ações, nós criamos nossa própria essência, definimos quem somos. Essa liberdade é radical e inescapável, levando Sartre a afirmar que estamos 'condenados a ser **livres**'. Somos inteiramente responsáveis por tudo o que fazemos, e essa responsabilidade gera uma profunda angústia.\n\n**Friedrich Nietzsche: O Precursor Visionário**\nApesar de ter escrito décadas antes, Nietzsche é considerado um precursor vital do existencialismo. Com sua famosa declaração 'Deus está morto', ele anunciou o colapso dos valores morais e religiosos tradicionais da Europa. Em seu lugar, ele propôs a figura do **'Übermensch'** (Além-do-Homem ou Super-Homem), um indivíduo que supera a moralidade de 'rebanho', cria seus próprios valores e vive a vida com paixão, poder e vontade, abraçando o 'eterno retorno' de todos os momentos."
+        "titulo": "Existencialismo",
+        "resumo": "O existencialismo foi uma corrente filosófica popular no século XX que se focou na liberdade e na responsabilidade individual para dar sentido à vida.\n\n**Jean-Paul Sartre**\nSartre é talvez o nome mais famoso do existencialismo. Sua ideia central é que **'a existência precede a essência'**. Isso significa que, ao contrário de um objeto (como uma cadeira, que primeiro é pensada para ter a essência de 'servir para sentar' e depois é construída), o ser humano primeiro existe, nasce no mundo, e só depois, através de suas escolhas e ações, define quem ele é, sua 'essência'. Por isso, para Sartre, estamos 'condenados a ser **livres**', pois somos totalmente responsáveis por criar nosso próprio propósito.\n\n**Friedrich Nietzsche**\nApesar de ser um precursor, Nietzsche influenciou muito o existencialismo com sua crítica aos valores tradicionais e a ideia do **'Super-Homem'** (Übermensch). Para ele, o ser humano deveria superar a moralidade comum e criar seus próprios valores, vivendo a vida com paixão e poder."
       },
       "exercicios": [
-        { "id": 1, "tipo": "multipla_escolha", "pergunta": "A famosa frase 'A existência precede a essência' é o pilar do pensamento de qual filósofo?", "opcoes": ["Nietzsche", "Kierkegaard", "Jean-Paul Sartre"], "respostaCorreta": "Jean-Paul Sartre" },
-        { "id": 2, "tipo": "multipla_escolha", "pergunta": "Para o existencialismo, o ser humano está 'condenado a ser ___'.", "opcoes": ["Feliz", "Livre", "Racional"], "respostaCorreta": "Livre" },
-        { "id": 3, "tipo": "preenchimento", "pergunta": "O conceito de 'Übermensch' foi desenvolvido pelo filósofo Friedrich ___.", "respostaCorreta": "Nietzsche" },
-        { "id": 4, "tipo": "multipla_escolha", "pergunta": "A ideia de 'Deus está morto' de Nietzsche significa:", "opcoes": ["Um evento literal da morte de uma divindade", "A perda da fé e dos valores morais tradicionais na sociedade", "A vitória da ciência sobre a religião"], "respostaCorreta": "A perda da fé e dos valores morais tradicionais na sociedade" },
-        { "id": 5, "tipo": "multipla_escolha", "pergunta": "Segundo Sartre, a 'má-fé' é:", "opcoes": ["Mentir para os outros", "Negar a própria liberdade e responsabilidade", "Cometer um ato imoral"], "respostaCorreta": "Negar a própria liberdade e responsabilidade" },
-        { "id": 6, "tipo": "preenchimento", "pergunta": "Para Sartre, a emoção que surge da consciência de nossa total liberdade e responsabilidade é a ___.", "respostaCorreta": "angústia" },
-        { "id": 7, "tipo": "multipla_escolha", "pergunta": "O Übermensch de Nietzsche é aquele que:", "opcoes": ["Obedece cegamente às regras sociais", "Cria seus próprios valores", "Busca poder sobre os outros a qualquer custo"], "respostaCorreta": "Cria seus próprios valores" },
-        { "id": 8, "tipo": "multipla_escolha", "pergunta": "O que significa dizer que 'a existência precede a essência'?", "opcoes": ["Nossa essência é definida por Deus antes de nascermos", "Nós primeiro nascemos e depois definimos quem somos através de nossas ações", "A essência humana é imutável"], "respostaCorreta": "Nós primeiro nascemos e depois definimos quem somos através de nossas ações" },
-        { "id": 9, "tipo": "preenchimento", "pergunta": "Søren Kierkegaard, um filósofo dinamarquês, é considerado o 'pai' do existencialismo ___.", "respostaCorreta": "cristão" },
-        { "id": 10, "tipo": "multipla_escolha", "pergunta": "Qual desses conceitos está associado a Nietzsche?", "opcoes": ["Tábula Rasa", "Imperativo Categórico", "Vontade de Poder"], "respostaCorreta": "Vontade de Poder" },
-        { "id": 11, "tipo": "multipla_escolha", "pergunta": "A ideia de que 'o inferno são os outros' de Sartre, significa que:", "opcoes": ["As outras pessoas são inerentemente más", "Somos julgados e definidos pelo olhar dos outros, o que limita nossa liberdade", "Devemos viver em isolamento"], "respostaCorreta": "Somos julgados e definidos pelo olhar dos outros, o que limita nossa liberdade" },
-        { "id": 12, "tipo": "preenchimento", "pergunta": "O conceito de Nietzsche de viver a vida de tal forma que você desejaria repeti-la infinitamente é chamado de 'Eterno ___'.", "respostaCorreta": "Retorno" },
-        { "id": 13, "tipo": "multipla_escolha", "pergunta": "Simone de Beauvoir, uma importante filósofa existencialista, aplicou esses conceitos para analisar a condição:", "opcoes": ["Da criança", "Do trabalhador", "Da mulher"], "respostaCorreta": "Da mulher" },
-        { "id": 14, "tipo": "multipla_escolha", "pergunta": "Para o existencialismo, a vida tem:", "opcoes": ["Um sentido pré-definido", "O sentido que nós damos a ela", "Nenhum sentido possível"], "respostaCorreta": "O sentido que nós damos a ela" },
-        { "id": 15, "tipo": "preenchimento", "pergunta": "A obra mais famosa de Sartre, que expõe suas ideias existencialistas, é 'O Ser e o ___'.", "respostaCorreta": "Nada" },
-        { "id": 16, "tipo": "multipla_escolha", "pergunta": "A crítica de Nietzsche à 'moralidade de rebanho' se refere:", "opcoes": ["À moralidade que valoriza a força e a nobreza", "À moralidade judaico-cristã que valoriza a humildade e a compaixão", "À ausência total de moralidade"], "respostaCorreta": "À moralidade judaico-cristã que valoriza a humildade e a compaixão" },
-        { "id": 17, "tipo": "multipla_escolha", "pergunta": "Albert Camus, outro pensador ligado ao existencialismo, usou o mito de Sísifo para ilustrar a condição humana como:", "opcoes": ["Absurda", "Divina", "Racional"], "respostaCorreta": "Absurda" },
-        { "id": 18, "tipo": "preenchimento", "pergunta": "Para Sartre, somos responsáveis não apenas por nós mesmos, mas por toda a ___.", "respostaCorreta": "humanidade" },
-        { "id": 19, "tipo": "multipla_escolha", "pergunta": "Qual obra de Nietzsche introduz o conceito do Übermensch?", "opcoes": ["O Anticristo", "Assim Falou Zaratustra", "A Genealogia da Moral"], "respostaCorreta": "Assim Falou Zaratustra" },
-        { "id": 20, "tipo": "multipla_escolha", "pergunta": "O existencialismo ganhou grande popularidade em qual período histórico?", "opcoes": ["Na Grécia Antiga", "Durante o Renascimento", "No pós-Segunda Guerra Mundial"], "respostaCorreta": "No pós-Segunda Guerra Mundial" }
+        {
+          "id": 1,
+          "tipo": "multipla_escolha",
+          "pergunta": "A famosa frase 'A existência precede a essência' é o pilar do pensamento de qual filósofo?",
+          "opcoes": ["Nietzsche", "Kierkegaard", "Jean-Paul Sartre"],
+          "respostaCorreta": "Jean-Paul Sartre"
+        },
+        {
+          "id": 2,
+          "tipo": "multipla_escolha",
+          "pergunta": "Para o existencialismo, o ser humano está 'condenado a ser ___'.",
+          "opcoes": ["Feliz", "Livre", "Racional"],
+          "respostaCorreta": "Livre"
+        },
+        {
+          "id": 3,
+          "tipo": "preenchimento",
+          "pergunta": "O conceito de 'Super-Homem' (Übermensch) foi desenvolvido pelo filósofo Friedrich ___.",
+          "respostaCorreta": "Nietzsche"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual autor é frequentemente citado como precursor do existencialismo por focalizar a angústia individual e a fé pessoal?",
+          "opcoes": ["Kierkegaard", "Locke", "Descartes"],
+          "respostaCorreta": "Kierkegaard"
+        },
+        {
+          "id": 5,
+          "tipo": "multipla_escolha",
+          "pergunta": "Sartre enfatizava que a responsabilidade moral surge porque as escolhas individuais são:",
+          "opcoes": ["Determinadas por instintos", "Exemplos de valores coletivos", "A base da construção da própria identidade"], 
+          "respostaCorreta": "A base da construção da própria identidade"
+        },
+        {
+          "id": 6,
+          "tipo": "preenchimento",
+          "pergunta": "A sensação desagradável de falta de sentido ou angústia diante da liberdade é chamada de ___.",
+          "respostaCorreta": "angústia"
+        },
+        {
+          "id": 7,
+          "tipo": "multipla_escolha",
+          "pergunta": "Nietzsche criticou fortemente a moral tradicional vinculada a:",
+          "opcoes": ["Religião e moralidade herdada", "Ciência experimental", "Arte hedonista"], 
+          "respostaCorreta": "Religião e moralidade herdada"
+        },
+        {
+          "id": 8,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual conceito sartreano indica que não existe uma natureza humana fixa e que cada ação contribui para definir o indivíduo?",
+          "opcoes": ["Essencialismo", "Existencialismo", "Determinismo"], 
+          "respostaCorreta": "Existencialismo"
+        },
+        {
+          "id": 9,
+          "tipo": "preenchimento",
+          "pergunta": "A obra de Sartre que explora a liberdade humana e a má-fé é 'O Ser e o ___.'.",
+          "respostaCorreta": "Nada"
+        },
+        {
+          "id": 10,
+          "tipo": "multipla_escolha",
+          "pergunta": "A 'má-fé' (bad faith) em Sartre refere-se a:",
+          "opcoes": ["Autenticidade plena", "Negar a própria liberdade e responsabilidade", "Um estado religioso"], 
+          "respostaCorreta": "Negar a própria liberdade e responsabilidade"
+        },
+        {
+          "id": 11,
+          "tipo": "multipla_escolha",
+          "pergunta": "Nietzsche falou sobre a 'morte de Deus' para indicar:",
+          "opcoes": ["Declínio da religião e necessidade de criar novos valores", "Prova científica da inexistência divina", "Retorno ao teocentrismo"], 
+          "respostaCorreta": "Declínio da religião e necessidade de criar novos valores"
+        },
+        {
+          "id": 12,
+          "tipo": "preenchimento",
+          "pergunta": "O filósofo que escreveu 'Assim Falou Zaratustra' foi ___.",
+          "respostaCorreta": "Nietzsche"
+        },
+        {
+          "id": 13,
+          "tipo": "multipla_escolha",
+          "pergunta": "Quem entre os abaixo enfatizava a escolha individual mesmo diante da angústia existencial?",
+          "opcoes": ["Sartre", "Hobbes", "Epicuro"], 
+          "respostaCorreta": "Sartre"
+        },
+        {
+          "id": 14,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual pensamento está ligado ao existencialismo de Sartre sobre o outro (o olhar do outro)?",
+          "opcoes": ["O olhar do outro ajuda a definir meu ser e pode objetificar-me", "O olhar do outro é irrelevante", "O outro pertence apenas ao mundo das ideias"], 
+          "respostaCorreta": "O olhar do outro ajuda a definir meu ser e pode objetificar-me"
+        },
+        {
+          "id": 15,
+          "tipo": "preenchimento",
+          "pergunta": "A ideia de 'criar valores próprios' frente ao colapso de valores tradicionais está associada a ___.",
+          "respostaCorreta": "Nietzsche"
+        },
+        {
+          "id": 16,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual autor existencialista combinou pensamento filosófico com literatura (romances/peças)?",
+          "opcoes": ["Sartre", "Platon", "Locke"], 
+          "respostaCorreta": "Sartre"
+        },
+        {
+          "id": 17,
+          "tipo": "multipla_escolha",
+          "pergunta": "Para Sartre, a liberdade humana é:",
+          "opcoes": ["Limitada, mas sempre presente e fonte de responsabilidade", "Totalmente inexistente", "Uma ilusão apenas social"], 
+          "respostaCorreta": "Limitada, mas sempre presente e fonte de responsabilidade"
+        },
+        {
+          "id": 18,
+          "tipo": "preenchimento",
+          "pergunta": "O termo alemão 'Übermensch' corresponde ao português '___-Homem' (forma coloquial).",
+          "respostaCorreta": "Super"
+        },
+        {
+          "id": 19,
+          "tipo": "multipla_escolha",
+          "pergunta": "Kierkegaard é frequentemente considerado precursor do existencialismo por enfatizar:",
+          "opcoes": ["A escolha individual, fé e subjetividade", "A tábula rasa", "O empirismo científico"], 
+          "respostaCorreta": "A escolha individual, fé e subjetividade"
+        },
+        {
+          "id": 20,
+          "tipo": "preenchimento",
+          "pergunta": "A atitude filosófica que valoriza viver de forma autêntica, assumindo responsabilidade pelas próprias escolhas, é chamada de ___.",
+          "respostaCorreta": "autenticidade"
+        }
       ]
     }
   ]

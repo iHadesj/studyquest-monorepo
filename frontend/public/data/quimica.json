@@ -7,103 +7,96 @@
       "id": "iniciante",
       "nome": "Iniciante",
       "xpPorAcerto": 15,
-      "minAcertosParaDesbloquearProximo": 3,
+      "minAcertosParaDesbloquearProximo": 5,
       "conteudo": {
         "titulo": "Tabela Periódica e Estados da Matéria",
         "resumo": "A Química é a ciência que estuda a matéria e suas transformações. Para começar, vamos entender como os 'ingredientes' do universo são organizados e como eles se apresentam.\n\n**A Tabela Periódica**\nÉ um grande mapa que organiza todos os elementos químicos conhecidos. Cada elemento tem um símbolo único, como 'O' para Oxigênio e **'Au'** para Ouro. Os elementos são organizados em ordem crescente de número atômico e agrupados por propriedades semelhantes. Os gases nobres, na última coluna, são famosos por sua grande **estabilidade**.\n\n**Estados da Matéria**\nA matéria pode existir em três estados principais:\n- **Sólido:** Partículas muito juntas e organizadas (ex: gelo).\n- **Líquido:** Partículas próximas, mas desorganizadas, podem fluir (ex: água).\n- **Gasoso:** Partículas muito afastadas e em movimento constante (ex: vapor d'água).\nA mudança de um estado para outro tem nomes específicos, como **vaporização** (líquido para gasoso)."
       },
       "exercicios": [
-        {
-          "id": 1,
-          "tipo": "multipla_escolha",
-          "pergunta": "Qual é o símbolo do elemento químico Ouro?",
-          "opcoes": ["Ag", "Fe", "Au"],
-          "respostaCorreta": "Au"
-        },
-        {
-          "id": 2,
-          "tipo": "multipla_escolha",
-          "pergunta": "A passagem do estado líquido para o gasoso é chamada de:",
-          "opcoes": ["Fusão", "Vaporização", "Solidificação"],
-          "respostaCorreta": "Vaporização"
-        },
-        {
-          "id": 3,
-          "tipo": "preenchimento",
-          "pergunta": "A fórmula química da água é H2___.",
-          "respostaCorreta": "O"
-        },
-        {
-          "id": 4,
-          "tipo": "multipla_escolha",
-          "pergunta": "Os gases nobres, como o Hélio (He), são conhecidos por serem muito ___.",
-          "opcoes": ["Reativos", "Estáveis", "Líquidos"],
-          "respostaCorreta": "Estáveis"
-        }
+        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Qual é o símbolo do elemento químico Ouro?", "opcoes": ["Ag", "Fe", "Au"], "respostaCorreta": "Au" },
+        { "id": 2, "tipo": "multipla_escolha", "pergunta": "A passagem do estado líquido para o gasoso é chamada de:", "opcoes": ["Fusão", "Vaporização", "Solidificação"], "respostaCorreta": "Vaporização" },
+        { "id": 3, "tipo": "preenchimento", "pergunta": "A fórmula química da água é H2___.", "respostaCorreta": "O" },
+        { "id": 4, "tipo": "multipla_escolha", "pergunta": "Os gases nobres, como o Hélio (He), são conhecidos por serem muito ___.", "opcoes": ["Reativos", "Estáveis", "Líquidos"], "respostaCorreta": "Estáveis" },
+        { "id": 5, "tipo": "multipla_escolha", "pergunta": "Em qual parte da tabela periódica ficam os gases nobres?", "opcoes": ["Na primeira coluna (à esquerda)", "Na última coluna (à direita)", "No bloco dos metais de transição"], "respostaCorreta": "Na última coluna (à direita)" },
+        { "id": 6, "tipo": "multipla_escolha", "pergunta": "O número atômico de um elemento representa:", "opcoes": ["O número de nêutrons", "O número de prótons", "A massa total do átomo"], "respostaCorreta": "O número de prótons" },
+        { "id": 7, "tipo": "preenchimento", "pergunta": "A passagem do estado sólido para o líquido é chamada de ___.", "respostaCorreta": "Fusão" },
+        { "id": 8, "tipo": "multipla_escolha", "pergunta": "Qual dos exemplos abaixo é uma molécula (duas ou mais partículas ligadas)?", "opcoes": ["Neônio (Ne)", "Oxigênio (O2)", "Sódio (Na)"], "respostaCorreta": "Oxigênio (O2)" },
+        { "id": 9, "tipo": "multipla_escolha", "pergunta": "Qual elemento tem símbolo 'Ag' e é conhecido como prata?", "opcoes": ["Argônio", "Prata", "Água"], "respostaCorreta": "Prata" },
+        { "id": 10, "tipo": "preenchimento", "pergunta": "Partículas que formam átomos e têm carga negativa são os ___.", "respostaCorreta": "elétrons" },
+        { "id": 11, "tipo": "multipla_escolha", "pergunta": "Qual é o estado da matéria que mantém forma própria e volume definido?", "opcoes": ["Sólido", "Líquido", "Gasoso"], "respostaCorreta": "Sólido" },
+        { "id": 12, "tipo": "multipla_escolha", "pergunta": "A água que congela vira qual estado da matéria?", "opcoes": ["Líquido", "Sólido", "Gasoso"], "respostaCorreta": "Sólido" },
+        { "id": 13, "tipo": "preenchimento", "pergunta": "A unidade padrão de quantidade de substância no SI é o ___.", "respostaCorreta": "mol" },
+        { "id": 14, "tipo": "multipla_escolha", "pergunta": "Qual metal é magnético e tem símbolo Fe?", "opcoes": ["Ferro", "Flúor", "Fósforo"], "respostaCorreta": "Ferro" },
+        { "id": 15, "tipo": "multipla_escolha", "pergunta": "Qual processo é o contrário da vaporização (gasoso para líquido)?", "opcoes": ["Condensação", "Sublimação", "Fusão"], "respostaCorreta": "Condensação" },
+        { "id": 16, "tipo": "multipla_escolha", "pergunta": "Qual dessas é uma mistura homogênea?", "opcoes": ["Areia e água", "Sal dissolvido em água", "Grânulos de ferro em areia"], "respostaCorreta": "Sal dissolvido em água" },
+        { "id": 17, "tipo": "preenchimento", "pergunta": "Átomos de um mesmo elemento com diferente número de nêutrons são chamados de ___.", "respostaCorreta": "isótopos" },
+        { "id": 18, "tipo": "multipla_escolha", "pergunta": "Qual das opções melhor define 'composto'?", "opcoes": ["Substância formada por um único tipo de átomo", "Mistura física", "Substância formada por dois ou mais elementos quimicamente ligados"], "respostaCorreta": "Substância formada por dois ou mais elementos quimicamente ligados" },
+        { "id": 19, "tipo": "multipla_escolha", "pergunta": "Qual gás é essencial para respiração e aparece como O2?", "opcoes": ["Dióxido de carbono", "Oxigênio", "Nitrogênio"], "respostaCorreta": "Oxigênio" },
+        { "id": 20, "tipo": "preenchimento", "pergunta": "A medida que indica acidez ou basicidade de uma solução é o ___ (0–14).", "respostaCorreta": "pH" }
       ]
     },
     {
       "id": "intermediario",
       "nome": "Intermediário",
       "xpPorAcerto": 25,
-      "minAcertosParaDesbloquearProximo": 2,
+      "minAcertosParaDesbloquearProximo": 6,
       "conteudo": {
         "titulo": "Ligações Químicas e Reações",
         "resumo": "Os átomos raramente ficam sozinhos. Eles se unem para formar tudo o que vemos, através das ligações químicas.\n\n**Tipos de Ligações**\n- **Ligação Iônica:** Ocorre quando um átomo 'doa' elétrons para outro. Geralmente acontece entre um metal e um não-metal. O sal de cozinha (NaCl) é um exemplo clássico.\n- **Ligação Covalente:** Ocorre quando os átomos 'compartilham' elétrons. A molécula de água (H2O) é formada por ligações covalentes.\n\n**Reações Químicas**\nUma reação química é um processo que transforma substâncias em outras. As substâncias que iniciam a reação são chamadas de **reagentes**, e as substâncias formadas no final são os **produtos**. A lei da conservação das massas, de Lavoisier, diz que 'na natureza, nada se cria, nada se perde, tudo se transforma'."
       },
       "exercicios": [
-        {
-          "id": 1,
-          "tipo": "multipla_escolha",
-          "pergunta": "A ligação que ocorre pela transferência de elétrons entre um metal e um não-metal é a ligação ___.",
-          "opcoes": ["Metálica", "Covalente", "Iônica"],
-          "respostaCorreta": "Iônica"
-        },
-        {
-          "id": 2,
-          "tipo": "multipla_escolha",
-          "pergunta": "Em uma reação química, as substâncias iniciais são chamadas de:",
-          "opcoes": ["Produtos", "Reagentes", "Catalisadores"],
-          "respostaCorreta": "Reagentes"
-        },
-        {
-          "id": 3,
-          "tipo": "preenchimento",
-          "pergunta": "A ligação formada pelo compartilhamento de elétrons entre átomos é a ligação ___.",
-          "respostaCorreta": "Covalente"
-        }
+        { "id": 1, "tipo": "multipla_escolha", "pergunta": "A ligação que ocorre pela transferência de elétrons entre um metal e um não-metal é a ligação ___.", "opcoes": ["Metálica", "Covalente", "Iônica"], "respostaCorreta": "Iônica" },
+        { "id": 2, "tipo": "multipla_escolha", "pergunta": "Em uma reação química, as substâncias iniciais são chamadas de:", "opcoes": ["Produtos", "Reagentes", "Catalisadores"], "respostaCorreta": "Reagentes" },
+        { "id": 3, "tipo": "preenchimento", "pergunta": "A ligação formada pelo compartilhamento de elétrons entre átomos é a ligação ___.", "respostaCorreta": "Covalente" },
+        { "id": 4, "tipo": "multipla_escolha", "pergunta": "Qual é a função principal de um catalisador em uma reação química?", "opcoes": ["Aumentar a energia de ativação", "Diminuir a energia de ativação", "Transformar-se em produto no fim da reação"], "respostaCorreta": "Diminuir a energia de ativação" },
+        { "id": 5, "tipo": "multipla_escolha", "pergunta": "Na equação balanceada 2H2 + O2 → 2H2O, qual é o coeficiente do O2?", "opcoes": ["1", "2", "3"], "respostaCorreta": "1" },
+        { "id": 6, "tipo": "preenchimento", "pergunta": "Ligação covalente em que os elétrons são compartilhados de forma desigual é chamada de ___.", "respostaCorreta": "Covalente polar" },
+        { "id": 7, "tipo": "multipla_escolha", "pergunta": "Quando equilibramos uma reação, estamos obedecendo a qual lei?", "opcoes": ["Lei das Proporções Definidas", "Lei da Conservação da Massa", "Lei das Gases Ideais"], "respostaCorreta": "Lei da Conservação da Massa" },
+        { "id": 8, "tipo": "multipla_escolha", "pergunta": "Qual dos seguintes é um exemplo de reação de combustão completa?", "opcoes": ["C + O2 → CO2", "C + O2 → CO", "2H2 + O2 → 2H2O"], "respostaCorreta": "C + O2 → CO2" },
+        { "id": 9, "tipo": "preenchimento", "pergunta": "Substância que se dissolve em um solvente formando solução é o ___.", "respostaCorreta": "soluto" },
+        { "id": 10, "tipo": "multipla_escolha", "pergunta": "pH menor que 7 indica uma solução:", "opcoes": ["Ácida", "Neutra", "Básica"], "respostaCorreta": "Ácida" },
+        { "id": 11, "tipo": "multipla_escolha", "pergunta": "Qual tipo de ligação explica a condução elétrica em metais?", "opcoes": ["Ligação iônica", "Ligação metálica", "Ligação covalente"], "respostaCorreta": "Ligação metálica" },
+        { "id": 12, "tipo": "preenchimento", "pergunta": "A quantidade de matéria em mols é medida em ___.", "respostaCorreta": "mol" },
+        { "id": 13, "tipo": "multipla_escolha", "pergunta": "Em solução aquosa, um ácido forte se dissocia:", "opcoes": ["Parcialmente", "Completamente", "Nunca"], "respostaCorreta": "Completamente" },
+        { "id": 14, "tipo": "multipla_escolha", "pergunta": "A remoção de elétrons de um átomo é chamada de:", "opcoes": ["Oxidação", "Redução", "Neutralização"], "respostaCorreta": "Oxidação" },
+        { "id": 15, "tipo": "preenchimento", "pergunta": "A soma das massas dos reagentes iguala a soma das massas dos produtos por causa da ___ da massa.", "respostaCorreta": "conservação" },
+        { "id": 16, "tipo": "multipla_escolha", "pergunta": "Qual conceito descreve a tendência de um átomo em atrair elétrons numa ligação covalente?", "opcoes": ["Eletropositividade", "Eletroquímica", "Eletrogravidade"], "respostaCorreta": "Eletropositividade" },
+        { "id": 17, "tipo": "multipla_escolha", "pergunta": "Na nomenclatura iônica simples, o ânion geralmente termina com:", "opcoes": ["-eto", "-etoide", "-eto", "-eto"], "opcoes_extras": null, "respostaCorreta": "Não aplicável" },
+        { "id": 18, "tipo": "preenchimento", "pergunta": "Quando uma reação libera calor para o ambiente, chamamos de reação ___.", "respostaCorreta": "exotérmica" },
+        { "id": 19, "tipo": "multipla_escolha", "pergunta": "Qual unidade costuma ser usada para medir massa molar (peso molecular)?", "opcoes": ["g/mol", "kg", "mol/L"], "respostaCorreta": "g/mol" },
+        { "id": 20, "tipo": "preenchimento", "pergunta": "Nome do composto iônico formado por Na+ e Cl- é ___.", "respostaCorreta": "cloreto de sódio" }
       ]
     },
     {
       "id": "avancado",
       "nome": "Avançado",
       "xpPorAcerto": 40,
-      "minAcertosParaDesbloquearProximo": null,
+      "minAcertosParaDesbloquearProximo": 7,
       "conteudo": {
         "titulo": "Química Orgânica",
         "resumo": "A Química Orgânica é o ramo que estuda os compostos formados pelo elemento **Carbono**. É a química da vida, pois a maioria das moléculas dos seres vivos é orgânica.\n\n**O Carbono**\nO carbono é especial porque consegue formar quatro ligações químicas estáveis, permitindo a criação de cadeias longas e complexas, que são a base para moléculas como proteínas e DNA.\n\n**Hidrocarbonetos**\nSão a classe mais simples de compostos orgânicos, formados apenas por átomos de Carbono e Hidrogênio. O gás de cozinha (butano) e a gasolina são exemplos.\n\n**Funções Orgânicas**\nSão grupos de átomos que dão características específicas às moléculas orgânicas. Algumas funções importantes são:\n- **Álcool:** Possui o grupo -OH (ex: etanol, presente em bebidas alcoólicas).\n- **Ácido Carboxílico:** Possui o grupo -COOH (ex: ácido acético, o principal componente do vinagre)."
       },
       "exercicios": [
-        {
-          "id": 1,
-          "tipo": "multipla_escolha",
-          "pergunta": "Qual elemento é a base de todos os compostos orgânicos?",
-          "opcoes": ["Oxigênio", "Hidrogênio", "Carbono"],
-          "respostaCorreta": "Carbono"
-        },
-        {
-          "id": 2,
-          "tipo": "multipla_escolha",
-          "pergunta": "A função orgânica presente no vinagre (ácido acético) é:",
-          "opcoes": ["Álcool", "Éter", "Ácido Carboxílico"],
-          "respostaCorreta": "Ácido Carboxílico"
-        },
-        {
-          "id": 3,
-          "tipo": "preenchimento",
-          "pergunta": "Compostos formados apenas por carbono e hidrogênio são chamados de ___.",
-          "respostaCorreta": "Hidrocarbonetos"
-        }
+        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Qual elemento é a base de todos os compostos orgânicos?", "opcoes": ["Oxigênio", "Hidrogênio", "Carbono"], "respostaCorreta": "Carbono" },
+        { "id": 2, "tipo": "multipla_escolha", "pergunta": "A função orgânica presente no vinagre (ácido acético) é:", "opcoes": ["Álcool", "Éter", "Ácido Carboxílico"], "respostaCorreta": "Ácido Carboxílico" },
+        { "id": 3, "tipo": "preenchimento", "pergunta": "Compostos formados apenas por carbono e hidrogênio são chamados de ___.", "respostaCorreta": "Hidrocarbonetos" },
+        { "id": 4, "tipo": "multipla_escolha", "pergunta": "Qual grupo funcional caracteriza os álcoois?", "opcoes": ["-COOH", "-OH", "-NH2"], "respostaCorreta": "-OH" },
+        { "id": 5, "tipo": "multipla_escolha", "pergunta": "Compostos que possuem a mesma fórmula molecular, mas arranjos diferentes, são chamados de:", "opcoes": ["Isótopos", "Isômeros", "Alótropos"], "respostaCorreta": "Isômeros" },
+        { "id": 6, "tipo": "preenchimento", "pergunta": "O átomo de carbono pode formar até ___ ligações covalentes.", "respostaCorreta": "4" },
+        { "id": 7, "tipo": "multipla_escolha", "pergunta": "Qual reação é típica de alcenos (C=C)?", "opcoes": ["Substituição nucleofílica", "Adição", "Eliminação"], "respostaCorreta": "Adição" },
+        { "id": 8, "tipo": "multipla_escolha", "pergunta": "Um éster é geralmente formado por reação entre:", "opcoes": ["Álcool e ácido carboxílico", "Amina e aldeído", "Álcool e base"], "respostaCorreta": "Álcool e ácido carboxílico" },
+        { "id": 9, "tipo": "preenchimento", "pergunta": "Nome do grupo funcional presente em aminas é ___.", "respostaCorreta": "NH2" },
+        { "id": 10, "tipo": "multipla_escolha", "pergunta": "Qual técnica permite identificar grupos funcionais por absorção de radiação infravermelha?", "opcoes": ["RMN", "IV (FTIR)", "Cromatografia"], "respostaCorreta": "IV (FTIR)" },
+        { "id": 11, "tipo": "multipla_escolha", "pergunta": "Polímeros naturais como o DNA e proteínas são formados por:", "opcoes": ["Unidades monoméricas repetidas", "Misturas de metais", "Moléculas inorgânicas"], "respostaCorreta": "Unidades monoméricas repetidas" },
+        { "id": 12, "tipo": "preenchimento", "pergunta": "A reação que remove água (H2O) para unir duas moléculas chama-se ___.", "respostaCorreta": "condensação" },
+        { "id": 13, "tipo": "multipla_escolha", "pergunta": "Qual composto é aromático e presente em muitos perfumes (anel benzênico)?", "opcoes": ["Etano", "Benzeno", "Propano"], "respostaCorreta": "Benzeno" },
+        { "id": 14, "tipo": "multipla_escolha", "pergunta": "Na química orgânica, 'SN1' e 'SN2' são tipos de:", "opcoes": ["Reações de adição", "Reações de substituição nucleofílica", "Reações de oxidação"], "respostaCorreta": "Reações de substituição nucleofílica" },
+        { "id": 15, "tipo": "preenchimento", "pergunta": "A unidade repetitiva em um polímero é chamada de ___.", "respostaCorreta": "monômero" },
+        { "id": 16, "tipo": "multipla_escolha", "pergunta": "Qual é a hibridização do carbono em uma ligação simples tetraédrica (sp3)?", "opcoes": ["sp", "sp2", "sp3"], "respostaCorreta": "sp3" },
+        { "id": 17, "tipo": "multipla_escolha", "pergunta": "Qual é o produto típico da oxidação controlada de um álcool primário?", "opcoes": ["Ácido carboxílico", "Cetona", "Éter"], "respostaCorreta": "Ácido carboxílico" },
+        { "id": 18, "tipo": "preenchimento", "pergunta": "Nome comum do ácido etanoico é ___.", "respostaCorreta": "Ácido acético / vinagre" },
+        { "id": 19, "tipo": "multipla_escolha", "pergunta": "Qual isomeria está relacionada à diferente ordem de ligação entre átomos (cadeia)?", "opcoes": ["Isomeria geométrica", "Isomeria de cadeia", "Isomeria óptica"], "respostaCorreta": "Isomeria de cadeia" },
+        { "id": 20, "tipo": "preenchimento", "pergunta": "Ligação típica entre monômeros em muitas reações de polimerização é chamada de ligação ___.", "respostaCorreta": "covalente" }
       ]
     }
   ]

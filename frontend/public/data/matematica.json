@@ -7,7 +7,7 @@
       "id": "iniciante",
       "nome": "Iniciante",
       "xpPorAcerto": 10,
-      "minAcertosParaDesbloquearProximo": 15,
+      "minAcertosParaDesbloquearProximo": 5,
       "conteudo": {
         "titulo": "Os Pilares da Aritmética",
         "resumo": "A aritmética é a linguagem universal dos números e a base para toda a matemática. Dominar suas quatro operações fundamentais é o primeiro passo para resolver qualquer problema.\n\n**Adição (+):** É a operação de juntar ou combinar quantidades. Se você tem 7 maçãs e ganha mais 5, a operação $7 + 5$ revela que você agora possui 12 maçãs.\n\n**Subtração (-):** Representa a remoção ou a diferença entre quantidades. Se uma pizza tem 8 fatias e você come 3, a operação $8 - 3$ mostra que restam 5 fatias.\n\n**Multiplicação (× ou *):** É uma forma eficiente de realizar adições repetidas. Em vez de somar $6 + 6 + 6 + 6$, podemos simplesmente multiplicar $6 \\times 4$, obtendo o mesmo resultado: 24.\n\n**Divisão (÷ ou /):** É o ato de repartir uma quantidade em partes iguais ou descobrir quantas vezes um número cabe em outro. Se 20 doces são divididos igualmente entre 4 amigos ($20 \\div 4$), cada um receberá 5 doces."
@@ -39,7 +39,7 @@
       "id": "intermediario",
       "nome": "Intermediário",
       "xpPorAcerto": 20,
-      "minAcertosParaDesbloquearProximo": 15,
+      "minAcertosParaDesbloquearProximo": 6,
       "conteudo": {
         "titulo": "Álgebra e Frações: Desvendando o Desconhecido",
         "resumo": "Agora, vamos um passo além da aritmética para resolver problemas com valores desconhecidos e para entender como representar e operar com partes de um todo.\n\n**Equações de 1º Grau**\nUma equação é uma igualdade que contém um ou mais valores desconhecidos, chamados de incógnitas (geralmente $x$). O objetivo é descobrir o valor de $x$ que torna a igualdade verdadeira. Pense numa balança: tudo o que você faz de um lado da igualdade, deve fazer do outro para manter o equilíbrio.\nExemplo: $3x - 4 = 11$. Para isolar o $x$, primeiro somamos 4 dos dois lados: $3x = 11 + 4 \\implies 3x = 15$. Em seguida, dividimos os dois lados por 3: $x = 15 / 3 \\implies x = 5$.\n\n**Frações**\nFrações representam uma divisão de um número por outro ($numerador / denominador$) ou partes de um inteiro. Operar com frações é essencial.\n- **Soma/Subtração:** Para somar ou subtrair, as frações precisam ter o mesmo denominador (o número de baixo). Se não tiverem, encontramos um denominador comum (como o MMC). Exemplo: $1/3 + 1/2$. O denominador comum é 6. A soma fica $2/6 + 3/6 = 5/6$.\n- **Simplificação:** Uma fração como $4/8$ pode ser simplificada dividindo o numerador e o denominador pelo maior divisor comum, resultando em $1/2$."
@@ -71,7 +71,7 @@
       "id": "avancado",
       "nome": "Avançado",
       "xpPorAcerto": 40,
-      "minAcertosParaDesbloquearProximo": null,
+      "minAcertosParaDesbloquearProximo": 7,
       "conteudo": {
         "titulo": "Trigonometria no Triângulo Retângulo",
         "resumo": "A trigonometria é a poderosa ferramenta matemática que estuda as relações entre os lados e os ângulos dos triângulos. Ela é fundamental para áreas como engenharia, física, astronomia e games, permitindo calcular distâncias inacessíveis.\n\n**Teorema de Pitágoras**\nA base para o estudo do triângulo retângulo (com um ângulo de 90°). Ele afirma que o quadrado da hipotenusa (lado oposto ao ângulo reto) é igual à soma dos quadrados dos catetos (os outros dois lados). A fórmula é uma das mais famosas da matemática: $a² = b² + c²$.\n\n**Seno, Cosseno e Tangente**\nSão razões (divisões) que relacionam os ângulos agudos de um triângulo retângulo com o comprimento de seus lados. Para um ângulo $\\alpha$:\n- **Seno (sin $\\alpha$):** Medida do Cateto Oposto / Medida da Hipotenusa\n- **Cosseno (cos $\\alpha$):** Medida do Cateto Adjacente / Medida da Hipotenusa\n- **Tangente (tan $\\alpha$):** Medida do Cateto Oposto / Medida do Cateto Adjacente\nEssas razões são constantes para um mesmo ângulo, não importa o tamanho do triângulo. Por exemplo, o seno de 30° é sempre $0.5$ (ou $1/2$)."

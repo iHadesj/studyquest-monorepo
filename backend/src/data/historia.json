@@ -7,7 +7,7 @@
       "id": "iniciante",
       "nome": "Iniciante",
       "xpPorAcerto": 15,
-      "minAcertosParaDesbloquearProximo": 2,
+      "minAcertosParaDesbloquearProximo": 5,
       "conteudo": {
         "titulo": "Grandes Navegações",
         "resumo": "Entre os séculos XV e XVI, as nações europeias, com **Portugal** e **Espanha** na liderança, lançaram-se ao mar em uma era de exploração conhecida como as **Grandes Navegações**.\n\nO principal objetivo era encontrar uma nova rota marítima para as Índias, de onde vinham as valiosas **especiarias** (como pimenta e cravo), contornando o monopólio comercial das cidades italianas.\n\nNessas viagens, os navegadores enfrentaram perigos e o desconhecido, resultando em feitos históricos como a chegada de Cristóvão Colombo à América em 1492 e a de **Pedro Álvares Cabral** ao Brasil em 1500. Para evitar conflitos, Portugal e Espanha assinaram o **Tratado de Tordesilhas**, que dividia as terras recém-descobertas entre os dois reinos."
@@ -32,6 +32,140 @@
           "tipo": "preenchimento",
           "pergunta": "O Tratado de Tordesilhas dividiu as novas terras entre Portugal e ___.",
           "respostaCorreta": "Espanha"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "Em que ano Cristóvão Colombo chegou ao continente americano (primeira viagem)?",
+          "opcoes": ["1492", "1500", "1488"],
+          "respostaCorreta": "1492"
+        },
+        {
+          "id": 5,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual era o principal meio de navegação usado nas Grandes Navegações?",
+          "opcoes": ["Caravelas", "Submarinos", "Dirigíveis"],
+          "respostaCorreta": "Caravelas"
+        },
+        {
+          "id": 6,
+          "tipo": "preenchimento",
+          "pergunta": "Um instrumento usado para determinar latitude no mar era o ___.",
+          "respostaCorreta": "astrolábio"
+        },
+        {
+          "id": 7,
+          "tipo": "multipla_escolha",
+          "pergunta": "Quem ficou famoso por abrir a rota marítima para a Índia contornando a África?",
+          "opcoes": ["Pedro Álvares Cabral", "Vasco da Gama", "Fernão de Magalhães"],
+          "respostaCorreta": "Vasco da Gama"
+        },
+        {
+          "id": 8,
+          "tipo": "multipla_escolha",
+          "pergunta": "O que motivou as nações europeias a financiar viagens de exploração?",
+          "opcoes": ["Competição comercial e busca por especiarias", "Interesse em turismo", "Proteger florestas locais"],
+          "respostaCorreta": "Competição comercial e busca por especiarias"
+        },
+        {
+          "id": 9,
+          "tipo": "preenchimento",
+          "pergunta": "A invenção que melhorou bastante as navegações foi a imprensa? Verdadeiro ou falso?",
+          "respostaCorreta": "falso"
+        },
+        {
+          "id": 10,
+          "tipo": "multipla_escolha",
+          "pergunta": "O Tratado de Tordesilhas foi assinado em que século?",
+          "opcoes": ["Século XV", "Século XVI", "Século XVII"],
+          "respostaCorreta": "Século XVI"
+        },
+        {
+          "id": 11,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual desses foi um efeito das Grandes Navegações?",
+          "opcoes": ["Isolamento cultural", "Expansão do comércio mundial", "Extinção imediata da escravidão"],
+          "respostaCorreta": "Expansão do comércio mundial"
+        },
+        {
+          "id": 12,
+          "tipo": "preenchimento",
+          "pergunta": "O navio típico portuguës usado nas explorações era chamado de ___.",
+          "respostaCorreta": "caravela"
+        },
+        {
+          "id": 13,
+          "tipo": "multipla_escolha",
+          "pergunta": "Quem financiou a primeira viagem de Colombo em 1492?",
+          "opcoes": ["A Coroa Portuguesa", "Os Reis Católicos da Espanha", "A Liga Hanseática"],
+          "respostaCorreta": "Os Reis Católicos da Espanha"
+        },
+        {
+          "id": 14,
+          "tipo": "multipla_escolha",
+          "pergunta": "As rotas das Grande Navegações resultaram em trocas culturais e econômicas chamadas de:",
+          "opcoes": ["Revolução Industrial", "Colonização e comércio atlântico", "Renascimento Cultural Asiático"],
+          "respostaCorreta": "Colonização e comércio atlântico"
+        },
+        {
+          "id": 15,
+          "tipo": "preenchimento",
+          "pergunta": "A rota direta para as Índias buscada pelos europeus visava evitar o controle comercial das cidades ___.",
+          "respostaCorreta": "italianas"
+        },
+        {
+          "id": 16,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual recurso era mais cobiçado nas rotas para as Índias?",
+          "opcoes": ["Petróleo", "Especiarias", "Café"],
+          "respostaCorreta": "Especiarias"
+        },
+        {
+          "id": 17,
+          "tipo": "multipla_escolha",
+          "pergunta": "Quem foi o navegador que completou a primeira volta ao mundo (expedição iniciada por ele)?",
+          "opcoes": ["Vasco da Gama", "Fernão de Magalhães (expedição)", "Cristóvão Colombo"],
+          "respostaCorreta": "Fernão de Magalhães (expedição)"
+        },
+        {
+          "id": 18,
+          "tipo": "preenchimento",
+          "pergunta": "O comércio transatlântico baseado em troca de produtos e trabalho forçado é chamado de ___.",
+          "respostaCorreta": "tráfico negreiro"
+        },
+        {
+          "id": 19,
+          "tipo": "multipla_escolha",
+          "pergunta": "As Grandes Navegações contribuíram para qual fenômeno econômico na Europa?",
+          "opcoes": ["Feudalismo reforçado", "Acúmulo de capital e mercantilismo", "Desvalorização do comércio"],
+          "respostaCorreta": "Acúmulo de capital e mercantilismo"
+        },
+        {
+          "id": 20,
+          "tipo": "preenchimento",
+          "pergunta": "O ato de reivindicar terras para um país europeu durante as navegações chamava-se ___.",
+          "respostaCorreta": "colonização",
+          "observacao": "termo geral"
+        },
+        {
+          "id": 21,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual era a principal vantagem das caravelas em comparação com navios anteriores?",
+          "opcoes": ["Maior velocidade e manobrabilidade", "Capacidade de voar", "Armas nucleares"],
+          "respostaCorreta": "Maior velocidade e manobrabilidade"
+        },
+        {
+          "id": 22,
+          "tipo": "preenchimento",
+          "pergunta": "Tratado que dividiu as terras entre Portugal e Espanha: Tratado de ___.",
+          "respostaCorreta": "Tordesilhas"
+        },
+        {
+          "id": 23,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual era um grande risco enfrentado pelos navegadores nas longas viagens?",
+          "opcoes": ["Excesso de internet", "Escorbuto e tempestades", "Falta de café"],
+          "respostaCorreta": "Escorbuto e tempestades"
         }
       ]
     },
@@ -39,7 +173,7 @@
       "id": "intermediario",
       "nome": "Intermediário",
       "xpPorAcerto": 25,
-      "minAcertosParaDesbloquearProximo": 2,
+      "minAcertosParaDesbloquearProximo": 6,
       "conteudo": {
         "titulo": "Revolução Francesa",
         "resumo": "A **Revolução Francesa**, iniciada em 1789, foi um dos eventos mais importantes da história, pondo fim à monarquia absolutista na França e espalhando ideais iluministas pelo mundo.\n\nO marco inicial foi a **Queda da Bastilha**, uma prisão que simbolizava o poder do rei. A revolução foi impulsionada pela insatisfação do povo com a desigualdade social e a crise econômica.\n\nSeu lema era **'Liberdade, Igualdade e Fraternidade'**, e ela resultou na Declaração dos Direitos do Homem e do Cidadão. A revolução teve fases turbulentas, como o **Período do Terror**, liderado por **Maximilien Robespierre**, onde milhares de pessoas foram executadas na guilhotina."
@@ -59,11 +193,143 @@
           "respostaCorreta": "Fraternidade"
         },
         {
-            "id": 3,
-            "tipo": "multipla_escolha",
-            "pergunta": "Quem foi uma figura central durante o Período do Terror?",
-            "opcoes": ["Luís XVI", "Napoleão Bonaparte", "Maximilien Robespierre"],
-            "respostaCorreta": "Maximilien Robespierre"
+          "id": 3,
+          "tipo": "multipla_escolha",
+          "pergunta": "Quem foi uma figura central durante o Período do Terror?",
+          "opcoes": ["Luís XVI", "Napoleão Bonaparte", "Maximilien Robespierre"],
+          "respostaCorreta": "Maximilien Robespierre"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual documento importante foi inspirado pelos ideais da Revolução Francesa?",
+          "opcoes": ["Declaração dos Direitos do Homem e do Cidadão", "Magna Carta", "Declaração de Independência dos EUA"],
+          "respostaCorreta": "Declaração dos Direitos do Homem e do Cidadão"
+        },
+        {
+          "id": 5,
+          "tipo": "preenchimento",
+          "pergunta": "O rei francês que foi executado durante a Revolução foi ___.",
+          "respostaCorreta": "Luís XVI"
+        },
+        {
+          "id": 6,
+          "tipo": "multipla_escolha",
+          "pergunta": "O Período do Terror buscava principalmente:",
+          "opcoes": ["Estender direitos civis", "Eliminar opositores da revolução por meio de execuções", "Promover comércio livre"],
+          "respostaCorreta": "Eliminar opositores da revolução por meio de execuções"
+        },
+        {
+          "id": 7,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual instituição representava a vontade do povo antes da queda da monarquia (assembleia)?",
+          "opcoes": ["Estados Gerais", "Parlamento Britânico", "Senado Romano"],
+          "respostaCorreta": "Estados Gerais"
+        },
+        {
+          "id": 8,
+          "tipo": "preenchimento",
+          "pergunta": "A principal causa ideológica da Revolução Francesa foi o movimento conhecido como ___.",
+          "respostaCorreta": "Iluminismo"
+        },
+        {
+          "id": 9,
+          "tipo": "multipla_escolha",
+          "pergunta": "Quem assumiu o poder na França após o período revolucionário, tornando-se imperador?",
+          "opcoes": ["Maximilien Robespierre", "Napoleão Bonaparte", "Luís XVIII"],
+          "respostaCorreta": "Napoleão Bonaparte"
+        },
+        {
+          "id": 10,
+          "tipo": "preenchimento",
+          "pergunta": "A prisão simbólica cuja tomada em 1789 é lembrada como marco revolucionário foi a ___.",
+          "respostaCorreta": "Bastilha"
+        },
+        {
+          "id": 11,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual foi uma consequência política direta da Revolução Francesa?",
+          "opcoes": ["Fortalecimento do absolutismo", "Queda da monarquia e avanço de ideias republicanas", "União da França com a Espanha"],
+          "respostaCorreta": "Queda da monarquia e avanço de ideias republicanas"
+        },
+        {
+          "id": 12,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual foi o tribunal revolucionário famoso por julgamentos e execuções durante o Terror?",
+          "opcoes": ["Tribunal Revolucionário", "Supremo Tribunal", "Tribunal de Veneza"],
+          "respostaCorreta": "Tribunal Revolucionário"
+        },
+        {
+          "id": 13,
+          "tipo": "preenchimento",
+          "pergunta": "Robespierre era associado a um comitê chamado Comitê de ___.",
+          "respostaCorreta": "Salvação Pública"
+        },
+        {
+          "id": 14,
+          "tipo": "multipla_escolha",
+          "pergunta": "O que significava o termo 'sans-culottes' durante a Revolução Francesa?",
+          "opcoes": ["Membros da nobreza", "Trabalhadores urbanos revolucionários", "Clérigos conservadores"],
+          "respostaCorreta": "Trabalhadores urbanos revolucionários"
+        },
+        {
+          "id": 15,
+          "tipo": "multipla_escolha",
+          "pergunta": "A 'Declaração dos Direitos do Homem e do Cidadão' defende principalmente:",
+          "opcoes": ["Direitos universais e igualdade perante a lei", "Direito divino dos reis", "Escravidão como prática legal"],
+          "respostaCorreta": "Direitos universais e igualdade perante a lei"
+        },
+        {
+          "id": 16,
+          "tipo": "preenchimento",
+          "pergunta": "A tomada da Bastilha aconteceu na data simbólica: 14 de ___.",
+          "respostaCorreta": "julho"
+        },
+        {
+          "id": 17,
+          "tipo": "multipla_escolha",
+          "pergunta": "Que classe social era mais beneficiada pelo regime absolutista antes da Revolução?",
+          "opcoes": ["Nobreza e clero", "Camponeses", "Burguesia urbana"], 
+          "respostaCorreta": "Nobreza e clero"
+        },
+        {
+          "id": 18,
+          "tipo": "preenchimento",
+          "pergunta": "O sistema que representava a sociedade dividida em três ordens era chamado de ___.",
+          "respostaCorreta": "Antigo Regime"
+        },
+        {
+          "id": 19,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual país liderou coalizões contra a França revolucionária e napoleônica?",
+          "opcoes": ["Rússia", "Brasil", "Suécia"], 
+          "respostaCorreta": "Rússia"
+        },
+        {
+          "id": 20,
+          "tipo": "preenchimento",
+          "pergunta": "Após a Revolução, o líder que se destacou militarmente e virou imperador foi ___.",
+          "respostaCorreta": "Napoleão Bonaparte"
+        },
+        {
+          "id": 21,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual ideologia política ganhou força com a Revolução Francesa?",
+          "opcoes": ["Absolutismo", "Republicanismo e nacionalismo", "Feudalismo"], 
+          "respostaCorreta": "Republicanismo e nacionalismo"
+        },
+        {
+          "id": 22,
+          "tipo": "preenchimento",
+          "pergunta": "A crise que precedeu a Revolução incluía um alto nível de ___.",
+          "respostaCorreta": "endividamento"
+        },
+        {
+          "id": 23,
+          "tipo": "multipla_escolha",
+          "pergunta": "O período chamado 'Diretório' na França situa-se entre:",
+          "opcoes": ["1795-1799", "1789-1792", "1804-1815"],
+          "respostaCorreta": "1795-1799"
         }
       ]
     },
@@ -71,7 +337,7 @@
       "id": "avancado",
       "nome": "Avançado",
       "xpPorAcerto": 40,
-      "minAcertosParaDesbloquearProximo": null,
+      "minAcertosParaDesbloquearProximo": 7,
       "conteudo": {
         "titulo": "Segunda Guerra Mundial",
         "resumo": "A **Segunda Guerra Mundial** (1939-1945) foi o conflito mais mortal da história, envolvendo duas grandes alianças militares:\n- **Eixo:** Liderado por **Alemanha**, **Itália** e **Japão**.\n- **Aliados:** Liderados por Reino Unido, União Soviética e **Estados Unidos**.\n\nO estopim da guerra na Europa foi a invasão da **Polônia** pela Alemanha nazista em 1939. Um evento crucial foi o ataque japonês à base naval de **Pearl Harbor** em 1941, que levou os Estados Unidos a entrarem oficialmente no conflito.\n\nUm dos momentos decisivos foi o **Dia D**, em 1944, quando as forças aliadas desembarcaram na Normandia (França), iniciando a libertação da Europa Ocidental. A guerra terminou em 1945 com a derrota das potências do Eixo."
@@ -98,11 +364,142 @@
           "respostaCorreta": "D"
         },
         {
-            "id": 4,
-            "tipo": "multipla_escolha",
-            "pergunta": "Quais eram os três principais países do Eixo?",
-            "opcoes": ["Alemanha, Itália e Japão", "Alemanha, Rússia e China", "Itália, França e Espanha"],
-            "respostaCorreta": "Alemanha, Itália e Japão"
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "Quais eram os três principais países do Eixo?",
+          "opcoes": ["Alemanha, Itália e Japão", "Alemanha, Rússia e China", "Itália, França e Espanha"],
+          "respostaCorreta": "Alemanha, Itália e Japão"
+        },
+        {
+          "id": 5,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual cidade foi alvo dos bombardeios atômicos dos EUA em 1945?",
+          "opcoes": ["Hiroshima e Nagasaki", "Tokyo e Osaka", "Kyoto e Sapporo"],
+          "respostaCorreta": "Hiroshima e Nagasaki"
+        },
+        {
+          "id": 6,
+          "tipo": "preenchimento",
+          "pergunta": "A política expansionista e ideológica que guiou a Alemanha nazista era chamada de ___.",
+          "respostaCorreta": "nazismo"
+        },
+        {
+          "id": 7,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual foi uma consequência direta da Segunda Guerra Mundial?",
+          "opcoes": ["Criação da ONU", "Início do Império Romano", "Unificação da Alemanha desde 1930"],
+          "respostaCorreta": "Criação da ONU"
+        },
+        {
+          "id": 8,
+          "tipo": "preenchimento",
+          "pergunta": "O julgamento dos principais líderes nazistas após a guerra ocorreu em ___.",
+          "respostaCorreta": "Nuremberg"
+        },
+        {
+          "id": 9,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual operação foi o desembarque aliado na Normandia?",
+          "opcoes": ["Operação Overlord", "Operação Barbarossa", "Operação Torch"],
+          "respostaCorreta": "Operação Overlord"
+        },
+        {
+          "id": 10,
+          "tipo": "multipla_escolha",
+          "pergunta": "A invasão da União Soviética pela Alemanha em 1941 recebeu o nome de:",
+          "opcoes": ["Operation Overlord", "Operation Barbarossa", "Operation Downfall"],
+          "respostaCorreta": "Operation Barbarossa"
+        },
+        {
+          "id": 11,
+          "tipo": "preenchimento",
+          "pergunta": "O líder do Reino Unido durante grande parte da guerra foi ___.",
+          "respostaCorreta": "Winston Churchill"
+        },
+        {
+          "id": 12,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual país sofreu a maior quantidade de baixas militares e civis na Europa?",
+          "opcoes": ["Reino Unido", "União Soviética", "Itália"],
+          "respostaCorreta": "União Soviética"
+        },
+        {
+          "id": 13,
+          "tipo": "preenchimento",
+          "pergunta": "A política de extermínio em massa promovida pelos nazistas é conhecida como ___.",
+          "respostaCorreta": "Holocausto"
+        },
+        {
+          "id": 14,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual foi o julgamento que estabeleceu tribunais internacionais pós-Segunda Guerra?",
+          "opcoes": ["Julgamentos de Nuremberg", "Julgamentos de Tordesilhas", "Julgamentos de Versalhes"],
+          "respostaCorreta": "Julgamentos de Nuremberg"
+        },
+        {
+          "id": 15,
+          "tipo": "preenchimento",
+          "pergunta": "A invasão japonesa que prejudicou severamente a frota americana foi em ___.",
+          "respostaCorreta": "Pearl Harbor"
+        },
+        {
+          "id": 16,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual conferência de 1945 definiu a organização da paz mundial (ONU)?",
+          "opcoes": ["Conferência de Yalta/Teerã/Postdam", "Conferência de Berlim", "Conferência de Versalhes"],
+          "respostaCorreta": "Conferência de Yalta/Teerã/Postdam"
+        },
+        {
+          "id": 17,
+          "tipo": "multipla_escolha",
+          "pergunta": "A campanha do Norte da África foi importante por:",
+          "opcoes": ["Controle de rotas e recursos estratégicos", "Exploração de petróleo no Brasil", "Construção de pirâmides modernas"],
+          "respostaCorreta": "Controle de rotas e recursos estratégicos"
+        },
+        {
+          "id": 18,
+          "tipo": "preenchimento",
+          "pergunta": "O processo de divisão da Alemanha pós-guerra resultou em Alemanha Ocidental e Alemanha ___.",
+          "respostaCorreta": "Oriental"
+        },
+        {
+          "id": 19,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual tecnologia militar teve papel decisivo no conflito aéreo e naval da guerra?",
+          "opcoes": ["Porta-aviões e radar", "Balões de festa", "Trens a vapor"], 
+          "respostaCorreta": "Porta-aviões e radar"
+        },
+        {
+          "id": 20,
+          "tipo": "preenchimento",
+          "pergunta": "O aniversário de fim da guerra na Europa é celebrado em 8 de ___.",
+          "respostaCorreta": "maio"
+        },
+        {
+          "id": 21,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual país não fazia parte dos Aliados principais no início do conflito?",
+          "opcoes": ["Reino Unido", "União Soviética", "Alemanha"],
+          "respostaCorreta": "Alemanha"
+        },
+        {
+          "id": 22,
+          "tipo": "preenchimento",
+          "pergunta": "A aliança militar formada pelos países que se opuseram ao Eixo ficou conhecida como os ___.",
+          "respostaCorreta": "Aliados"
+        },
+        {
+          "id": 23,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual foi um dos objetivos do Plano Marshall após a guerra?",
+          "opcoes": ["Reparar danos e reconstruir a economia europeia", "Invadir a América do Sul", "Destruir portos europeus"], 
+          "respostaCorreta": "Reparar danos e reconstruir a economia europeia"
+        },
+        {
+          "id": 24,
+          "tipo": "preenchimento",
+          "pergunta": "O nome do ditador alemão responsável pela Segunda Guerra Mundial foi ___.",
+          "respostaCorreta": "Adolf Hitler"
         }
       ]
     }

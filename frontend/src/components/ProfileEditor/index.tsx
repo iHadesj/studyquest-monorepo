@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../../config/firebase';
 import { useProgressStore } from '../../hooks/useProgressStore';
@@ -13,30 +13,68 @@ import {
   UsernameInput,
 } from './style';
 
-const avatarSeeds = [
-  'Max',
-  'Bella',
-  'Charlie',
-  'Lucy',
-  'Cooper',
-  'Daisy',
-  'Milo',
-  'Sadie',
-  'Rocky',
-  'Zoe',
-  'Bear',
-  'Ruby',
-  'Leo',
-  'Cleo',
-  'Oscar',
-  'Penny',
-  'Gizmo',
-  'Loki',
-  'Coco',
-  'Simba',
-  'Nala',
-  'Ollie',
-];
+function generateAvatarSeeds(count = 240) {
+  const ADJS = [
+    'pixel',
+    'neon',
+    'astro',
+    'bravo',
+    'doce',
+    'rápido',
+    'lento',
+    'forte',
+    'mágico',
+    'ninja',
+    'sábio',
+    'solar',
+    'lunar',
+    'vapor',
+    'rúnico',
+    'neo',
+    'zulu',
+    'crystal',
+    'frost',
+    'ember',
+    'shadow',
+    'glimmer',
+    'tiny',
+    'bold',
+  ];
+  const NOUNS = [
+    'gato',
+    'lobo',
+    'draco',
+    'byte',
+    'fênix',
+    'cacto',
+    'raposa',
+    'orca',
+    'panda',
+    'urso',
+    'leão',
+    'zebra',
+    'pixel',
+    'robo',
+    'gnomo',
+    'orca',
+    'orca2',
+    'mar',
+    'planeta',
+    'estrela',
+    'meteor',
+    'cubo',
+    'ovo',
+    'rato',
+  ];
+
+  const seeds: string[] = [];
+  for (let i = 0; i < count; i++) {
+    const a = ADJS[i % ADJS.length];
+    const n = NOUNS[Math.floor(i / ADJS.length) % NOUNS.length];
+    seeds.push(`${a}-${n}-${i}`);
+  }
+  return seeds;
+}
 
 interface ProfileEditorProps {
   isOpen: boolean;
@@ -53,15 +91,26 @@ export function ProfileEditor({
   const [username, setUsername] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState('');
 
+  // seeds geradas uma vez (determinístico)
+  const avatarSeeds = useMemo(() => generateAvatarSeeds(240), []);
+
   useEffect(() => {
     if (isOpen && !isSetupMode) {
       setUsername(currentUser.username || '');
+      // se o avatar atual for um seed Dicebear (string), usa ele,
+      // senão fallback pro primeiro seed gerado
       setSelectedAvatar(currentUser.avatarSeed || avatarSeeds[0]);
     } else if (isSetupMode) {
       setUsername('');
       setSelectedAvatar(avatarSeeds[0]);
     }
-  }, [isOpen, isSetupMode, currentUser.username, currentUser.avatarSeed]);
+  }, [
+    isOpen,
+    isSetupMode,
+    currentUser.username,
+    currentUser.avatarSeed,
+    avatarSeeds,
+  ]);
 
   const handleSave = async () => {
     const user = auth.currentUser;
@@ -79,12 +128,6 @@ export function ProfileEditor({
     }
   };
 
-  if (isSetupMode) {
-    // Aqui você pode retornar a UI original do ProfileSetup,
-    // mas usando os componentes e lógica deste editor.
-    // Por simplicidade, vamos focar no modo de edição.
-  }
-
   return (
     <Modal.Root isOpen={isOpen} onClose={onClose}>
       <Modal.Overlay />
@@ -93,7 +136,7 @@ export function ProfileEditor({
           <Modal.Close />
           <EditorTitle>Editar Perfil</EditorTitle>
           <EditorSubtitle>
-            Personalize seu nome de usuário e avatar.
+            Personalize seu nome de usuário e avatar (pixel-art).
           </EditorSubtitle>
 
           <UsernameInput
@@ -113,8 +156,12 @@ export function ProfileEditor({
                 title={seed}
               >
                 <img
-                  src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${seed}`}
+                  src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${encodeURIComponent(
+                    seed
+                  )}`}
                   alt={`Avatar ${seed}`}
+                  loading="lazy"
+                  decoding="async"
                 />
               </AvatarOption>
             ))}

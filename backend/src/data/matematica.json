@@ -7,45 +7,96 @@
       "id": "iniciante",
       "nome": "Iniciante",
       "xpPorAcerto": 10,
-      "minAcertosParaDesbloquearProximo": 3,
+      "minAcertosParaDesbloquearProximo": 5,
       "conteudo": {
-        "titulo": "Fundamentos da Aritmética",
-        "resumo": "A aritmética é a base de toda a matemática! Aqui, vamos dominar as quatro operações fundamentais que usamos no dia a dia.\n\n**Adição (+):** É o ato de juntar quantidades. Se você tem 7 maçãs e ganha mais 5, você soma 7 + 5 para encontrar o total de 12 maçãs.\n\n**Subtração (-):** É o ato de retirar uma quantidade de outra. Se você tem 10 reais e gasta 3, você subtrai 10 - 3 para descobrir que sobraram 7 reais.\n\n**Multiplicação (*):** É uma forma de somar o mesmo número várias vezes. Em vez de fazer 4 + 4 + 4, você pode multiplicar 4 * 3, que resulta em 12.\n\n**Divisão (/):** É o ato de repartir uma quantidade em partes iguais. Se você tem 20 doces para dividir entre 4 amigos, você divide 20 / 4 para descobrir que cada um receberá 5 doces."
+        "titulo": "Os Pilares da Aritmética",
+        "resumo": "A aritmética é a linguagem universal dos números e a base para toda a matemática. Dominar suas quatro operações fundamentais é o primeiro passo para resolver qualquer problema.\n\n**Adição (+):** É a operação de juntar ou combinar quantidades. Se você tem 7 maçãs e ganha mais 5, a operação $7 + 5$ revela que você agora possui 12 maçãs.\n\n**Subtração (-):** Representa a remoção ou a diferença entre quantidades. Se uma pizza tem 8 fatias e você come 3, a operação $8 - 3$ mostra que restam 5 fatias.\n\n**Multiplicação (× ou *):** É uma forma eficiente de realizar adições repetidas. Em vez de somar $6 + 6 + 6 + 6$, podemos simplesmente multiplicar $6 \\times 4$, obtendo o mesmo resultado: 24.\n\n**Divisão (÷ ou /):** É o ato de repartir uma quantidade em partes iguais ou descobrir quantas vezes um número cabe em outro. Se 20 doces são divididos igualmente entre 4 amigos ($20 \\div 4$), cada um receberá 5 doces."
       },
       "exercicios": [
-        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Quanto é 7 + 5?", "opcoes": ["10", "12", "14", "11"], "respostaCorreta": "12" },
-        { "id": 2, "tipo": "multipla_escolha", "pergunta": "Quanto é 10 - 3?", "opcoes": ["6", "8", "7"], "respostaCorreta": "7" },
-        { "id": 3, "tipo": "preenchimento", "pergunta": "O resultado de 4 * 3 é ___.", "respostaCorreta": "12" },
-        { "id": 4, "tipo": "multipla_escolha", "pergunta": "Quanto é 20 / 4?", "opcoes": ["4", "5", "6"], "respostaCorreta": "5" }
+        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Quanto é $15 + 8$?", "opcoes": ["22", "23", "24", "25"], "respostaCorreta": "23" },
+        { "id": 2, "tipo": "multipla_escolha", "pergunta": "Qual o resultado de $30 - 12$?", "opcoes": ["18", "28", "12", "22"], "respostaCorreta": "18" },
+        { "id": 3, "tipo": "preenchimento", "pergunta": "O resultado de $7 \\times 8$ é ___.", "respostaCorreta": "56" },
+        { "id": 4, "tipo": "multipla_escolha", "pergunta": "Quanto é $45 \\div 5$?", "opcoes": ["8", "9", "10", "7"], "respostaCorreta": "9" },
+        { "id": 5, "tipo": "multipla_escolha", "pergunta": "Ana tinha 12 lápis e perdeu 4. Com quantos lápis ela ficou?", "opcoes": ["6", "16", "8", "9"], "respostaCorreta": "8" },
+        { "id": 6, "tipo": "preenchimento", "pergunta": "Uma caixa tem 6 ovos. Quantos ovos há em 5 caixas? Resposta: ___ ovos.", "respostaCorreta": "30" },
+        { "id": 7, "tipo": "multipla_escolha", "pergunta": "Se você divide 21 balas para 3 pessoas, quantas balas cada uma ganha?", "opcoes": ["6", "7", "8", "9"], "respostaCorreta": "7" },
+        { "id": 8, "tipo": "multipla_escolha", "pergunta": "Qual operação é o inverso da adição?", "opcoes": ["Multiplicação", "Divisão", "Subtração", "Potenciação"], "respostaCorreta": "Subtração" },
+        { "id": 9, "tipo": "preenchimento", "pergunta": "Calcule: $100 - 25 = $ ___.", "respostaCorreta": "75" },
+        { "id": 10, "tipo": "multipla_escolha", "pergunta": "Quanto é $9 \\times 9$?", "opcoes": ["81", "72", "90", "99"], "respostaCorreta": "81" },
+        { "id": 11, "tipo": "multipla_escolha", "pergunta": "O que resulta da operação $50 + 150$?", "opcoes": ["100", "250", "300", "200"], "respostaCorreta": "200" },
+        { "id": 12, "tipo": "preenchimento", "pergunta": "Um ônibus tem 40 assentos. Se 15 estão vazios, quantos estão ocupados? ___ assentos.", "respostaCorreta": "25" },
+        { "id": 13, "tipo": "multipla_escolha", "pergunta": "O resultado de $12 \\times 10$ é:", "opcoes": ["110", "120", "130", "100"], "respostaCorreta": "120" },
+        { "id": 14, "tipo": "multipla_escolha", "pergunta": "Quanto é $64 \\div 8$?", "opcoes": ["6", "7", "8", "9"], "respostaCorreta": "8" },
+        { "id": 15, "tipo": "preenchimento", "pergunta": "Tenho 50 reais e gasto 32. Me sobram ___ reais.", "respostaCorreta": "18" },
+        { "id": 16, "tipo": "multipla_escolha", "pergunta": "Um pacote de biscoitos tem 12 unidades. Se eu comprar 3 pacotes, terei quantos biscoitos?", "opcoes": ["30", "32", "36", "40"], "respostaCorreta": "36" },
+        { "id": 17, "tipo": "multipla_escolha", "pergunta": "Qual o resultado de $8 + 8 + 8$?", "opcoes": ["21", "24", "16", "32"], "respostaCorreta": "24" },
+        { "id": 18, "tipo": "preenchimento", "pergunta": "Se $X + 10 = 25$, o valor de $X$ é ___.", "respostaCorreta": "15" },
+        { "id": 19, "tipo": "multipla_escolha", "pergunta": "Quanto é $11 \\times 5$?", "opcoes": ["50", "55", "60", "65"], "respostaCorreta": "55" },
+        { "id": 20, "tipo": "multipla_escolha", "pergunta": "Dividindo 100 por 2, obtemos:", "opcoes": ["20", "25", "50", "40"], "respostaCorreta": "50" }
       ]
     },
     {
       "id": "intermediario",
       "nome": "Intermediário",
       "xpPorAcerto": 20,
-      "minAcertosParaDesbloquearProximo": 2,
+      "minAcertosParaDesbloquearProximo": 6,
       "conteudo": {
-        "titulo": "Equações e Frações",
-        "resumo": "Vamos avançar para resolver problemas com valores desconhecidos e trabalhar com partes de um todo.\n\n**Equações de 1º Grau**\nUma equação é como uma balança em equilíbrio. O objetivo é descobrir o valor de uma incógnita, geralmente representada por 'X'. Para resolver, você precisa isolar o 'X' em um dos lados da igualdade.\nEx: Na equação `2X + 5 = 15`, primeiro passamos o 5 para o outro lado subtraindo: `2X = 15 - 5`, que resulta em `2X = 10`. Depois, passamos o 2 que está multiplicando para o outro lado dividindo: `X = 10 / 2`, então `X = 5`.\n\n**Frações**\nFrações representam partes de um inteiro. Uma fração como 1/2 significa uma parte de um todo que foi dividido em duas. Para somar frações com denominadores (o número de baixo) diferentes, como `1/2 + 1/4`, precisamos primeiro encontrar um denominador comum (neste caso, 4). A soma fica `2/4 + 1/4`, que é igual a `3/4`."
+        "titulo": "Álgebra e Frações: Desvendando o Desconhecido",
+        "resumo": "Agora, vamos um passo além da aritmética para resolver problemas com valores desconhecidos e para entender como representar e operar com partes de um todo.\n\n**Equações de 1º Grau**\nUma equação é uma igualdade que contém um ou mais valores desconhecidos, chamados de incógnitas (geralmente $x$). O objetivo é descobrir o valor de $x$ que torna a igualdade verdadeira. Pense numa balança: tudo o que você faz de um lado da igualdade, deve fazer do outro para manter o equilíbrio.\nExemplo: $3x - 4 = 11$. Para isolar o $x$, primeiro somamos 4 dos dois lados: $3x = 11 + 4 \\implies 3x = 15$. Em seguida, dividimos os dois lados por 3: $x = 15 / 3 \\implies x = 5$.\n\n**Frações**\nFrações representam uma divisão de um número por outro ($numerador / denominador$) ou partes de um inteiro. Operar com frações é essencial.\n- **Soma/Subtração:** Para somar ou subtrair, as frações precisam ter o mesmo denominador (o número de baixo). Se não tiverem, encontramos um denominador comum (como o MMC). Exemplo: $1/3 + 1/2$. O denominador comum é 6. A soma fica $2/6 + 3/6 = 5/6$.\n- **Simplificação:** Uma fração como $4/8$ pode ser simplificada dividindo o numerador e o denominador pelo maior divisor comum, resultando em $1/2$."
       },
       "exercicios": [
-        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Qual o valor de X na equação 2X + 5 = 15?", "opcoes": ["10", "5", "20"], "respostaCorreta": "5" },
-        { "id": 2, "tipo": "multipla_escolha", "pergunta": "Qual é o resultado da soma de 1/2 + 1/4?", "opcoes": ["3/4", "2/6", "1/6"], "respostaCorreta": "3/4" },
-        { "id": 3, "tipo": "preenchimento", "pergunta": "Se X - 8 = 2, qual o valor de X?", "respostaCorreta": "10" }
+        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Qual o valor de $x$ na equação $2x + 5 = 15$?", "opcoes": ["10", "5", "20", "7.5"], "respostaCorreta": "5" },
+        { "id": 2, "tipo": "multipla_escolha", "pergunta": "Qual é o resultado da soma de $1/2 + 1/4$?", "opcoes": ["3/4", "2/6", "1/6", "2/4"], "respostaCorreta": "3/4" },
+        { "id": 3, "tipo": "preenchimento", "pergunta": "Se $x - 8 = 2$, qual o valor de $x$?", "respostaCorreta": "10" },
+        { "id": 4, "tipo": "multipla_escolha", "pergunta": "Resolva a equação $5x = 50$.", "opcoes": ["5", "250", "45", "10"], "respostaCorreta": "10" },
+        { "id": 5, "tipo": "multipla_escolha", "pergunta": "Qual é a fração $6/10$ simplificada?", "opcoes": ["3/5", "2/5", "6/5", "3/10"], "respostaCorreta": "3/5" },
+        { "id": 6, "tipo": "preenchimento", "pergunta": "O resultado de $3/5 + 1/5$ é ___ (formato x/y).", "respostaCorreta": "4/5" },
+        { "id": 7, "tipo": "multipla_escolha", "pergunta": "Se $x/4 = 3$, qual o valor de $x$?", "opcoes": ["7", "1", "0.75", "12"], "respostaCorreta": "12" },
+        { "id": 8, "tipo": "multipla_escolha", "pergunta": "Qual o resultado de $1 - 1/3$?", "opcoes": ["2/3", "1/2", "0", "1/3"], "respostaCorreta": "2/3" },
+        { "id": 9, "tipo": "preenchimento", "pergunta": "Na equação $10 - x = 7$, o valor de $x$ é ___.", "respostaCorreta": "3" },
+        { "id": 10, "tipo": "multipla_escolha", "pergunta": "Qual fração é equivalente a 0.5?", "opcoes": ["1/5", "1/2", "1/3", "1/4"], "respostaCorreta": "1/2" },
+        { "id": 11, "tipo": "multipla_escolha", "pergunta": "Resolva a equação $4x - 3 = 13$.", "opcoes": ["5", "4", "3", "10"], "respostaCorreta": "4" },
+        { "id": 12, "tipo": "preenchimento", "pergunta": "O resultado da multiplicação $1/2 \\times 3/4$ é ___ (formato x/y).", "respostaCorreta": "3/8" },
+        { "id": 13, "tipo": "multipla_escolha", "pergunta": "Qual é o denominador da fração $7/11$?", "opcoes": ["7", "11", "18", "4"], "respostaCorreta": "11" },
+        { "id": 14, "tipo": "multipla_escolha", "pergunta": "O dobro de um número mais 5 é igual a 25. Qual é o número?", "opcoes": ["5", "15", "10", "20"], "respostaCorreta": "10" },
+        { "id": 15, "tipo": "preenchimento", "pergunta": "Se $2(x + 1) = 8$, o valor de $x$ é ___.", "respostaCorreta": "3" },
+        { "id": 16, "tipo": "multipla_escolha", "pergunta": "Qual o resultado de $5/2 - 1/2$?", "opcoes": ["4", "2", "4/2", "1"], "respostaCorreta": "2" },
+        { "id": 17, "tipo": "multipla_escolha", "pergunta": "Qual o MMC (Mínimo Múltiplo Comum) entre 4 e 6?", "opcoes": ["24", "10", "12", "8"], "respostaCorreta": "12" },
+        { "id": 18, "tipo": "preenchimento", "pergunta": "Resolva: $x + 2x = 9$. O valor de $x$ é ___.", "respostaCorreta": "3" },
+        { "id": 19, "tipo": "multipla_escolha", "pergunta": "Quanto é metade de $1/2$?", "opcoes": ["1", "1/4", "1/3", "2"], "respostaCorreta": "1/4" },
+        { "id": 20, "tipo": "multipla_escolha", "pergunta": "Se um terço de um número é 6, que número é esse?", "opcoes": ["2", "9", "18", "3"], "respostaCorreta": "18" }
       ]
     },
     {
       "id": "avancado",
       "nome": "Avançado",
       "xpPorAcerto": 40,
-      "minAcertosParaDesbloquearProximo": null,
+      "minAcertosParaDesbloquearProximo": 7,
       "conteudo": {
-        "titulo": "Trigonometria Básica",
-        "resumo": "A trigonometria é o estudo das relações entre os lados e os ângulos dos triângulos, especialmente os triângulos retângulos (aqueles com um ângulo de 90 graus).\n\n**Teorema de Pitágoras**\nÉ a regra mais famosa dos triângulos retângulos. Ela diz que o quadrado da hipotenusa (o lado maior, oposto ao ângulo de 90 graus) é igual à soma dos quadrados dos catetos (os outros dois lados). Fórmula: a² = b² + c².\n\n**Seno, Cosseno e Tangente**\nSão as três principais razões trigonométricas. Elas relacionam os ângulos de um triângulo retângulo com as razões entre os comprimentos de seus lados.\n- **Seno (sin):** Cateto Oposto / Hipotenusa\n- **Cosseno (cos):** Cateto Adjacente / Hipotenusa\n- **Tangente (tan):** Cateto Oposto / Cateto Adjacente\nO seno de 30 graus, por exemplo, é sempre 0.5 (ou 1/2)."
+        "titulo": "Trigonometria no Triângulo Retângulo",
+        "resumo": "A trigonometria é a poderosa ferramenta matemática que estuda as relações entre os lados e os ângulos dos triângulos. Ela é fundamental para áreas como engenharia, física, astronomia e games, permitindo calcular distâncias inacessíveis.\n\n**Teorema de Pitágoras**\nA base para o estudo do triângulo retângulo (com um ângulo de 90°). Ele afirma que o quadrado da hipotenusa (lado oposto ao ângulo reto) é igual à soma dos quadrados dos catetos (os outros dois lados). A fórmula é uma das mais famosas da matemática: $a² = b² + c²$.\n\n**Seno, Cosseno e Tangente**\nSão razões (divisões) que relacionam os ângulos agudos de um triângulo retângulo com o comprimento de seus lados. Para um ângulo $\\alpha$:\n- **Seno (sin $\\alpha$):** Medida do Cateto Oposto / Medida da Hipotenusa\n- **Cosseno (cos $\\alpha$):** Medida do Cateto Adjacente / Medida da Hipotenusa\n- **Tangente (tan $\\alpha$):** Medida do Cateto Oposto / Medida do Cateto Adjacente\nEssas razões são constantes para um mesmo ângulo, não importa o tamanho do triângulo. Por exemplo, o seno de 30° é sempre $0.5$ (ou $1/2$)."
       },
       "exercicios": [
-        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Em um triângulo retângulo com catetos 3 e 4, qual a hipotenusa?", "opcoes": ["5", "6", "7"], "respostaCorreta": "5" },
-        { "id": 2, "tipo": "multipla_escolha", "pergunta": "Qual é o seno de 30 graus?", "opcoes": ["1", "0.5", "0.866"], "respostaCorreta": "0.5" }
+        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Em um triângulo retângulo com catetos medindo 3 e 4, qual a medida da hipotenusa?", "opcoes": ["5", "6", "7", "25"], "respostaCorreta": "5" },
+        { "id": 2, "tipo": "multipla_escolha", "pergunta": "Qual é o valor do seno de 30°?", "opcoes": ["1", "0.5", "0.866", "0.707"], "respostaCorreta": "0.5" },
+        { "id": 3, "tipo": "preenchimento", "pergunta": "A fórmula do Teorema de Pitágoras é $a² = b² +$ ___.", "respostaCorreta": "c²" },
+        { "id": 4, "tipo": "multipla_escolha", "pergunta": "O cosseno de um ângulo é definido pela razão entre:", "opcoes": ["Cateto Oposto e Hipotenusa", "Cateto Adjacente e Hipotenusa", "Cateto Oposto e Cateto Adjacente", "Hipotenusa e Cateto Adjacente"], "respostaCorreta": "Cateto Adjacente e Hipotenusa" },
+        { "id": 5, "tipo": "multipla_escolha", "pergunta": "Se a hipotenusa de um triângulo retângulo mede 10 e um dos catetos mede 6, quanto mede o outro cateto?", "opcoes": ["4", "6", "8", "12"], "respostaCorreta": "8" },
+        { "id": 6, "tipo": "preenchimento", "pergunta": "Qual é o valor da tangente de 45°?", "respostaCorreta": "1" },
+        { "id": 7, "tipo": "multipla_escolha", "pergunta": "A soma dos ângulos internos de qualquer triângulo é sempre:", "opcoes": ["90°", "180°", "360°", "100°"], "respostaCorreta": "180°" },
+        { "id": 8, "tipo": "multipla_escolha", "pergunta": "Se o seno de um ângulo é $3/5$ e o cosseno é $4/5$, qual a tangente desse ângulo?", "opcoes": ["5/3", "5/4", "4/3", "3/4"], "respostaCorreta": "3/4" },
+        { "id": 9, "tipo": "preenchimento", "pergunta": "Em um triângulo retângulo, o lado oposto ao ângulo de 90° é chamado de ___.", "respostaCorreta": "hipotenusa" },
+        { "id": 10, "tipo": "multipla_escolha", "pergunta": "O valor do cosseno de 60° é igual ao seno de qual ângulo?", "opcoes": ["60°", "45°", "30°", "90°"], "respostaCorreta": "30°" },
+        { "id": 11, "tipo": "multipla_escolha", "pergunta": "Uma escada de 5 metros está apoiada em um muro. A base da escada está a 3 metros do muro. Qual a altura que a escada alcança no muro?", "opcoes": ["3m", "4m", "5m", "2m"], "respostaCorreta": "4m" },
+        { "id": 12, "tipo": "preenchimento", "pergunta": "A tangente é a razão entre o seno e o ___.", "respostaCorreta": "cosseno" },
+        { "id": 13, "tipo": "multipla_escolha", "pergunta": "Qual desses conjuntos de medidas pode formar um triângulo retângulo?", "opcoes": ["2, 3, 4", "5, 12, 13", "4, 5, 6", "7, 8, 9"], "respostaCorreta": "5, 12, 13" },
+        { "id": 14, "tipo": "multipla_escolha", "pergunta": "Em um triângulo retângulo, um ângulo é 90° e outro é 40°. Qual o valor do terceiro ângulo?", "opcoes": ["40°", "90°", "50°", "60°"], "respostaCorreta": "50°" },
+        { "id": 15, "tipo": "preenchimento", "pergunta": "Se um quadrado tem lado 5, sua diagonal mede $5\\sqrt{2}$. Isso é uma aplicação do Teorema de ___.", "respostaCorreta": "Pitágoras" },
+        { "id": 16, "tipo": "multipla_escolha", "pergunta": "O seno e o cosseno de um ângulo são sempre valores entre:", "opcoes": ["0 e 1", "-1 e 1", "0 e infinito", "-10 e 10"], "respostaCorreta": "-1 e 1" },
+        { "id": 17, "tipo": "multipla_escolha", "pergunta": "O cosseno de 0° é:", "opcoes": ["0", "0.5", "1", "-1"], "respostaCorreta": "1" },
+        { "id": 18, "tipo": "preenchimento", "pergunta": "Um triângulo com lados 6, 8 e 10 é um triângulo ___.", "respostaCorreta": "retângulo" },
+        { "id": 19, "tipo": "multipla_escolha", "pergunta": "Se o cateto oposto a um ângulo de 30° mede 7, quanto mede a hipotenusa?", "opcoes": ["7", "3.5", "14", "21"], "respostaCorreta": "14" },
+        { "id": 20, "tipo": "multipla_escolha", "pergunta": "A palavra Trigonometria vem do grego e significa, basicamente:", "opcoes": ["Medida de círculos", "Medida de triângulos", "Estudo das formas", "Lógica dos números"], "respostaCorreta": "Medida de triângulos" }
       ]
     }
   ]

@@ -7,71 +7,64 @@
       "id": "iniciante",
       "nome": "Iniciante",
       "xpPorAcerto": 15,
-      "minAcertosParaDesbloquearProximo": 3,
+      "minAcertosParaDesbloquearProximo": 15,
       "conteudo": {
-        "titulo": "Instrumentos e Notas Musicais",
-        "resumo": "A música é a arte de combinar sons. Para começar, vamos conhecer suas ferramentas (os instrumentos) e seu alfabeto (as notas).\n\n**As Notas Musicais**\nSão a base de toda melodia. Existem **sete** notas principais, que formam a escala musical. A sequência que aprendemos é:\n**Dó - Ré - Mi - Fá - Sol - Lá - Si**\nApós o 'Si', a sequência recomeça em um 'Dó' mais agudo, e assim por diante.\n\n**Famílias de Instrumentos**\nOs instrumentos são agrupados pelo modo como produzem o som:\n- **Cordas:** O som é produzido pela vibração de cordas. Ex: **Violão**, violino, baixo.\n- **Sopro:** O som é produzido pela vibração do ar. Ex: Flauta, saxofone, trompete.\n- **Percussão:** O som é produzido ao bater, raspar ou agitar o instrumento. Ex: Bateria, tambor, chocalho.\n- **Teclas:** O som é produzido ao pressionar teclas. Ex: **Piano**, teclado, órgão."
+        "titulo": "O Alfabeto e as Cores do Som",
+        "resumo": "A música é a arte de combinar sons e silêncios. Para começar, vamos conhecer seu alfabeto (as notas), suas cores (o timbre) e suas ferramentas (os instrumentos).\n\n**As Notas Musicais**\nSão a base de toda melodia. Existem **sete** notas principais que se repetem em diferentes alturas (mais graves ou mais agudas). A sequência padrão é:\n**Dó - Ré - Mi - Fá - Sol - Lá - Si**\nElas também podem ser representadas por letras: C - D - E - F - G - A - B.\n\n**Timbre: A 'Cor' do Som**\nÉ a qualidade que nos faz diferenciar dois instrumentos tocando a mesma nota. É o 'DNA' do som, o que faz um violão soar como um violão e uma flauta soar como uma flauta.\n\n**Famílias de Instrumentos**\n- **Cordas:** O som nasce da vibração de cordas. Ex: **Violão**, violino, harpa, contrabaixo.\n- **Sopro:** O som é produzido pela vibração do ar dentro de um tubo. Podem ser de *madeira* (flauta, clarinete) ou *metal* (trompete, trombone).\n- **Percussão:** O som é gerado ao ser percutido (batido), raspado ou agitado. Ex: Bateria, tambor, pandeiro, xilofone.\n- **Teclas:** O som é ativado ao pressionar teclas. Ex: **Piano**, teclado eletrônico, órgão."
       },
       "exercicios": [
-        {
-          "id": 1,
-          "tipo": "multipla_escolha",
-          "pergunta": "Qual destes é um instrumento de cordas?",
-          "opcoes": ["Flauta", "Bateria", "Violão"],
-          "respostaCorreta": "Violão"
-        },
-        {
-          "id": 2,
-          "tipo": "multipla_escolha",
-          "pergunta": "Quantas são as notas musicais principais?",
-          "opcoes": ["Cinco", "Sete", "Nove"],
-          "respostaCorreta": "Sete"
-        },
-        {
-          "id": 3,
-          "tipo": "preenchimento",
-          "pergunta": "A sequência das notas musicais é Dó, Ré, Mi, Fá, Sol, Lá e ___.",
-          "respostaCorreta": "Si"
-        },
-        {
-          "id": 4,
-          "tipo": "multipla_escolha",
-          "pergunta": "O piano é um instrumento de qual família?",
-          "opcoes": ["Sopro", "Percussão", "Teclas"],
-          "respostaCorreta": "Teclas"
-        }
+        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Qual destes é um instrumento de cordas?", "opcoes": ["Flauta", "Bateria", "Violão"], "respostaCorreta": "Violão" },
+        { "id": 2, "tipo": "multipla_escolha", "pergunta": "Quantas são as notas musicais principais?", "opcoes": ["Cinco", "Sete", "Nove", "Doze"], "respostaCorreta": "Sete" },
+        { "id": 3, "tipo": "preenchimento", "pergunta": "A sequência das notas musicais é Dó, Ré, Mi, Fá, Sol, Lá e ___.", "respostaCorreta": "Si" },
+        { "id": 4, "tipo": "multipla_escolha", "pergunta": "O piano é um instrumento de qual família?", "opcoes": ["Sopro", "Percussão", "Teclas", "Cordas"], "respostaCorreta": "Teclas" },
+        { "id": 5, "tipo": "multipla_escolha", "pergunta": "A qualidade que diferencia o som de um trompete e de um violino tocando a mesma nota é o:", "opcoes": ["Ritmo", "Timbre", "Andamento", "Volume"], "respostaCorreta": "Timbre" },
+        { "id": 6, "tipo": "preenchimento", "pergunta": "Qual nota vem imediatamente depois do Sol na escala musical?", "respostaCorreta": "Lá" },
+        { "id": 7, "tipo": "multipla_escolha", "pergunta": "O saxofone pertence a qual família de instrumentos?", "opcoes": ["Cordas", "Sopro", "Teclas", "Percussão"], "respostaCorreta": "Sopro" },
+        { "id": 8, "tipo": "multipla_escolha", "pergunta": "Qual letra representa a nota Ré?", "opcoes": ["A", "B", "C", "D"], "respostaCorreta": "D" },
+        { "id": 9, "tipo": "preenchimento", "pergunta": "Um tambor produz som ao ser percutido, por isso é um instrumento de ___.", "respostaCorreta": "percussão" },
+        { "id": 10, "tipo": "multipla_escolha", "pergunta": "Qual instrumento NÃO pertence à família das cordas?", "opcoes": ["Violino", "Harpa", "Contrabaixo", "Clarinete"], "respostaCorreta": "Clarinete" },
+        { "id": 11, "tipo": "multipla_escolha", "pergunta": "A nota que vem antes de Dó é:", "opcoes": ["Ré", "Lá", "Si", "Mi"], "respostaCorreta": "Si" },
+        { "id": 12, "tipo": "preenchimento", "pergunta": "O órgão eletrônico é um instrumento da família das ___.", "respostaCorreta": "teclas" },
+        { "id": 13, "tipo": "multipla_escolha", "pergunta": "Qual destes é um instrumento de percussão?", "opcoes": ["Trombone", "Violoncelo", "Pandeiro", "Acordeão"], "respostaCorreta": "Pandeiro" },
+        { "id": 14, "tipo": "multipla_escolha", "pergunta": "A nota Lá é representada pela letra:", "opcoes": ["A", "L", "G", "C"], "respostaCorreta": "A" },
+        { "id": 15, "tipo": "preenchimento", "pergunta": "O som do trompete é produzido pela vibração do ar, classificando-o como um instrumento de ___.", "respostaCorreta": "sopro" },
+        { "id": 16, "tipo": "multipla_escolha", "pergunta": "Qual nota está entre Mi e Sol?", "opcoes": ["Lá", "Fá", "Ré", "Si"], "respostaCorreta": "Fá" },
+        { "id": 17, "tipo": "multipla_escolha", "pergunta": "Qual é a primeira nota da sequência tradicional?", "opcoes": ["Lá", "Sol", "Dó", "Mi"], "respostaCorreta": "Dó" },
+        { "id": 18, "tipo": "preenchimento", "pergunta": "A letra G representa a nota ___.", "respostaCorreta": "Sol" },
+        { "id": 19, "tipo": "multipla_escolha", "pergunta": "O xilofone é um instrumento de:", "opcoes": ["Teclas", "Cordas", "Sopro", "Percussão"], "respostaCorreta": "Percussão" },
+        { "id": 20, "tipo": "multipla_escolha", "pergunta": "Um contrabaixo elétrico pertence à família das:", "opcoes": ["Cordas", "Teclas", "Percussão", "Sopro"], "respostaCorreta": "Cordas" }
       ]
     },
     {
       "id": "intermediario",
       "nome": "Intermediário",
       "xpPorAcerto": 25,
-      "minAcertosParaDesbloquearProximo": 2,
+      "minAcertosParaDesbloquearProximo": 15,
       "conteudo": {
-        "titulo": "Gêneros Musicais",
-        "resumo": "A música se manifesta de inúmeras formas. Os gêneros musicais são como 'rótulos' que nos ajudam a classificar estilos com características semelhantes.\n\n**Música Clássica**\nÉ um gênero amplo, geralmente associado a orquestras e instrumentos acústicos. Compositores como **Beethoven** e **Mozart** são mestres deste estilo, conhecido por sua complexidade e estrutura formal.\n\n**Rock**\nNascido nos anos 50, o Rock é marcado pela energia e pelo uso de instrumentos como a **guitarra elétrica**, o baixo e a bateria. Possui inúmeros subgêneros, do rock 'n' roll clássico ao heavy metal.\n\n**Jazz**\nOriginário das comunidades afro-americanas de Nova Orleans, nos EUA, o **Jazz** é um gênero que tem a **improvisação** como uma de suas principais características. É comum que os músicos criem solos espontaneamente durante a performance."
+        "titulo": "Explorando os Gêneros Musicais",
+        "resumo": "A música se manifesta de inúmeras formas. Os gêneros musicais nos ajudam a classificar estilos com características, instrumentação e origens culturais semelhantes.\n\n**Música Clássica**\nUm gênero amplo, associado a orquestras, complexidade harmônica e estrutura formal. Compositores como **Bach**, **Mozart** e **Beethoven** são pilares deste estilo, que abrange desde o período Barroco ao Contemporâneo.\n\n**Rock**\nNascido nos anos 50, o Rock é marcado pela atitude e pelo uso de instrumentos como a **guitarra elétrica**, o contrabaixo e a bateria. Bandas como **The Beatles** e **Led Zeppelin** definiram suas bases.\n\n**Jazz**\nOriginário das comunidades afro-americanas de Nova Orleans (EUA), o **Jazz** tem a **improvisação** como sua alma. Músicos como **Louis Armstrong** e **Miles Davis** são ícones do gênero, que valoriza a liberdade de criação espontânea.\n\n**Samba**\nSímbolo da música brasileira, o Samba tem suas raízes na cultura africana. É um gênero rico em ritmo, com forte presença de instrumentos de **percussão** (como surdo e pandeiro) e do violão de 7 cordas. **Cartola** é um de seus maiores poetas.\n\n**Pop**\nAbreviatura de 'música popular', o Pop visa alcançar um grande público. Suas características são melodias fáceis de lembrar (refrões 'chiclete'), ritmo dançante e produção musical polida. **Michael Jackson** é aclamado como o 'Rei do Pop'."
       },
       "exercicios": [
-        {
-          "id": 1,
-          "tipo": "multipla_escolha",
-          "pergunta": "Qual gênero musical é famoso pelo uso de guitarras elétricas com distorção?",
-          "opcoes": ["Samba", "Rock", "Música Clássica"],
-          "respostaCorreta": "Rock"
-        },
-        {
-          "id": 2,
-          "tipo": "multipla_escolha",
-          "pergunta": "Beethoven e Mozart são compositores de qual gênero musical?",
-          "opcoes": ["Jazz", "Música Clássica", "Pop"],
-          "respostaCorreta": "Música Clássica"
-        },
-        {
-          "id": 3,
-          "tipo": "preenchimento",
-          "pergunta": "O gênero musical que nasceu nos Estados Unidos e é conhecido pela improvisação é o ___.",
-          "respostaCorreta": "Jazz"
-        }
+        { "id": 1, "tipo": "multipla_escolha", "pergunta": "Qual gênero musical é famoso pelo uso de guitarras elétricas com distorção?", "opcoes": ["Samba", "Rock", "Música Clássica", "Jazz"], "respostaCorreta": "Rock" },
+        { "id": 2, "tipo": "multipla_escolha", "pergunta": "Beethoven e Mozart são compositores de qual gênero musical?", "opcoes": ["Jazz", "Música Clássica", "Pop", "Rock"], "respostaCorreta": "Música Clássica" },
+        { "id": 3, "tipo": "preenchimento", "pergunta": "O gênero musical que nasceu nos Estados Unidos e é conhecido pela improvisação é o ___.", "respostaCorreta": "Jazz" },
+        { "id": 4, "tipo": "multipla_escolha", "pergunta": "Cartola e Noel Rosa são grandes nomes de qual gênero musical brasileiro?", "opcoes": ["Rock", "Bossa Nova", "Samba", "Forró"], "respostaCorreta": "Samba" },
+        { "id": 5, "tipo": "multipla_escolha", "pergunta": "A improvisação é a principal característica de qual destes gêneros?", "opcoes": ["Pop", "Jazz", "Música Clássica", "Marcha Militar"], "respostaCorreta": "Jazz" },
+        { "id": 6, "tipo": "preenchimento", "pergunta": "Michael Jackson é conhecido mundialmente como o 'Rei do ___'.", "respostaCorreta": "Pop" },
+        { "id": 7, "tipo": "multipla_escolha", "pergunta": "Uma orquestra sinfônica é mais comumente associada a qual gênero musical?", "opcoes": ["Rock", "Samba", "Música Clássica", "Jazz"], "respostaCorreta": "Música Clássica" },
+        { "id": 8, "tipo": "multipla_escolha", "pergunta": "O surdo, o pandeiro e o cavaquinho são instrumentos típicos do:", "opcoes": ["Rock", "Samba", "Jazz", "Pop"], "respostaCorreta": "Samba" },
+        { "id": 9, "tipo": "preenchimento", "pergunta": "A banda britânica The Beatles é um dos maiores ícones da história do ___.", "respostaCorreta": "Rock" },
+        { "id": 10, "tipo": "multipla_escolha", "pergunta": "Qual gênero musical é conhecido por ter refrões cativantes e apelo comercial?", "opcoes": ["Música Clássica", "Jazz", "Pop", "Blues"], "respostaCorreta": "Pop" },
+        { "id": 11, "tipo": "multipla_escolha", "pergunta": "Louis Armstrong é uma lenda de qual gênero?", "opcoes": ["Samba", "Rock", "Pop", "Jazz"], "respostaCorreta": "Jazz" },
+        { "id": 12, "tipo": "preenchimento", "pergunta": "A 'Quinta Sinfonia' é uma obra-prima de Beethoven, um mestre da música ___.", "respostaCorreta": "Clássica" },
+        { "id": 13, "tipo": "multipla_escolha", "pergunta": "Qual destes subgêneros pertence ao Rock?", "opcoes": ["Swing", "Choro", "Heavy Metal", "Barroco"], "respostaCorreta": "Heavy Metal" },
+        { "id": 14, "tipo": "multipla_escolha", "pergunta": "A cidade de Nova Orleans é considerada o berço de qual gênero musical?", "opcoes": ["Samba", "Rock", "Jazz", "Tango"], "respostaCorreta": "Jazz" },
+        { "id": 15, "tipo": "preenchimento", "pergunta": "O gênero musical que tem forte influência da cultura africana no Brasil é o ___.", "respostaCorreta": "Samba" },
+        { "id": 16, "tipo": "multipla_escolha", "pergunta": "Madonna é frequentemente chamada de 'Rainha do ___'.", "opcoes": ["Rock", "Samba", "Pop", "Jazz"], "respostaCorreta": "Pop" },
+        { "id": 17, "tipo": "multipla_escolha", "pergunta": "O que é um 'solo' no contexto do Jazz ou do Rock?", "opcoes": ["Um momento de silêncio", "Uma parte cantada por uma só pessoa", "Uma seção onde um músico improvisa ou se destaca", "O início da música"], "respostaCorreta": "Uma seção onde um músico improvisa ou se destaca" },
+        { "id": 18, "tipo": "preenchimento", "pergunta": "Johann Sebastian Bach foi um importante compositor do período Barroco, dentro da música ___.", "respostaCorreta": "Clássica" },
+        { "id": 19, "tipo": "multipla_escolha", "pergunta": "Qual instrumento é o mais emblemático do Rock?", "opcoes": ["Violino", "Saxofone", "Guitarra Elétrica", "Pandeiro"], "respostaCorreta": "Guitarra Elétrica" },
+        { "id": 20, "tipo": "multipla_escolha", "pergunta": "As Escolas de Samba são a maior expressão de qual gênero musical?", "opcoes": ["Pop", "Samba", "Rock", "Jazz"], "respostaCorreta": "Samba" }
       ]
     },
     {
@@ -80,37 +73,30 @@
       "xpPorAcerto": 40,
       "minAcertosParaDesbloquearProximo": null,
       "conteudo": {
-        "titulo": "Teoria Musical Básica",
-        "resumo": "Para entender a música mais a fundo, precisamos conhecer seus três elementos fundamentais e como ela é organizada no tempo.\n\n**Os Três Elementos da Música**\n- **Melodia:** É a 'voz' principal da música, a sucessão de notas que cantamos ou assobiamos.\n- **Harmonia:** É a combinação de notas tocadas ao mesmo tempo para dar suporte à melodia. Um **acorde** (três ou mais notas simultâneas) é a base da harmonia.\n- **Ritmo:** É a organização dos sons no tempo, o que nos faz querer bater o pé.\n\n**Organização no Tempo**\n- **Andamento:** É a velocidade da música (rápida, moderada ou lenta).\n- **Compasso:** É a forma de dividir a música em pequenas partes de tempo iguais. O compasso **4/4**, o mais comum, significa que cada 'caixinha' de música (compasso) tem 4 tempos."
+        "titulo": "A Estrutura da Música",
+        "resumo": "Para entender a música em um nível mais profundo, precisamos analisar seus elementos constituintes e como ela é organizada no tempo e no espaço sonoro.\n\n**Os Três Elementos Essenciais**\n- **Melodia:** É a sucessão de notas organizadas de forma horizontal, criando uma linha musical que podemos cantarolar. É a 'personagem principal' da música.\n- **Harmonia:** É a combinação de notas tocadas simultaneamente, de forma vertical, para criar uma base sonora. Um **acorde** (três ou mais notas) é a unidade fundamental da harmonia. Ela pode ser *consonante* (soa estável) ou *dissonante* (gera tensão).\n- **Ritmo:** É a organização dos sons e silêncios no tempo. O ritmo é definido pela duração das notas (representadas por **figuras rítmicas** como semibreve, mínima, semínima) e pela sua acentuação.\n\n**Organização e Percepção**\n- **Andamento:** É a velocidade da música (ex: *Lento*, *Moderato*, *Allegro*).\n- **Compasso:** É a divisão da música em pequenas unidades de tempo. O compasso **4/4**, o mais comum, agrupa os tempos de 4 em 4. Já uma valsa usa o compasso **3/4**.\n- **Intervalo:** É a distância de altura entre duas notas (ex: a distância entre Dó e Sol é um intervalo de 5ª)."
       },
       "exercicios": [
-        {
-          "id": 1,
-          "tipo": "multipla_escolha",
-          "pergunta": "O que define a 'velocidade' de uma música?",
-          "opcoes": ["Harmonia", "Andamento", "Melodia"],
-          "respostaCorreta": "Andamento"
-        },
-        {
-          "id": 2,
-          "tipo": "multipla_escolha",
-          "pergunta": "Um conjunto de três ou mais notas tocadas ao mesmo tempo forma um:",
-          "opcoes": ["Acorde", "Ritmo", "Compasso"],
-          "respostaCorreta": "Acorde"
-        },
-        {
-          "id": 3,
-          "tipo": "preenchimento",
-          "pergunta": "A sucessão de notas musicais de forma coerente e agradável é chamada de ___.",
-          "respostaCorreta": "Melodia"
-        },
-        {
-            "id": 4,
-            "tipo": "multipla_escolha",
-            "pergunta": "O que é um compasso 4/4?",
-            "opcoes": ["Quatro notas por segundo", "Quatro tempos por compasso", "Uma música com quatro instrumentos"],
-            "respostaCorreta": "Quatro tempos por compasso"
-        }
+        { "id": 1, "tipo": "multipla_escolha", "pergunta": "O que define a 'velocidade' de uma música?", "opcoes": ["Harmonia", "Andamento", "Melodia", "Ritmo"], "respostaCorreta": "Andamento" },
+        { "id": 2, "tipo": "multipla_escolha", "pergunta": "Um conjunto de três ou mais notas tocadas ao mesmo tempo forma um:", "opcoes": ["Acorde", "Ritmo", "Compasso", "Intervalo"], "respostaCorreta": "Acorde" },
+        { "id": 3, "tipo": "preenchimento", "pergunta": "A sucessão de notas musicais que formam uma linha principal é chamada de ___.", "respostaCorreta": "Melodia" },
+        { "id": 4, "tipo": "multipla_escolha", "pergunta": "O que significa um compasso 4/4?", "opcoes": ["Quatro notas por segundo", "Quatro tempos por compasso", "Uma música com quatro instrumentos", "A música está em 4ª velocidade"], "respostaCorreta": "Quatro tempos por compasso" },
+        { "id": 5, "tipo": "multipla_escolha", "pergunta": "Qual elemento da música se refere à organização dos sons no tempo?", "opcoes": ["Harmonia", "Melodia", "Ritmo", "Andamento"], "respostaCorreta": "Ritmo" },
+        { "id": 6, "tipo": "preenchimento", "pergunta": "A distância entre duas notas, como de Dó a Ré, é chamada de ___.", "respostaCorreta": "intervalo" },
+        { "id": 7, "tipo": "multipla_escolha", "pergunta": "Qual destes termos de andamento significa 'rápido' e 'alegre' em italiano?", "opcoes": ["Lento", "Adagio", "Allegro", "Moderato"], "respostaCorreta": "Allegro" },
+        { "id": 8, "tipo": "multipla_escolha", "pergunta": "A harmonia que soa instável ou tensa é chamada de:", "opcoes": ["Consonante", "Melódica", "Rítmica", "Dissonante"], "respostaCorreta": "Dissonante" },
+        { "id": 9, "tipo": "preenchimento", "pergunta": "O elemento que combina notas simultaneamente para dar 'profundidade' à música é a ___.", "respostaCorreta": "harmonia" },
+        { "id": 10, "tipo": "multipla_escolha", "pergunta": "Em uma partitura, o que representa a duração de um som?", "opcoes": ["A clave", "A fórmula de compasso", "As figuras rítmicas", "A armadura de clave"], "respostaCorreta": "As figuras rítmicas" },
+        { "id": 11, "tipo": "multipla_escolha", "pergunta": "O compasso 3/4 é característico de qual estilo de dança?", "opcoes": ["Samba", "Valsa", "Rock 'n' roll", "Tango"], "respostaCorreta": "Valsa" },
+        { "id": 12, "tipo": "preenchimento", "pergunta": "A combinação de notas que soa estável e 'relaxada' é chamada de ___.", "respostaCorreta": "consonante" },
+        { "id": 13, "tipo": "multipla_escolha", "pergunta": "Qual figura rítmica geralmente tem a maior duração?", "opcoes": ["Semínima", "Mínima", "Semibreve", "Colcheia"], "respostaCorreta": "Semibreve" },
+        { "id": 14, "tipo": "multipla_escolha", "pergunta": "A parte da música que você assobia ou canta é a:", "opcoes": ["Harmonia", "Melodia", "Ritmo", "Textura"], "respostaCorreta": "Melodia" },
+        { "id": 15, "tipo": "preenchimento", "pergunta": "A base da harmonia é o ___.", "respostaCorreta": "acorde" },
+        { "id": 16, "tipo": "multipla_escolha", "pergunta": "Qual dos três elementos é considerado o aspecto 'vertical' da música?", "opcoes": ["Melodia", "Ritmo", "Harmonia", "Andamento"], "respostaCorreta": "Harmonia" },
+        { "id": 17, "tipo": "multipla_escolha", "pergunta": "O intervalo entre Dó e o próximo Dó mais agudo é chamado de:", "opcoes": ["Quinta", "Terça", "Oitava", "Sétima"], "respostaCorreta": "Oitava" },
+        { "id": 18, "tipo": "preenchimento", "pergunta": "A batida do coração de uma música é o seu ___.", "respostaCorreta": "ritmo" },
+        { "id": 19, "tipo": "multipla_escolha", "pergunta": "Um termo para um andamento muito lento é:", "opcoes": ["Presto", "Andante", "Largo", "Vivace"], "respostaCorreta": "Largo" },
+        { "id": 20, "tipo": "multipla_escolha", "pergunta": "Qual elemento musical é análogo a uma frase em uma linguagem?", "opcoes": ["Acorde", "Ritmo", "Harmonia", "Melodia"], "respostaCorreta": "Melodia" }
       ]
     }
   ]

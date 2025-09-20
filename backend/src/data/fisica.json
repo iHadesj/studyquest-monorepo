@@ -7,7 +7,7 @@
       "id": "iniciante",
       "nome": "Iniciante",
       "xpPorAcerto": 15,
-      "minAcertosParaDesbloquearProximo": 3,
+      "minAcertosParaDesbloquearProximo": 5,
       "conteudo": {
         "titulo": "Leis de Newton e Movimento",
         "resumo": "A mecânica clássica, que descreve o movimento dos objetos, foi revolucionada por Isaac Newton e suas três leis fundamentais.\n\n**1ª Lei de Newton (Lei da Inércia)**\nUm corpo em repouso tende a ficar em repouso, e um corpo em movimento tende a continuar em movimento com velocidade constante, a menos que uma força externa atue sobre ele. É por isso que você é 'jogado para frente' quando um ônibus freia bruscamente.\n\n**2ª Lei de Newton (Princípio Fundamental da Dinâmica)**\nA famosa equação F = m . a. Ela diz que a força (F) aplicada a um objeto é igual à sua massa (m) multiplicada pela sua aceleração (a). A unidade de força é o **Newton (N)**.\n\n**3ª Lei de Newton (Ação e Reação)**\nPara toda ação, existe uma reação de mesma intensidade, mesma direção e sentido oposto. Quando você empurra uma parede, a parede 'empurra' você de volta com a mesma força."
@@ -39,6 +39,139 @@
           "pergunta": "Se um carro viaja a 60 km/h por 2 horas, qual distância ele percorre?",
           "opcoes": ["60 km", "100 km", "120 km"],
           "respostaCorreta": "120 km"
+        },
+        {
+          "id": 5,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual grandeza física mede a 'quantidade de movimento' de um objeto (produto de massa e velocidade)?",
+          "opcoes": ["Força", "Impulso", "Momento linear (quantidade de movimento)"],
+          "respostaCorreta": "Momento linear (quantidade de movimento)"
+        },
+        {
+          "id": 6,
+          "tipo": "multipla_escolha",
+          "pergunta": "Se você empurra um objeto e ele não muda de velocidade, o que isso indica sobre as forças atuantes?",
+          "opcoes": ["Há resultante nula (equilíbrio)", "Há uma força resultante positiva", "Força de atrito é zero"],
+          "respostaCorreta": "Há resultante nula (equilíbrio)"
+        },
+        {
+          "id": 7,
+          "tipo": "preenchimento",
+          "pergunta": "A fórmula que relaciona força, massa e aceleração é F = ___.",
+          "respostaCorreta": "m . a"
+        },
+        {
+          "id": 8,
+          "tipo": "multipla_escolha",
+          "pergunta": "A reação a uma ação é sempre:",
+          "opcoes": ["Maior que a ação", "Igual em intensidade e oposta em direção", "Irrelevante em mecânica"], 
+          "respostaCorreta": "Igual em intensidade e oposta em direção"
+        },
+        {
+          "id": 9,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual situação exemplifica a inércia?",
+          "opcoes": ["Uma bicicleta parando de repente e o ciclista indo para frente", "Um objeto que acelera sozinho sem forças", "Um objeto teleportando-se"],
+          "respostaCorreta": "Uma bicicleta parando de repente e o ciclista indo para frente"
+        },
+        {
+          "id": 10,
+          "tipo": "preenchimento",
+          "pergunta": "A unidade de massa no SI é o ___.",
+          "respostaCorreta": "quilograma"
+        },
+        {
+          "id": 11,
+          "tipo": "multipla_escolha",
+          "pergunta": "Se uma força resultante atua sobre um corpo, o que acontece com sua velocidade?",
+          "opcoes": ["Permanece constante", "Muda (acelera ou desacelera)", "Fica nula"], 
+          "respostaCorreta": "Muda (acelera ou desacelera)"
+        },
+        {
+          "id": 12,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual destas forças sempre atua na direção oposta ao movimento e tende a desacelerar objetos?",
+          "opcoes": ["Força normal", "Força de atrito", "Força centrífuga"],
+          "respostaCorreta": "Força de atrito"
+        },
+        {
+          "id": 13,
+          "tipo": "preenchimento",
+          "pergunta": "A velocidade média é calculada como distância total dividida pelo tempo total: v = ___.",
+          "respostaCorreta": "Δs / Δt"
+        },
+        {
+          "id": 14,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é a unidade de aceleração no SI?",
+          "opcoes": ["m/s", "m/s²", "N"], 
+          "respostaCorreta": "m/s²"
+        },
+        {
+          "id": 15,
+          "tipo": "multipla_escolha",
+          "pergunta": "Se duplicamos a massa de um objeto e queremos a mesma aceleração, o que deve acontecer com a força aplicada?",
+          "opcoes": ["Manter igual", "Duplicar a força", "Diminuir a força pela metade"],
+          "respostaCorreta": "Duplicar a força"
+        },
+        {
+          "id": 16,
+          "tipo": "preenchimento",
+          "pergunta": "A componente da força perpendicular à superfície que suporta o peso chama-se ___.",
+          "respostaCorreta": "força normal"
+        },
+        {
+          "id": 17,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é a relação entre impulso (J) e variação de quantidade de movimento (Δp)?",
+          "opcoes": ["J = Δp", "J = p × t", "J = F - t"], 
+          "respostaCorreta": "J = Δp"
+        },
+        {
+          "id": 18,
+          "tipo": "multipla_escolha",
+          "pergunta": "A gravidade perto da superfície terrestre tende a puxar objetos para:",
+          "opcoes": ["Para cima", "Para o centro da Terra", "Para fora da Terra"], 
+          "respostaCorreta": "Para o centro da Terra"
+        },
+        {
+          "id": 19,
+          "tipo": "preenchimento",
+          "pergunta": "A força que faz um objeto seguir movimento circular é chamada de força ___.",
+          "respostaCorreta": "centrípeta"
+        },
+        {
+          "id": 20,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual das opções é um exemplo de força de contato?",
+          "opcoes": ["Gravitação", "Atrito", "Força elétrica à distância"], 
+          "respostaCorreta": "Atrito"
+        },
+        {
+          "id": 21,
+          "tipo": "multipla_escolha",
+          "pergunta": "Se um objeto está em equilíbrio estático, sua aceleração é:",
+          "opcoes": ["Positiva", "Zero", "Negativa"], 
+          "respostaCorreta": "Zero"
+        },
+        {
+          "id": 22,
+          "tipo": "preenchimento",
+          "pergunta": "A soma vetorial de todas as forças atuantes é chamada de ___.",
+          "respostaCorreta": "força resultante"
+        },
+        {
+          "id": 23,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual instrumento mede força diretamente em laboratórios simples?",
+          "opcoes": ["Barômetro", "Dinamômetro", "Voltímetro"], 
+          "respostaCorreta": "Dinamômetro"
+        },
+        {
+          "id": 24,
+          "tipo": "preenchimento",
+          "pergunta": "Se a aceleração é 2 m/s² e a massa é 3 kg, a força aplicada é ___ N.",
+          "respostaCorreta": "6"
         }
       ]
     },
@@ -46,7 +179,7 @@
       "id": "intermediario",
       "nome": "Intermediário",
       "xpPorAcerto": 25,
-      "minAcertosParaDesbloquearProximo": 2,
+      "minAcertosParaDesbloquearProximo": 6,
       "conteudo": {
         "titulo": "Termodinâmica e Ondas",
         "resumo": "Vamos explorar o mundo da energia térmica e das vibrações que se propagam pelo espaço.\n\n**Termodinâmica**\nÉ o estudo do calor e da temperatura. O calor é a transferência de energia térmica entre corpos. Existem três formas de transferência de calor:\n- **Condução:** Transferência por contato direto. Ex: segurar uma xícara quente.\n- **Convecção:** Transferência em fluidos (líquidos e gases), onde o fluido quente sobe e o frio desce. Ex: água fervendo em uma panela.\n- **Irradiação:** Transferência por ondas eletromagnéticas, que não precisa de um meio. Ex: o calor do Sol chegando à Terra.\n\n**Ondas**\nSão perturbações que se propagam, transportando energia. Existem dois tipos principais:\n- **Ondas Mecânicas:** Precisam de um meio material para se propagar. O **som** é o melhor exemplo.\n- **Ondas Eletromagnéticas:** Não precisam de um meio. A luz, as ondas de rádio e os raios-X são exemplos."
@@ -71,6 +204,139 @@
           "tipo": "preenchimento",
           "pergunta": "A temperatura em que a água ferve ao nível do mar é de 100 graus ___.",
           "respostaCorreta": "Celsius"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é a unidade de calor (energia térmica) no SI?",
+          "opcoes": ["Joule", "Watt", "Caloria"], 
+          "respostaCorreta": "Joule"
+        },
+        {
+          "id": 5,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual processo não precisa de meio material para transferir energia térmica?",
+          "opcoes": ["Condução", "Convecção", "Irradiação"], 
+          "respostaCorreta": "Irradiação"
+        },
+        {
+          "id": 6,
+          "tipo": "preenchimento",
+          "pergunta": "A velocidade de uma onda é dada por v = λ × ___.",
+          "respostaCorreta": "f"
+        },
+        {
+          "id": 7,
+          "tipo": "multipla_escolha",
+          "pergunta": "Em uma onda sonora, o que representa a frequência?",
+          "opcoes": ["Altura do som (quanto mais alta, maior frequência)", "Volume do som", "Cor do som"], 
+          "respostaCorreta": "Altura do som (quanto mais alta, maior frequência)"
+        },
+        {
+          "id": 8,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual fenômeno ocorre quando uma onda muda de direção ao passar de um meio para outro?",
+          "opcoes": ["Refração", "Reflexão", "Difração"], 
+          "respostaCorreta": "Refração"
+        },
+        {
+          "id": 9,
+          "tipo": "preenchimento",
+          "pergunta": "A energia interna provida por vibrações de partículas em um corpo chama-se ___.",
+          "respostaCorreta": "calor interno / energia térmica"
+        },
+        {
+          "id": 10,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é a equação do trabalho (work) quando força e deslocamento são colineares?",
+          "opcoes": ["W = F × d", "W = m × a", "W = P / t"], 
+          "respostaCorreta": "W = F × d"
+        },
+        {
+          "id": 11,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual propriedade de uma onda está associada à sua intensidade (volume no som)?",
+          "opcoes": ["Frequência", "Amplitude", "Comprimento de onda"], 
+          "respostaCorreta": "Amplitude"
+        },
+        {
+          "id": 12,
+          "tipo": "preenchimento",
+          "pergunta": "A unidade de frequência no SI é o ___.",
+          "respostaCorreta": "Hertz"
+        },
+        {
+          "id": 13,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual efeito explica que sons graves contornam obstáculos melhor que sons agudos?",
+          "opcoes": ["Interferência", "Difração", "Polarização"], 
+          "respostaCorreta": "Difração"
+        },
+        {
+          "id": 14,
+          "tipo": "multipla_escolha",
+          "pergunta": "Um gás aquecido tende a subir porque a convecção faz com que ele fique:",
+          "opcoes": ["Mais denso", "Menos denso", "Igualmente denso"], 
+          "respostaCorreta": "Menos denso"
+        },
+        {
+          "id": 15,
+          "tipo": "preenchimento",
+          "pergunta": "A onda que não precisa de meio material para se propagar é chamada de ___.",
+          "respostaCorreta": "eletromagnética"
+        },
+        {
+          "id": 16,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual instrumento mede temperatura de forma rápida em contato com a superfície?",
+          "opcoes": ["Termômetro de mercúrio", "Higrômetro", "Anemômetro"], 
+          "respostaCorreta": "Termômetro de mercúrio"
+        },
+        {
+          "id": 17,
+          "tipo": "multipla_escolha",
+          "pergunta": "Quando duas ondas se somam e produzem uma amplitude maior, isso é chamado de:",
+          "opcoes": ["Interferência construtiva", "Interferência destrutiva", "Reflexão"], 
+          "respostaCorreta": "Interferência construtiva"
+        },
+        {
+          "id": 18,
+          "tipo": "preenchimento",
+          "pergunta": "A relação entre pressão, volume e temperatura de um gás ideal é dada pela equação ___.",
+          "respostaCorreta": "PV = nRT"
+        },
+        {
+          "id": 19,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual fenômeno faz com que você ouça seu próprio eco refletido numa parede distante?",
+          "opcoes": ["Refração", "Reflexão", "Absorção"], 
+          "respostaCorreta": "Reflexão"
+        },
+        {
+          "id": 20,
+          "tipo": "preenchimento",
+          "pergunta": "A velocidade do som no ar a 20°C é aproximadamente ___. (m/s)",
+          "respostaCorreta": "343"
+        },
+        {
+          "id": 21,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual processo aumenta a energia interna de um sistema sem troca de massa com o ambiente?",
+          "opcoes": ["Calor transferido por trabalho", "Calor transferido por convecção", "Nenhuma das anteriores"], 
+          "respostaCorreta": "Calor transferido por convecção"
+        },
+        {
+          "id": 22,
+          "tipo": "preenchimento",
+          "pergunta": "A unidade de energia no SI é o ___.",
+          "respostaCorreta": "Joule"
+        },
+        {
+          "id": 23,
+          "tipo": "multipla_escolha",
+          "pergunta": "O efeito Doppler altera a percepção da frequência de uma onda quando há:",
+          "opcoes": ["Movimento relativo entre fonte e observador", "Mudança de amplitude", "Mudança de polarização"], 
+          "respostaCorreta": "Movimento relativo entre fonte e observador"
         }
       ]
     },
@@ -78,7 +344,7 @@
       "id": "avancado",
       "nome": "Avançado",
       "xpPorAcerto": 40,
-      "minAcertosParaDesbloquearProximo": null,
+      "minAcertosParaDesbloquearProximo": 7,
       "conteudo": {
         "titulo": "Eletromagnetismo",
         "resumo": "O eletromagnetismo é a área da física que une os fenômenos elétricos e magnéticos, mostrando que são duas faces da mesma moeda.\n\n**Cargas Elétricas**\nA matéria é formada por átomos, que contêm partículas com carga elétrica:\n- **Prótons:** Carga positiva.\n- **Elétrons:** Carga negativa.\nCargas opostas se atraem, e cargas iguais se repelem. A força entre elas é descrita pela **Lei de Coulomb**.\n\n**Corrente Elétrica**\nÉ o movimento ordenado de elétrons. Materiais que permitem esse movimento facilmente são chamados de **condutores** (ex: metais). Materiais que dificultam muito esse movimento são os **isolantes** (ex: borracha, plástico).\n\n**Magnetismo**\nUma corrente elétrica em movimento gera um campo magnético ao seu redor. Da mesma forma, a variação de um campo magnético pode gerar uma corrente elétrica. Essa relação é a base para o funcionamento de motores elétricos, geradores e transformadores."
@@ -103,6 +369,138 @@
           "tipo": "preenchimento",
           "pergunta": "A lei que descreve a força entre duas cargas elétricas é a Lei de ___.",
           "respostaCorreta": "Coulomb"
+        },
+        {
+          "id": 4,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual é a unidade de carga elétrica no SI?",
+          "opcoes": ["Ampère", "Coulomb", "Volt"], 
+          "respostaCorreta": "Coulomb"
+        },
+        {
+          "id": 5,
+          "tipo": "preenchimento",
+          "pergunta": "A intensidade da corrente elétrica é medida em ___ no SI.",
+          "respostaCorreta": "Ampère"
+        },
+        {
+          "id": 6,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual lei relaciona tensão, corrente e resistência em um circuito simples?",
+          "opcoes": ["Lei de Ohm", "Lei de Faraday", "Lei de Ampère"], 
+          "respostaCorreta": "Lei de Ohm"
+        },
+        {
+          "id": 7,
+          "tipo": "preenchimento",
+          "pergunta": "A resistência elétrica é medida em ___.",
+          "respostaCorreta": "Ohm"
+        },
+        {
+          "id": 8,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual fenômeno gera corrente elétrica quando um campo magnético muda em um circuito?",
+          "opcoes": ["Indução eletromagnética", "Polarização", "Capacitação"], 
+          "respostaCorreta": "Indução eletromagnética"
+        },
+        {
+          "id": 9,
+          "tipo": "multipla_escolha",
+          "pergunta": "Em um circuito resistivo simples, se duplicamos a resistência mantendo a tensão, a corrente:",
+          "opcoes": ["Dobra", "Fica pela metade", "Permanece igual"], 
+          "respostaCorreta": "Fica pela metade"
+        },
+        {
+          "id": 10,
+          "tipo": "preenchimento",
+          "pergunta": "A unidade de resistência (símbolo Ω) é chamada de ___.",
+          "respostaCorreta": "Ohm"
+        },
+        {
+          "id": 11,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual cientista formulou as equações que unificam eletricidade e magnetismo (equações fundamentais do eletromagnetismo)?",
+          "opcoes": ["Newton", "Maxwell", "Galileu"], 
+          "respostaCorreta": "Maxwell"
+        },
+        {
+          "id": 12,
+          "tipo": "preenchimento",
+          "pergunta": "A força magnética sobre uma carga em movimento é perpendicular à velocidade e ao ___.",
+          "respostaCorreta": "campo magnético"
+        },
+        {
+          "id": 13,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual dispositivo converte energia mecânica em energia elétrica por indução?",
+          "opcoes": ["Motor elétrico", "Gerador", "Transformador"], 
+          "respostaCorreta": "Gerador"
+        },
+        {
+          "id": 14,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual componente armazena carga elétrica em um circuito?",
+          "opcoes": ["Resistor", "Condensador (capacitor)", "Indutor"], 
+          "respostaCorreta": "Condensador (capacitor)"
+        },
+        {
+          "id": 15,
+          "tipo": "preenchimento",
+          "pergunta": "A potência elétrica é dada por P = V × ___.",
+          "respostaCorreta": "I"
+        },
+        {
+          "id": 16,
+          "tipo": "multipla_escolha",
+          "pergunta": "O que acontece com a resistência total em um circuito em série quando adicionamos mais resistores iguais?",
+          "opcoes": ["Aumenta", "Diminui", "Permanece igual"], 
+          "respostaCorreta": "Aumenta"
+        },
+        {
+          "id": 17,
+          "tipo": "preenchimento",
+          "pergunta": "A unidade de potência no SI é o ___.",
+          "respostaCorreta": "Watt"
+        },
+        {
+          "id": 18,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual fenômeno explica a operação de transformadores (mudança de tensão AC)?",
+          "opcoes": ["Indução eletromagnética", "Efeito Joule", "Corrente contínua"], 
+          "respostaCorreta": "Indução eletromagnética"
+        },
+        {
+          "id": 19,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual gráfico descreve a relação linear entre tensão e corrente em um resistor ideal?",
+          "opcoes": ["I × V linear (reta)", "I × t exponencial", "V × f oscilatório"], 
+          "respostaCorreta": "I × V linear (reta)"
+        },
+        {
+          "id": 20,
+          "tipo": "preenchimento",
+          "pergunta": "A constante física que aparece na Lei de Coulomb é conhecida como constante de ___.",
+          "respostaCorreta": "Coulomb / eletrostática (k)"
+        },
+        {
+          "id": 21,
+          "tipo": "multipla_escolha",
+          "pergunta": "Num circuito RC (resistor-capacitor) em corrente contínua, o capacitor após muito tempo estará:",
+          "opcoes": ["Totalmente carregado e a corrente tende a zero", "Totalmente descarregado e corrente máxima", "Oscilando continuamente"], 
+          "respostaCorreta": "Totalmente carregado e a corrente tende a zero"
+        },
+        {
+          "id": 22,
+          "tipo": "preenchimento",
+          "pergunta": "A integral da potência elétrica ao longo do tempo dá a energia elétrica consumida: E = ∫ P dt. A unidade de energia elétrica na conta é ___.",
+          "respostaCorreta": "kWh / quilowatt-hora"
+        },
+        {
+          "id": 23,
+          "tipo": "multipla_escolha",
+          "pergunta": "Qual fenômeno faz com que uma bússola aponte para o norte magnético?",
+          "opcoes": ["Campo elétrico da Terra", "Campo magnético da Terra", "Rotação da Lua"], 
+          "respostaCorreta": "Campo magnético da Terra"
         }
       ]
     }
