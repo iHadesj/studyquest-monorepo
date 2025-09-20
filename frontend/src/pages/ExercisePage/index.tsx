@@ -103,6 +103,59 @@ export const ExercisePage = ({
   const currentProgress = progress[subject.id]?.[level.id];
   const currentAttempts = currentProgress?.tentativas || 0;
 
+  const parseText = (text: string) => {
+    if (!text) return null;
+
+    const regex = /(\*[^*]+\*)|(_[^_]+_)|(~[^~]+~)|(`[^`]+`)|(\$[^$]+\$)/g;
+
+    const parts = text.split(regex).filter(Boolean);
+
+    return parts.map((part, idx) => {
+      if (part.startsWith('*') && part.endsWith('*')) {
+        return <strong key={idx}>{part.slice(1, -1)}</strong>;
+      }
+      if (part.startsWith('_') && part.endsWith('_')) {
+        return <em key={idx}>{part.slice(1, -1)}</em>;
+      }
+      if (part.startsWith('~') && part.endsWith('~')) {
+        return <del key={idx}>{part.slice(1, -1)}</del>;
+      }
+      if (part.startsWith('`') && part.endsWith('`')) {
+        return (
+          <code
+            key={idx}
+            style={{
+              backgroundColor: '#2f3136',
+              color: '#f8f8f2',
+              padding: '0 4px',
+              borderRadius: '4px',
+              fontFamily: 'monospace',
+            }}
+          >
+            {part.slice(1, -1)}
+          </code>
+        );
+      }
+      if (part.startsWith('$') && part.endsWith('$')) {
+        return (
+          <span
+            key={idx}
+            style={{
+              fontFamily: 'monospace',
+              backgroundColor: '#1e1e1e',
+              color: '#ffd700',
+              padding: '0 4px',
+              borderRadius: '3px',
+            }}
+          >
+            {part.slice(1, -1)}
+          </span>
+        );
+      }
+      return <span key={idx}>{part}</span>;
+    });
+  };
+
   useEffect(() => {
     if (level.exercicios.length > 10) {
       const shuffled = [...level.exercicios].sort(() => 0.5 - Math.random());
@@ -247,7 +300,7 @@ export const ExercisePage = ({
               {results.wrongAnswers.map((q) => (
                 <WrongAnswerItem key={q.id}>
                   <p>
-                    <strong>Pergunta:</strong> {q.pergunta}
+                    <strong>Pergunta:</strong> {parseText(q.pergunta)}
                   </p>
                   <p style={{ color: '#ed4245' }}>
                     <strong>Sua resposta:</strong> {q.userAnswer}
@@ -294,7 +347,7 @@ export const ExercisePage = ({
         {shuffledExercises.map((ex, index) => (
           <ExerciseBox key={ex.id}>
             <QuestionText>
-              {index + 1}. {ex.pergunta}
+              {index + 1}. {parseText(ex.pergunta)}
             </QuestionText>
             {ex.tipo === 'multipla_escolha' && (
               <div
