@@ -9,7 +9,6 @@ import {
   CloseIcon,
 } from './style';
 
-// --- Tipos e Contexto ---
 interface ModalContextType {
   onClose: () => void;
 }
@@ -23,8 +22,6 @@ const useModal = () => {
   }
   return context;
 };
-
-// --- Componentes do "Lego" ---
 
 interface RootProps {
   isOpen: boolean;

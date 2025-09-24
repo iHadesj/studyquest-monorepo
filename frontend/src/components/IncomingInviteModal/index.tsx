@@ -1,3 +1,4 @@
+import { useProgressStore } from '../../hooks/useProgressStore';
 import { socket } from '../../services/socket';
 import * as Modal from '../Modal';
 import { InviteBox, ButtonGroup, ActionButton, InviterTag } from './style';
@@ -13,13 +14,21 @@ export function IncomingInviteModal({
   inviterTag,
   onClose,
 }: IncomingInviteModalProps) {
+  const { fullTag: myTag } = useProgressStore();
+
+  if (isOpen && inviterTag === myTag) {
+    onClose();
+    return null;
+  }
+
   const handleResponse = (accepted: boolean) => {
-    if (!inviterTag) return;
+    if (!inviterTag || inviterTag === myTag) return;
 
     socket.emit('invite_response', {
       inviterTag,
       accepted,
     });
+
     onClose();
   };
 
@@ -33,11 +42,15 @@ export function IncomingInviteModal({
         </Modal.Header>
         <Modal.Body>
           <InviteBox>
-            <p>
-              O jogador <InviterTag>{inviterTag}</InviterTag> quer um duelo no
-              Brainstorm.
-            </p>
-            <p>Você aceita o desafio?</p>
+            {inviterTag !== myTag && (
+              <>
+                <p>
+                  O jogador <InviterTag>{inviterTag}</InviterTag> quer um duelo
+                  no Brainstorm.
+                </p>
+                <p>Você aceita o desafio?</p>
+              </>
+            )}
             <ButtonGroup>
               <ActionButton onClick={() => handleResponse(false)}>
                 Recusar

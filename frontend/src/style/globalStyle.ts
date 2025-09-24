@@ -109,7 +109,7 @@ export const RankingButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   font-family: 'Fira Code', monospace;
-  font-size: 0.875rem;
+  font-size: 1rem;
   &:hover {
     color: #ffffff;
   }

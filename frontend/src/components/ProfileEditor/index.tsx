@@ -68,6 +68,7 @@ function generateAvatarSeeds(count = 240) {
   ];
 
   const seeds: string[] = [];
+
   for (let i = 0; i < count; i++) {
     const a = ADJS[i % ADJS.length];
     const n = NOUNS[Math.floor(i / ADJS.length) % NOUNS.length];
@@ -91,14 +92,11 @@ export function ProfileEditor({
   const [username, setUsername] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState('');
 
-  // seeds geradas uma vez (determinístico)
   const avatarSeeds = useMemo(() => generateAvatarSeeds(240), []);
 
   useEffect(() => {
     if (isOpen && !isSetupMode) {
       setUsername(currentUser.username || '');
-      // se o avatar atual for um seed Dicebear (string), usa ele,
-      // senão fallback pro primeiro seed gerado
       setSelectedAvatar(currentUser.avatarSeed || avatarSeeds[0]);
     } else if (isSetupMode) {
       setUsername('');

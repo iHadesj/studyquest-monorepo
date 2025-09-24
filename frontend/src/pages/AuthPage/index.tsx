@@ -96,7 +96,7 @@ export const AuthPage = () => {
         );
         const user = userCredential.user;
 
-        const tempUsername = user.email!.split('@')[0]; // Pega um username temporário do email
+        const tempUsername = user.email!.split('@')[0];
         const userTag = getRandomTag();
         const fullTag = `${tempUsername}#${userTag}`;
 

@@ -29,7 +29,7 @@ const GAME_DURATION = 60; // 1 minuto
 const QUESTION_TIME_LIMIT = 15; // 15 segundos
 const INITIAL_LIVES = 3;
 const BASE_XP_PER_CORRECT_ANSWER = 20;
-const STREAK_MULTIPLIER_BONUS = 0.5; // Bônus de 50% para cada acerto no combo
+const STREAK_MULTIPLIER_BONUS = 0.5;
 
 interface BrainStormProps {
   subjects: Materia[];
@@ -37,7 +37,6 @@ interface BrainStormProps {
 }
 
 export function BrainStorm({ subjects, onBack }: BrainStormProps) {
-  // Estados do jogo
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'finished'>(
     'idle'
   );
@@ -170,9 +169,6 @@ export function BrainStorm({ subjects, onBack }: BrainStormProps) {
     }
     setTimeout(pickNextQuestion, 1500);
   };
-
-  // --- RENDERIZAÇÃO ---
-
   if (gameState === 'idle') {
     return (
       <StormWrapper>

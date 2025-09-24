@@ -39,7 +39,7 @@ export function MultiplayerLobbyPage({
   const [players, setPlayers] = useState<Player[]>([]);
   const [hasAnswered, setHasAnswered] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(15); // timer da pergunta (server -> timer_tick)
+  const [timeLeft, setTimeLeft] = useState(15);
   const { fullTag: myTag } = useProgressStore();
 
   const [modeTimeLeft, setModeTimeLeft] = useState<number | null>(null);
@@ -227,7 +227,7 @@ export function MultiplayerLobbyPage({
                 modeTimeLeft !== null && modeTimeLeft <= 5
                   ? '#ed4245'
                   : 'inherit',
-              minWidth: '36px',
+              minWidth: '34px',
               textAlign: 'right',
             }}
             key={modeTimeLeft ?? 'mode-null'}
@@ -268,7 +268,7 @@ export function MultiplayerLobbyPage({
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.5 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.2 }}
             >
               <span className="status">{roundResult.status}</span>
               {roundResult.points && (
