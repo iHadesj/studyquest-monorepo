@@ -1,4 +1,4 @@
-// server.ts (refatorado)
+// server.ts (refatorado e corrigido)
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -82,12 +82,10 @@ const sendNextQuestion = (roomId: string) => {
   const room = gameRooms.get(roomId);
   if (!room) return;
 
-  // Se o modo já acabou, não tenta enviar nada
   if (typeof room.modeTimeLeft === "number" && room.modeTimeLeft <= 0) {
     return;
   }
 
-  // garante limpeza do timer anterior de pergunta
   if (room.questionTimer) {
     clearInterval(room.questionTimer);
     room.questionTimer = null;
@@ -95,7 +93,6 @@ const sendNextQuestion = (roomId: string) => {
 
   const nextQuestion = getRandomQuestion();
   if (!nextQuestion) {
-    // sem mais perguntas => fim de jogo
     safeClearAllTimers(room);
     io.to(roomId).emit("game_over", { finalScores: room.players });
     gameRooms.delete(roomId);
@@ -107,7 +104,6 @@ const sendNextQuestion = (roomId: string) => {
   room.questionStartTime = Date.now();
   room.questionAnswered = false;
 
-  // envia pergunta sem resposta correta
   const { respostaCorreta, ...questionForPlayers } = nextQuestion as any;
   io.to(roomId).emit("new_question", questionForPlayers);
   console.log(`Enviando nova pergunta para a sala ${roomId}`);
@@ -120,7 +116,6 @@ const sendNextQuestion = (roomId: string) => {
     io.to(roomId).emit("timer_tick", { timeLeft });
 
     if (timeLeft <= 0) {
-      // timeout: ninguém respondeu a tempo
       if (room.questionTimer) {
         clearInterval(room.questionTimer);
         room.questionTimer = null;
@@ -133,7 +128,6 @@ const sendNextQuestion = (roomId: string) => {
           isCorrect: false,
         });
 
-        // agenda próxima pergunta (guardando o timeout para limpar se necessário)
         room.nextQuestionTimeout = setTimeout(() => {
           room.nextQuestionTimeout = null;
           sendNextQuestion(roomId);
@@ -147,13 +141,26 @@ io.on("connection", (socket) => {
   console.log("✅ Novo jogador conectado! ID:", socket.id);
 
   socket.on("register", (fullTag: string) => {
-    const prev = onlineUsers.get(fullTag);
-    if (prev && prev !== socket.id) {
-      console.log(`Tag ${fullTag} reconectou. Atualizando socketId.`);
-    }
     onlineUsers.set(fullTag, socket.id);
+    console.log(`Jogador ${fullTag} registrado com o socket ID ${socket.id}`);
     socket.emit("registered", { tag: fullTag });
   });
+
+  // --- CORREÇÃO ADICIONADA AQUI ---
+  // Listener para quando o cliente pede a lista de amigos online
+  socket.on(
+    "get_online_friends",
+    ({ friendTags }: { friendTags: string[] }) => {
+      if (!Array.isArray(friendTags)) return;
+
+      // Filtra a lista de amigos recebida, mantendo apenas aqueles que estão no nosso mapa de usuários online
+      const onlineFriends = friendTags.filter((tag) => onlineUsers.has(tag));
+
+      // Envia a lista de volta APENAS para o cliente que pediu
+      socket.emit("online_friends", onlineFriends);
+    }
+  );
+  // --- FIM DA CORREÇÃO ---
 
   socket.on("invite_player", ({ inviteeTag }: { inviteeTag: string }) => {
     let inviterTag = "";
@@ -189,22 +196,15 @@ io.on("connection", (socket) => {
 
       if (accepted) {
         const roomId = `game-${uuidv4()}`;
-        const inviterSocket = inviterSocketId;
-        const inviteeSocket = socket.id;
 
         const players: Player[] = [
           {
             tag: inviterTag,
             score: 0,
             ready: false,
-            socketId: inviterSocket,
+            socketId: inviterSocketId,
           },
-          {
-            tag: inviteeTag,
-            score: 0,
-            ready: false,
-            socketId: inviteeSocket,
-          },
+          { tag: inviteeTag, score: 0, ready: false, socketId: socket.id },
         ];
 
         gameRooms.set(roomId, {
@@ -212,13 +212,12 @@ io.on("connection", (socket) => {
           currentQuestion: null,
           questionTimer: null,
           questionStartTime: null,
-          questionAnswered: true, // começa trancado até a primeira pergunta ser enviada
+          questionAnswered: true,
           modeTimer: null,
           modeTimeLeft: null,
           nextQuestionTimeout: null,
         });
 
-        // juntar sockets na room
         socket.join(roomId);
         io.sockets.sockets.get(inviterSocketId)?.join(roomId);
 
@@ -228,7 +227,7 @@ io.on("connection", (socket) => {
         });
 
         console.log(
-          `Sala criada ${roomId} entre ${inviterTag} (${inviterSocketId}) e ${inviteeTag} (${socket.id})`
+          `Sala criada ${roomId} entre ${inviterTag} e ${inviteeTag}`
         );
       } else {
         io.to(inviterSocketId).emit("invite_declined", { from: inviteeTag });
@@ -240,42 +239,24 @@ io.on("connection", (socket) => {
     const room = gameRooms.get(roomId);
     if (!room) return;
 
-    let playerTag = "";
-    for (const [tag, id] of onlineUsers.entries()) {
-      if (id === socket.id) {
-        playerTag = tag;
-        break;
-      }
-    }
-
-    const player = room.players.find((p) => p.tag === playerTag);
+    const player = room.players.find((p) => p.socketId === socket.id);
     if (player) {
       player.ready = true;
-      // também atualiza socketId caso o player tenha reconectado com outro socket
-      player.socketId = socket.id;
-      console.log(`Jogador ${playerTag} está pronto na sala ${roomId}.`);
+      console.log(`Jogador ${player.tag} está pronto na sala ${roomId}.`);
     }
 
-    const allReady = room.players.every((p) => p.ready);
-    if (allReady) {
-      // proteção: se já existe um modeTimer, limpa antes de recriar
-      if (room.modeTimer) {
-        clearInterval(room.modeTimer);
-        room.modeTimer = null;
-      }
+    if (room.players.every((p) => p.ready)) {
+      if (room.modeTimer) clearInterval(room.modeTimer);
 
       room.modeTimeLeft = MODE_DURATION_S;
       io.to(roomId).emit("mode_started", { duration: MODE_DURATION_S });
 
-      // emitir ticks do modo e finalizar a sala quando acabar
       room.modeTimer = setInterval(() => {
         if (typeof room.modeTimeLeft !== "number") return;
         room.modeTimeLeft!--;
         io.to(roomId).emit("mode_tick", { timeLeft: room.modeTimeLeft });
 
         if (room.modeTimeLeft! <= 0) {
-          // finalizar jogo por tempo
-          // limpa todos os timers associados à sala
           safeClearAllTimers(room);
           io.to(roomId).emit("game_over", { finalScores: room.players });
           gameRooms.delete(roomId);
@@ -283,7 +264,6 @@ io.on("connection", (socket) => {
         }
       }, 1000);
 
-      // manda a primeira pergunta
       sendNextQuestion(roomId);
     }
   });
@@ -292,77 +272,53 @@ io.on("connection", (socket) => {
     "submit_answer",
     ({ roomId, answer }: { roomId: string; answer: string }) => {
       const room = gameRooms.get(roomId);
-
-      // Se a sala não existe ou a pergunta JÁ FOI RESPONDIDA, ignora.
-      if (!room || room.questionAnswered) {
-        return;
-      }
-      // TRANCAR A PORTA imediatamente
+      if (!room || room.questionAnswered) return;
       room.questionAnswered = true;
 
-      // limpa timer da pergunta
       if (room.questionTimer) {
         clearInterval(room.questionTimer);
         room.questionTimer = null;
       }
 
-      // Checagem de segurança pra garantir que os dados existem
       if (!room.currentQuestion || !room.questionStartTime) return;
 
       const timeTakenMs = Date.now() - room.questionStartTime;
       const timeTakenS = Math.floor(timeTakenMs / 1000);
 
-      let playerTag = "";
-      for (const [tag, id] of onlineUsers.entries()) {
-        if (id === socket.id) {
-          playerTag = tag;
-          break;
-        }
-      }
+      const player = room.players.find((p) => p.socketId === socket.id);
+      if (!player) return;
 
-      const correct = normalizeAnswer(room.currentQuestion.respostaCorreta);
-      const given = normalizeAnswer(answer || "");
-
-      const isCorrect = correct === given;
+      const isCorrect =
+        normalizeAnswer(room.currentQuestion.respostaCorreta) ===
+        normalizeAnswer(answer || "");
 
       if (isCorrect) {
-        const player = room.players.find((p) => p.tag === playerTag);
-        if (player) {
-          const timeLeft = Math.max(0, QUESTION_TIME_LIMIT_S - timeTakenS);
-          const timeBonus = timeLeft * TIME_BONUS_MULTIPLIER;
-          player.score += BASE_SCORE + timeBonus;
-          console.log(
-            `Jogador ${playerTag} acertou! +${BASE_SCORE} base, +${timeBonus} bônus.`
-          );
-        }
+        const timeLeft = Math.max(0, QUESTION_TIME_LIMIT_S - timeTakenS);
+        const timeBonus = timeLeft * TIME_BONUS_MULTIPLIER;
+        player.score += BASE_SCORE + timeBonus;
+        console.log(
+          `Jogador ${player.tag} acertou! +${BASE_SCORE} base, +${timeBonus} bônus.`
+        );
       } else {
         console.log(
-          `Jogador ${playerTag} errou. Resp correta: ${room.currentQuestion.respostaCorreta}`
+          `Jogador ${player.tag} errou. Resp correta: ${room.currentQuestion.respostaCorreta}`
         );
       }
 
-      io.to(roomId).emit("answer_result", { playerTag, isCorrect });
+      io.to(roomId).emit("answer_result", { playerTag: player.tag, isCorrect });
       io.to(roomId).emit("update_score", room.players);
 
-      // Inicia o ciclo para a próxima pergunta (só o primeiro que respondeu vai chegar aqui)
-      if (room) {
-        // garante que não acumule timeouts duplicados
-        if (room.nextQuestionTimeout) {
-          clearTimeout(room.nextQuestionTimeout);
-          room.nextQuestionTimeout = null;
-        }
-        room.nextQuestionTimeout = setTimeout(() => {
-          room.nextQuestionTimeout = null;
-          sendNextQuestion(roomId);
-        }, NEXT_QUESTION_DELAY_MS);
-      }
+      if (room.nextQuestionTimeout) clearTimeout(room.nextQuestionTimeout);
+      room.nextQuestionTimeout = setTimeout(() => {
+        room.nextQuestionTimeout = null;
+        sendNextQuestion(roomId);
+      }, NEXT_QUESTION_DELAY_MS);
     }
   );
 
   socket.on("disconnect", () => {
     console.log("❌ Jogador desconectou. ID:", socket.id);
 
-    // remove do onlineUsers (se existir)
     for (const [tag, id] of [...onlineUsers.entries()]) {
       if (id === socket.id) {
         onlineUsers.delete(tag);
@@ -371,21 +327,18 @@ io.on("connection", (socket) => {
       }
     }
 
-    // procurar salas que contenham esse socket e encerrar/limpar
     for (const [roomId, room] of [...gameRooms.entries()]) {
-      const idx = room.players.findIndex((p) => p.socketId === socket.id);
-      if (idx !== -1) {
-        const disconnectedPlayer = room.players[idx];
-        // notifica a sala
+      const disconnectedPlayer = room.players.find(
+        (p) => p.socketId === socket.id
+      );
+      if (disconnectedPlayer) {
         io.to(roomId).emit("player_disconnected", {
-          tag: disconnectedPlayer?.tag,
+          tag: disconnectedPlayer.tag,
         });
-
-        // limpa todos os timers e remove a sala
         safeClearAllTimers(room);
         gameRooms.delete(roomId);
         console.log(
-          `Sala ${roomId} encerrada por desconexão (${disconnectedPlayer?.tag}).`
+          `Sala ${roomId} encerrada por desconexão (${disconnectedPlayer.tag}).`
         );
       }
     }
