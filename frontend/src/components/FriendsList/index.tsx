@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-// CORREÇÃO: Importando 'documentId' para a query
 import {
   collection,
   doc,
@@ -46,7 +45,6 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
     const fetchUserDetails = async (uids: string[]): Promise<UserDetails[]> => {
       if (!uids || uids.length === 0) return [];
       const usersRef = collection(db, 'users');
-      // CORREÇÃO: A query agora usa documentId() para buscar pelos IDs dos documentos, que é mais robusto.
       const q = query(usersRef, where(documentId(), 'in', uids));
       const querySnapshot = await getDocs(q);
       return querySnapshot.docs.map((doc) => doc.data() as UserDetails);
@@ -66,18 +64,27 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
     };
 
     fetchFriendsAndRequests();
+  }, [isOpen, currentUser.friends, currentUser.friendRequestsReceived]);
 
-    // Socket listeners
+  useEffect(() => {
+    if (!isOpen || friendsDetails.length === 0) return;
+
+    // Pega as tags de todos os amigos para enviar ao servidor
+    const friendTags = friendsDetails.map((f) => f.fullTag);
+
     const onOnlineFriends = (onlineTags: string[]) => {
       setOnlineFriends(onlineTags);
     };
+
+    // Configura o listener
     socket.on('online_friends', onOnlineFriends);
-    socket.emit('get_online_friends'); // Pede a lista ao abrir
+
+    socket.emit('get_online_friends', { friendTags });
 
     return () => {
       socket.off('online_friends', onOnlineFriends);
     };
-  }, [isOpen, currentUser.friends, currentUser.friendRequestsReceived]);
+  }, [isOpen, friendsDetails]);
 
   const refreshCurrentUserState = async () => {
     const user = auth.currentUser;
@@ -101,17 +108,14 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
         const currentUserRef = doc(db, 'users', currentUserId);
         const requesterRef = doc(db, 'users', requesterId);
 
-        // Sempre remove o pedido recebido do usuário atual
         transaction.update(currentUserRef, {
           friendRequestsReceived: arrayRemove(requesterId),
         });
-        // Sempre remove o pedido enviado do outro usuário
         transaction.update(requesterRef, {
           friendRequestsSent: arrayRemove(currentUserId),
         });
 
         if (accept) {
-          // Se aceitou, adiciona em ambas as listas de amigos
           transaction.update(currentUserRef, {
             friends: arrayUnion(requesterId),
           });
