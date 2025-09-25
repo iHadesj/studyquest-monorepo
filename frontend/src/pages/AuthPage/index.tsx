@@ -3,6 +3,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
+// A correção está aqui: Adicionado 'getDoc'
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { z } from 'zod';
 import { auth, db } from '../../config/firebase';
@@ -110,6 +111,9 @@ export const AuthPage = () => {
           progress: {},
           userTag: userTag,
           fullTag: fullTag,
+          friends: [],
+          friendRequestsSent: [],
+          friendRequestsReceived: [],
         });
 
         setIsLogin(true);

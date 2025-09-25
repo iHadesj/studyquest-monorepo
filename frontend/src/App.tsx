@@ -1,4 +1,4 @@
-// App.tsx (substitui o teu)
+// App.tsx
 import { useState, useEffect } from 'react';
 import { createGlobalStyle } from 'styled-components';
 import { onAuthStateChanged, type User } from 'firebase/auth';
@@ -23,6 +23,7 @@ import { BrainStorm } from './pages/BrainStorm';
 import { MultiplayerLobbyPage } from './pages/MultiplayerLobbyPage';
 import { ModalUserPerfil } from './components/ModalUserPerfil';
 import { InviteModal } from './components/InviteModal';
+import { FriendsList } from './components/FriendsList'; // Importando o novo componente
 
 import {
   AppContainer,
@@ -31,11 +32,12 @@ import {
   BarWrapper,
   FooterWrapper,
   RankingButton,
+  FriendsButton, // Importando o novo botão
   HomeButton,
   LoadingContainer,
   LoadingSpinner,
 } from './style/globalStyle';
-import { House, Trophy } from 'phosphor-react';
+import { House, Trophy, Users } from 'phosphor-react'; // Importando o ícone de amigos
 import { socket } from './services/socket';
 import { IncomingInviteModal } from './components/IncomingInviteModal';
 
@@ -67,6 +69,7 @@ export default function App() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isIncomingInviteModalOpen, setIsIncomingInviteModalOpen] =
     useState(false);
+  const [isFriendsListOpen, setIsFriendsListOpen] = useState(false); // Estado para o novo modal
   const [inviterTag, setInviterTag] = useState<string | null>(null);
   const [gameRoomId, setGameRoomId] = useState<string | null>(null);
 
@@ -367,9 +370,15 @@ export default function App() {
 
       <Footer>
         <FooterWrapper>
-          <RankingButton onClick={() => setScreen('ranking')}>
-            <Trophy weight="bold" /> Ranking
-          </RankingButton>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <RankingButton onClick={() => setScreen('ranking')}>
+              <Trophy weight="bold" /> Ranking
+            </RankingButton>
+            <FriendsButton onClick={() => setIsFriendsListOpen(true)}>
+              <Users weight="bold" /> Amigos
+            </FriendsButton>
+          </div>
+
           {screen !== 'subject' && screen !== 'ranking' && (
             <HomeButton onClick={backToHome} title="Voltar ao menu principal">
               <House size={24} weight="bold" />
@@ -389,6 +398,10 @@ export default function App() {
           isOpen={isIncomingInviteModalOpen}
           inviterTag={inviterTag}
           onClose={() => setIsIncomingInviteModalOpen(false)}
+        />
+        <FriendsList
+          isOpen={isFriendsListOpen}
+          onClose={() => setIsFriendsListOpen(false)}
         />
       </Footer>
     </>

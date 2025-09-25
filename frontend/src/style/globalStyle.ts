@@ -100,7 +100,8 @@ export const HomeButton = styled.button`
   }
 `;
 
-export const RankingButton = styled.button`
+// Botão base para Ranking e Amigos
+const FooterButton = styled.button`
   background: none;
   border: none;
   color: #b9bbbe;
@@ -114,6 +115,10 @@ export const RankingButton = styled.button`
     color: #ffffff;
   }
 `;
+
+export const RankingButton = styled(FooterButton)``;
+
+export const FriendsButton = styled(FooterButton)``;
 
 export const spin = keyframes`
   to {

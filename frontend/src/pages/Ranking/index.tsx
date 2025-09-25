@@ -1,9 +1,23 @@
 import { useState, useEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  limit,
+  doc,
+  arrayUnion,
+  // A correção está aqui: Adicionado 'getDoc'
+  getDoc,
+  arrayRemove,
+  runTransaction,
+} from 'firebase/firestore';
 import { db, auth } from '../../config/firebase';
 import { BackButton, Title } from '../../style/globalStyle';
-import { Crown } from 'phosphor-react';
+import { Crown, UserPlus } from 'phosphor-react';
+import { useProgressStore } from '../../hooks/useProgressStore';
+import type { FirestoreUserData } from '../../hooks/useProgressStore';
 
 // --- TIPOS ---
 type UserData = {
@@ -124,6 +138,31 @@ const CenteredContainer = styled.div`
   color: #b9bbbe;
 `;
 
+const FriendActionButton = styled.button`
+  background-color: #40444b;
+  color: #dcddde;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-family: 'Fira Code', monospace;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:hover {
+    background-color: #5865f2;
+    color: white;
+  }
+
+  &:disabled {
+    background-color: #2f3136;
+    color: #72767d;
+    cursor: not-allowed;
+  }
+`;
+
 // --- LÓGICA UTILITÁRIA ---
 type LevelInfo = {
   level: number;
@@ -159,31 +198,29 @@ export const RankingPage = ({ onBack }: { onBack: () => void }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const currentUserId = auth.currentUser?.uid;
+  const currentUserData = useProgressStore((state) => state);
+  const { hydrateFromFirestore } = useProgressStore();
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchRanking = async () => {
       try {
         const usersCollection = collection(db, 'users');
         const q = query(usersCollection, orderBy('xp', 'desc'), limit(50));
         const querySnapshot = await getDocs(q);
 
-        const usersData: UserData[] = [];
-        querySnapshot.forEach((doc) => {
+        const usersData: UserData[] = querySnapshot.docs.map((doc) => {
           const data = doc.data();
-          if (data.username) {
-            usersData.push({
-              uid: doc.id,
-              username: data.username,
-              avatarSeed: data.avatarSeed,
-              xp: data.xp,
-              level: calculateLevel(data.xp).level,
-            });
-          }
+          return {
+            uid: doc.id,
+            username: data.username || 'Anônimo',
+            avatarSeed: data.avatarSeed || 'default',
+            xp: data.xp || 0,
+            level: calculateLevel(data.xp || 0).level,
+          };
         });
         setRanking(usersData);
-      } catch (error) {
-        console.error('Erro ao buscar o ranking:', error);
+      } catch (err) {
+        console.error('Erro ao buscar o ranking:', err);
         setError(
           'Não foi possível carregar o ranking. Tente novamente mais tarde.'
         );
@@ -192,8 +229,97 @@ export const RankingPage = ({ onBack }: { onBack: () => void }) => {
       }
     };
 
-    fetchUsers();
+    fetchRanking();
   }, []);
+
+  const refreshCurrentUserState = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc.exists()) {
+        hydrateFromFirestore(userDoc.data() as FirestoreUserData);
+      }
+    }
+  };
+
+  const handleSendFriendRequest = async (targetUserId: string) => {
+    const currentUserId = auth.currentUser?.uid;
+    if (!currentUserId) return;
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const currentUserRef = doc(db, 'users', currentUserId);
+        const targetUserRef = doc(db, 'users', targetUserId);
+
+        transaction.update(currentUserRef, {
+          friendRequestsSent: arrayUnion(targetUserId),
+        });
+        transaction.update(targetUserRef, {
+          friendRequestsReceived: arrayUnion(currentUserId),
+        });
+      });
+      await refreshCurrentUserState();
+    } catch (e) {
+      console.error('Erro ao enviar pedido de amizade:', e);
+    }
+  };
+
+  const handleAcceptFriendRequest = async (requesterId: string) => {
+    const currentUserId = auth.currentUser?.uid;
+    if (!currentUserId) return;
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const currentUserRef = doc(db, 'users', currentUserId);
+        const requesterRef = doc(db, 'users', requesterId);
+
+        transaction.update(currentUserRef, {
+          friends: arrayUnion(requesterId),
+          friendRequestsReceived: arrayRemove(requesterId),
+        });
+        transaction.update(requesterRef, {
+          friends: arrayUnion(currentUserId),
+          friendRequestsSent: arrayRemove(currentUserId),
+        });
+      });
+      await refreshCurrentUserState();
+    } catch (e) {
+      console.error('Erro ao aceitar pedido de amizade:', e);
+    }
+  };
+
+  const renderFriendButton = (user: UserData) => {
+    const currentUserId = auth.currentUser?.uid;
+    if (!currentUserData || user.uid === currentUserId) return null;
+
+    const isFriend = currentUserData.friends?.includes(user.uid);
+    const hasSentRequest = currentUserData.friendRequestsSent?.includes(
+      user.uid
+    );
+    const hasReceivedRequest = currentUserData.friendRequestsReceived?.includes(
+      user.uid
+    );
+
+    if (isFriend) {
+      return <FriendActionButton disabled>Amigos</FriendActionButton>;
+    }
+    if (hasSentRequest) {
+      return <FriendActionButton disabled>Pendente</FriendActionButton>;
+    }
+    if (hasReceivedRequest) {
+      return (
+        <FriendActionButton onClick={() => handleAcceptFriendRequest(user.uid)}>
+          Aceitar
+        </FriendActionButton>
+      );
+    }
+    return (
+      <FriendActionButton onClick={() => handleSendFriendRequest(user.uid)}>
+        <UserPlus size={18} /> Adicionar
+      </FriendActionButton>
+    );
+  };
 
   if (isLoading) {
     return (
@@ -237,7 +363,7 @@ export const RankingPage = ({ onBack }: { onBack: () => void }) => {
           <UserRow
             key={user.uid}
             rank={index + 1}
-            isCurrentUser={user.uid === currentUserId}
+            isCurrentUser={user.uid === auth.currentUser?.uid}
           >
             <Rank>#{index + 1}</Rank>
             <Avatar
@@ -250,6 +376,7 @@ export const RankingPage = ({ onBack }: { onBack: () => void }) => {
                 Nível {user.level} - {user.xp.toLocaleString('pt-BR')} XP
               </UserStats>
             </UserInfo>
+            {renderFriendButton(user)}
           </UserRow>
         ))
       )}

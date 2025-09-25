@@ -8,6 +8,9 @@ export type FirestoreUserData = {
   progress: UserProgress;
   userTag?: number;
   fullTag?: string;
+  friends?: string[];
+  friendRequestsSent?: string[];
+  friendRequestsReceived?: string[];
 };
 
 type LevelProgress = {
@@ -36,6 +39,9 @@ export const useProgressStore = create<ProgressState>()((set) => ({
   progress: {},
   userTag: undefined,
   fullTag: undefined,
+  friends: [],
+  friendRequestsSent: [],
+  friendRequestsReceived: [],
 
   hydrateFromFirestore: (data) => {
     set({
@@ -45,6 +51,9 @@ export const useProgressStore = create<ProgressState>()((set) => ({
       progress: data.progress,
       userTag: data.userTag,
       fullTag: data.fullTag,
+      friends: data.friends || [],
+      friendRequestsSent: data.friendRequestsSent || [],
+      friendRequestsReceived: data.friendRequestsReceived || [],
     });
   },
 
@@ -56,5 +65,8 @@ export const useProgressStore = create<ProgressState>()((set) => ({
       avatarSeed: null,
       userTag: undefined,
       fullTag: undefined,
+      friends: [],
+      friendRequestsSent: [],
+      friendRequestsReceived: [],
     }),
 }));

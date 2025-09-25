@@ -24,6 +24,7 @@ import { useProgressStore } from '../../hooks/useProgressStore';
 type SubjectInfo = Omit<Materia, 'niveis'> & {
   categoria: string;
   iconName: string;
+  qtdQuestoes?: number;
 };
 
 // --- HELPERS ---
@@ -346,17 +347,34 @@ export const SubjectSelector: React.FC<{
 
   const progress = useProgressStore((s) => s.progress);
 
-  const computeSubjectPercent = (subjectId: string) => {
+  const computeCompletedLevels = (subjectId: string) => {
     const subjectProgress = progress?.[subjectId] ?? {};
-    const levelEntries = Object.values(subjectProgress);
-    if (levelEntries.length === 0) return 0;
-    const completed = levelEntries.filter((lvl: any) => lvl?.concluido).length;
-    return Math.round((completed / levelEntries.length) * 100);
+    // conta apenas níveis marcados como concluído (true)
+    const completed = Object.values(subjectProgress).filter(
+      (lvl: any) => lvl?.concluido
+    ).length;
+    return completed;
   };
 
-  const computeLevelCount = (subjectId: string) => {
+  const computeCorrectAnswers = (subjectId: string) => {
     const subjectProgress = progress?.[subjectId] ?? {};
-    return Object.keys(subjectProgress).length || 0;
+
+    const totalCorrect = Object.values(subjectProgress).reduce(
+      (sum, lvl: any) => sum + (lvl?.acertos || 0),
+      0
+    );
+
+    return totalCorrect;
+  };
+
+  const computeSubjectPercent = (subjectId: string, totalLevels = 3) => {
+    // totalLevels default 3; se tiver outro valor podes passar
+    const completed = computeCompletedLevels(subjectId);
+    // prevenção: totalLevels nunca 0
+    const total = Math.max(1, totalLevels);
+    const raw = (completed / total) * 100;
+    const percent = Math.round(Math.max(0, Math.min(100, raw)));
+    return percent;
   };
 
   return (
@@ -370,8 +388,10 @@ export const SubjectSelector: React.FC<{
           <CategoryTitle>{category}</CategoryTitle>
           <SubjectGrid>
             {subjectsInCategory.map((subject, idx) => {
-              const percent = computeSubjectPercent(subject.id);
-              const levels = computeLevelCount(subject.id);
+              const totalLevels = 3;
+              const correctAnswers = computeCorrectAnswers(subject.id);
+              const completed = computeCompletedLevels(subject.id);
+              const percent = computeSubjectPercent(subject.id, totalLevels);
               const textColor = getContrastText(subject.cor.bg || '#111827');
               return (
                 <SubjectCard
@@ -390,7 +410,8 @@ export const SubjectSelector: React.FC<{
                     <div style={{ flex: 1 }}>
                       <h3>{subject.nome}</h3>
                       <div className="meta">
-                        {levels} níveis • {subject.nome}
+                        {completed}/{totalLevels} níveis • {correctAnswers}{' '}
+                        acertos
                       </div>
                     </div>
                     <div style={{ marginLeft: 8, textAlign: 'right' }} />
@@ -408,7 +429,6 @@ export const SubjectSelector: React.FC<{
                       <ProgressBarFill percent={percent} />
                     </ProgressBarContainer>
                     <ProgressLabel>
-                      <span style={{ opacity: 0.9 }}>{levels}/3 níveis</span>
                       <span style={{ opacity: 0.9 }}>{percent}%</span>
                     </ProgressLabel>
                   </div>
