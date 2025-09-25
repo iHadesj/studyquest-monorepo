@@ -27,7 +27,7 @@ app.use(
 app.use(express.json());
 app.use(routes);
 
-const onlineUsers = new Map<string, string>(); // tag -> socketId
+const onlineUsers = new Map<string, string>();
 
 interface Player {
   tag: string;
@@ -60,9 +60,8 @@ const normalizeAnswer = (s: string) =>
     .trim()
     .toLowerCase()
     .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, ""); // remove acentos
+    .replace(/\p{Diacritic}/gu, "");
 
-// Limpa todos os timers de uma sala (question, mode e nextQuestion timeout)
 const safeClearAllTimers = (room: GameRoom) => {
   if (room.questionTimer) {
     clearInterval(room.questionTimer);
@@ -146,21 +145,16 @@ io.on("connection", (socket) => {
     socket.emit("registered", { tag: fullTag });
   });
 
-  // --- CORREÇÃO ADICIONADA AQUI ---
-  // Listener para quando o cliente pede a lista de amigos online
   socket.on(
     "get_online_friends",
     ({ friendTags }: { friendTags: string[] }) => {
       if (!Array.isArray(friendTags)) return;
 
-      // Filtra a lista de amigos recebida, mantendo apenas aqueles que estão no nosso mapa de usuários online
       const onlineFriends = friendTags.filter((tag) => onlineUsers.has(tag));
 
-      // Envia a lista de volta APENAS para o cliente que pediu
       socket.emit("online_friends", onlineFriends);
     }
   );
-  // --- FIM DA CORREÇÃO ---
 
   socket.on("invite_player", ({ inviteeTag }: { inviteeTag: string }) => {
     let inviterTag = "";

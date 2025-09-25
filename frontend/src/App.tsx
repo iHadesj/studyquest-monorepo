@@ -23,7 +23,7 @@ import { BrainStorm } from './pages/BrainStorm';
 import { MultiplayerLobbyPage } from './pages/MultiplayerLobbyPage';
 import { ModalUserPerfil } from './components/ModalUserPerfil';
 import { InviteModal } from './components/InviteModal';
-import { FriendsList } from './components/FriendsList'; // Importando o novo componente
+import { FriendsList } from './components/FriendsList';
 
 import {
   AppContainer,
@@ -32,12 +32,13 @@ import {
   BarWrapper,
   FooterWrapper,
   RankingButton,
-  FriendsButton, // Importando o novo botão
+  FriendsButton,
   HomeButton,
   LoadingContainer,
   LoadingSpinner,
+  FooterCredit,
 } from './style/globalStyle';
-import { House, Trophy, Users } from 'phosphor-react'; // Importando o ícone de amigos
+import { House, Trophy, Users } from 'phosphor-react';
 import { socket } from './services/socket';
 import { IncomingInviteModal } from './components/IncomingInviteModal';
 
@@ -83,7 +84,6 @@ export default function App() {
       return;
     }
 
-    // handlers
     const onConnect = () => {
       console.log('Conectado ao servidor! Registrando como:', fullTag);
       socket.emit('register', fullTag);
@@ -116,7 +116,6 @@ export default function App() {
     socket.on('game_started', onGameStarted);
     socket.on('invite_declined', onInviteDeclined);
 
-    // conecta só se ainda não conectado
     if (!socket.connected) socket.connect();
 
     return () => {
@@ -144,20 +143,16 @@ export default function App() {
       const userDocRef = doc(db, 'users', user.uid);
 
       try {
-        // garante token fresco — evita casos de token expirado que geram permission-denied
         await user.getIdToken(true);
 
-        // tenta buscar doc uma vez (getDoc) - isso falhará se as regras negarem
         const snap = await getDoc(userDocRef);
         if (snap.exists()) {
           hydrateFromFirestore(snap.data() as FirestoreUserData);
         } else {
           console.log('Usuário novo (sem doc). abrindo ProfileSetup...');
-          // mantém ProfileSetup aberto (username vazio) — UX ok
         }
       } catch (err: unknown) {
         console.error('Erro ao buscar doc do usuário:', err);
-        // Tratamento específico para permissão negada:
         if (
           typeof err === 'object' &&
           err !== null &&
@@ -170,17 +165,13 @@ export default function App() {
             (typeof message === 'string' &&
               message.includes('permission-denied'))
           ) {
-            // Ação segura: limpa store local e mostra ProfileSetup (ou força logout se preferir)
             resetLocalStore();
-            // opcional: desloga o usuário forçando um novo sign-in
-            // await auth.signOut();
           }
         }
       } finally {
         setIsInitializing(false);
       }
 
-      // Subscribes no snapshot com handler de erro pra evitar 'Uncaught Error in snapshot listener'
       unsubscribeFirestore = onSnapshot(
         userDocRef,
         (d) => {
@@ -202,13 +193,10 @@ export default function App() {
             'code' in snapshotErr &&
             (snapshotErr as { code?: string }).code === 'permission-denied'
           ) {
-            // evita crash no console — trata de forma user-friendly
             console.warn(
               'Sem permissão para escutar o doc do usuário. Abrindo setup.'
             );
             resetLocalStore();
-            // opcional: desloga ou mostra mensagem ao usuário
-            // auth.signOut();
           }
         }
       );
@@ -384,6 +372,17 @@ export default function App() {
               <House size={24} weight="bold" />
             </HomeButton>
           )}
+
+          <FooterCredit>
+            Desenvolvido por:{' '}
+            <a
+              href="https://github.com/iHadesJ"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Eduardo Alexandre
+            </a>
+          </FooterCredit>
         </FooterWrapper>
 
         <ModalUserPerfil

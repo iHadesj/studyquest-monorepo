@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 
-// --- TIPOS ---
 export type FirestoreUserData = {
   username: string | null;
   avatarSeed: string | null;
@@ -31,7 +30,6 @@ type ProgressState = FirestoreUserData & {
   resetLocalStore: () => void;
 };
 
-// --- GERENCIAMENTO DE ESTADO COM ZUSTAND ---
 export const useProgressStore = create<ProgressState>()((set) => ({
   username: null,
   avatarSeed: null,

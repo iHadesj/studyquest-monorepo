@@ -472,3 +472,18 @@ export const Footer = styled.footer`
     margin: 0;
   }
 `;
+
+export const FooterCredit = styled.p`
+  margin: 0;
+  font-size: 0.8rem;
+  color: #72767d;
+
+  a {
+    color: #5865f2;
+    text-decoration: none;
+    font-weight: bold;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;

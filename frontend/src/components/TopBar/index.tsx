@@ -5,7 +5,6 @@ import { useProgressStore } from '../../hooks/useProgressStore';
 import { SignOut, Gear } from 'phosphor-react';
 import { calculateLevelInfo } from '../../style/level';
 
-// --- COMPONENTES ESTILIZADOS ---
 export const TopBarContainer = styled.div`
   display: flex;
   align-items: center;
@@ -20,47 +19,41 @@ export const ProfileInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  cursor: pointer;
 `;
 
-export const Avatar = styled.img<{
-  $pointer?: boolean;
-}>`
+export const Avatar = styled.img`
   width: 40px;
   height: 40px;
   border-radius: 50%;
   background-color: #2f3136;
   border: 2px solid #40444b;
-  cursor: ${(props) => (props.$pointer ? 'pointer' : 'default')};
+  object-fit: cover;
 `;
 
-export const AvatarContainer = styled.div`
-  position: relative;
-  cursor: pointer;
-`;
-
-export const SettingsIcon = styled(Gear)`
-  position: absolute;
-  bottom: 6px;
-  right: 0;
-  transform: translate(25%, 25%);
-
-  background-color: #40444b;
-  color: #ffffff;
-  border-radius: 50%;
-  padding: 2px;
-  width: 14px;
-  height: 14px;
-  border: 2px solid #2f3136;
-`;
-
-export const Username = styled.span`
+export const UserDetails = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   color: #ffffff;
   font-weight: bold;
   font-size: 1rem;
 
+  &:hover .settings-icon {
+    opacity: 1;
+  }
+
   @media (max-width: 768px) {
     display: none;
   }
+`;
+
+export const Username = styled.span``;
+
+export const SettingsIcon = styled(Gear)`
+  color: #b9bbbe;
+  opacity: 0;
+  transition: opacity 0.2s;
 `;
 
 export const LevelBarContainer = styled.div`
@@ -95,6 +88,11 @@ export const ProgressBarContainer = styled.div`
   overflow: hidden;
   position: relative;
   border: 1px solid #40444b;
+`;
+
+export const AvatarContainer = styled.div`
+  position: relative;
+  cursor: pointer;
 `;
 
 export const ProgressBarFill = styled.div<{ progress: number }>`
@@ -142,9 +140,8 @@ type TopBarProps = {
   onClick?: () => void;
 };
 
-// --- COMPONENTE PRINCIPAL ---
 export const TopBar = ({ onClick }: TopBarProps) => {
-  const { xp, username, avatarSeed } = useProgressStore();
+  const { xp, username, avatarSeed, fullTag } = useProgressStore();
   const { level, progress, xpInCurrentLevel, xpNeededForLevel } =
     calculateLevelInfo(xp);
 
@@ -156,17 +153,20 @@ export const TopBar = ({ onClick }: TopBarProps) => {
     }
   };
 
+  const devTag = 'Edu.dev#8636';
+  const avatarSrc =
+    fullTag === devTag
+      ? './Light.jpg'
+      : `https://api.dicebear.com/8.x/pixel-art/svg?seed=${avatarSeed}`;
+
   return (
     <TopBarContainer>
-      <ProfileInfo>
-        <AvatarContainer onClick={onClick}>
-          <Avatar
-            src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${avatarSeed}`}
-            alt="User Avatar"
-          />
-          <SettingsIcon weight="fill" />
-        </AvatarContainer>
-        <Username>{username}</Username>
+      <ProfileInfo onClick={onClick}>
+        <Avatar src={avatarSrc} alt="User Avatar" />
+        <UserDetails>
+          <Username>{username}</Username>
+          <SettingsIcon className="settings-icon" weight="fill" size={16} />
+        </UserDetails>
       </ProfileInfo>
 
       <LevelBarContainer>

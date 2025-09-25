@@ -69,16 +69,13 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
   useEffect(() => {
     if (!isOpen || friendsDetails.length === 0) return;
 
-    // Pega as tags de todos os amigos para enviar ao servidor
     const friendTags = friendsDetails.map((f) => f.fullTag);
 
     const onOnlineFriends = (onlineTags: string[]) => {
       setOnlineFriends(onlineTags);
     };
 
-    // Configura o listener
     socket.on('online_friends', onOnlineFriends);
-
     socket.emit('get_online_friends', { friendTags });
 
     return () => {
@@ -135,6 +132,14 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
     onClose();
   };
 
+  // --- LÓGICA DA FOTO DO DEV AQUI ---
+  const devTag = 'Edu.dev#8636';
+  const getAvatarSrc = (user: UserDetails) => {
+    return user.fullTag === devTag
+      ? '/Light.jpg' // <-- Sua foto na pasta /public
+      : `https://api.dicebear.com/8.x/pixel-art/svg?seed=${user.avatarSeed}`;
+  };
+
   return (
     <Modal.Root isOpen={isOpen} onClose={onClose}>
       <Modal.Overlay />
@@ -165,9 +170,7 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
                   const isOnline = onlineFriends.includes(friend.fullTag);
                   return (
                     <S.UserEntry key={friend.uid}>
-                      <S.Avatar
-                        src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${friend.avatarSeed}`}
-                      />
+                      <S.Avatar src={getAvatarSrc(friend)} />
                       <S.UserInfo>
                         <S.Username>{friend.username}</S.Username>
                         <S.Status isOnline={isOnline}>
@@ -196,9 +199,7 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
               (requestsDetails.length > 0 ? (
                 requestsDetails.map((request) => (
                   <S.UserEntry key={request.uid}>
-                    <S.Avatar
-                      src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${request.avatarSeed}`}
-                    />
+                    <S.Avatar src={getAvatarSrc(request)} />
                     <S.UserInfo>
                       <S.Username>{request.username}</S.Username>
                     </S.UserInfo>

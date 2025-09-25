@@ -20,42 +20,33 @@ import { Subtitle, Title } from '../../style/globalStyle';
 import type { Materia } from '../../interfaces';
 import { useProgressStore } from '../../hooks/useProgressStore';
 
-// --- TIPOS ---
 type SubjectInfo = Omit<Materia, 'niveis'> & {
   categoria: string;
   iconName: string;
   qtdQuestoes?: number;
 };
 
-// --- HELPERS ---
 const hexToLuminance = (hex = '#000000') => {
   const c = hex.replace('#', '');
   const r = parseInt(c.substring(0, 2), 16) / 255;
   const g = parseInt(c.substring(2, 4), 16) / 255;
   const b = parseInt(c.substring(4, 6), 16) / 255;
-  // linearize
   const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
   return lum;
 };
 const getContrastText = (bg = '#000000') =>
   hexToLuminance(bg) > 0.55 ? '#0b0b0b' : '#ffffff';
 
-// --- ANIMAÇÕES ---
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 `;
 
-/* INVERTEI A DIREÇÃO DO "SHINE":
-   Antes: from -120% -> 220% (podia parecer "indo pra trás" dependendo do gradiente)
-   Agora: vai de 220% -> -120% para dar a sensação de movimento LEFT -> RIGHT
-*/
 const shine = keyframes`
   0% { background-position: 220% 0; }
   100% { background-position: -120% 0; }
 `;
 
-// --- STYLES ---
 const Container = styled.div`
   animation: ${fadeIn} 380ms ease-out;
   padding-bottom: 2rem;
@@ -168,7 +159,6 @@ const ProgressBarContainer = styled.div`
 const ProgressBarFill = styled.div<{ percent: number }>`
   width: ${(p) => Math.max(0, Math.min(100, p.percent))}%;
   height: 100%;
-  /* Mantive o gradiente branco (visível sobre bg colorido) e o efeito shine direcionado */
   background: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0.95),
@@ -178,7 +168,6 @@ const ProgressBarFill = styled.div<{ percent: number }>`
   transition: width 420ms cubic-bezier(0.2, 0.9, 0.2, 1);
   position: relative;
   background-size: 220% 100%;
-  /* animação invertida aplicada (agora vai "pra frente") */
   animation: ${shine} 2.6s linear infinite;
 `;
 
@@ -190,7 +179,6 @@ const ProgressLabel = styled.div`
   color: rgba(255, 255, 255, 0.95);
 `;
 
-/* Brainstorm area - MELHOR POSICIONAMENTO e LAYOUT */
 const BrainstormSection = styled.section`
   padding: 1.6rem;
 
@@ -199,7 +187,6 @@ const BrainstormSection = styled.section`
   align-items: start;
   justify-items: center;
 
-  /* desktop: coluna de conteúdo + coluna de controle (buttons) */
   @media (min-width: 880px) {
     grid-template-columns: minmax(360px, 0fr) 830px;
     align-items: center;
@@ -263,7 +250,6 @@ const BrainInfo = styled.div`
     line-height: 1.55;
   }
 
-  /* garantir que o card não "engula" os controles no mobile */
   @media (max-width: 879px) {
     padding: 14px;
   }
@@ -313,7 +299,6 @@ const LargeButton = styled.button<{ variant?: 'primary' | 'accent' }>`
   }
 `;
 
-// --- ICON MAP (mantive) ---
 const iconMap: { [key: string]: React.ReactNode } = {
   Divide: <Divide size={36} color="white" weight="light" />,
   Code: <Code size={36} color="white" weight="light" />,
@@ -332,7 +317,6 @@ const iconMap: { [key: string]: React.ReactNode } = {
 const getIcon = (iconName: string) =>
   iconMap[iconName] || <Book size={36} color="white" weight="light" />;
 
-// --- COMPONENTE PRINCIPAL ---
 export const SubjectSelector: React.FC<{
   subjects: readonly SubjectInfo[];
   onSelect: (subject: SubjectInfo) => void;

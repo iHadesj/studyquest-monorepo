@@ -25,10 +25,11 @@ type UserData = {
   avatarSeed: string;
   xp: number;
   level: number;
+  fullTag?: string; // Adicionado para a verificação do dev
 };
 
 // --- ANIMAÇÕES DE NEON ---
-// Keyframes para a animação de brilho pulsante
+// (o restante das animações e estilos permanece o mesmo)
 const neonGold = keyframes`
   0%, 100% { box-shadow: 0 0 3px #f1c40f, 0 0 6px #f1c40f, 0 0 9px #f1c40f; }
   50% { box-shadow: 0 0 6px #f1c40f, 0 0 18px #f1c40f, 0 0 6px #f1c40f; }
@@ -96,6 +97,7 @@ const Avatar = styled.img`
   height: 50px;
   border-radius: 50%;
   margin: 0 1rem;
+  object-fit: cover; // Adicionado para sua foto não distorcer
 `;
 
 const UserInfo = styled.div`
@@ -214,6 +216,7 @@ export const RankingPage = ({ onBack }: { onBack: () => void }) => {
             avatarSeed: data.avatarSeed || 'default',
             xp: data.xp || 0,
             level: calculateLevel(data.xp || 0).level,
+            fullTag: data.fullTag || '', // Buscando a fullTag
           };
         });
         setRanking(usersData);
@@ -236,8 +239,6 @@ export const RankingPage = ({ onBack }: { onBack: () => void }) => {
       const userDocRef = doc(db, 'users', user.uid);
       const userDoc = await getDoc(userDocRef);
       if (userDoc.exists()) {
-        // CORREÇÃO AQUI: Chamando a ação de hidratação através do getState()
-        // para garantir que funcione corretamente fora do ciclo de renderização do React.
         useProgressStore
           .getState()
           .hydrateFromFirestore(userDoc.data() as FirestoreUserData);
@@ -361,26 +362,31 @@ export const RankingPage = ({ onBack }: { onBack: () => void }) => {
           <p>O ranking ainda está vazio. Seja o primeiro a marcar pontos!</p>
         </CenteredContainer>
       ) : (
-        ranking.map((user, index) => (
-          <UserRow
-            key={user.uid}
-            rank={index + 1}
-            isCurrentUser={user.uid === auth.currentUser?.uid}
-          >
-            <Rank>#{index + 1}</Rank>
-            <Avatar
-              src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${user.avatarSeed}`}
-              alt={user.username}
-            />
-            <UserInfo>
-              <Username>{user.username}</Username>
-              <UserStats>
-                Nível {user.level} - {user.xp.toLocaleString('pt-BR')} XP
-              </UserStats>
-            </UserInfo>
-            {renderFriendButton(user)}
-          </UserRow>
-        ))
+        ranking.map((user, index) => {
+          const devTag = 'Edu.dev#8636';
+          const avatarSrc =
+            user.fullTag === devTag
+              ? '/Light.jpg'
+              : `https://api.dicebear.com/8.x/pixel-art/svg?seed=${user.avatarSeed}`;
+
+          return (
+            <UserRow
+              key={user.uid}
+              rank={index + 1}
+              isCurrentUser={user.uid === auth.currentUser?.uid}
+            >
+              <Rank>#{index + 1}</Rank>
+              <Avatar src={avatarSrc} alt={user.username} />
+              <UserInfo>
+                <Username>{user.username}</Username>
+                <UserStats>
+                  Nível {user.level} - {user.xp.toLocaleString('pt-BR')} XP
+                </UserStats>
+              </UserInfo>
+              {renderFriendButton(user)}
+            </UserRow>
+          );
+        })
       )}
     </RankingContainer>
   );

@@ -55,6 +55,12 @@ export function ModalUserPerfil({
       .filter((level) => level.concluido).length;
   }, [progress]);
 
+  const devTag = 'Edu.dev#8636';
+  const avatarSrc =
+    fullTag === devTag
+      ? '/Light.jpg'
+      : `https://api.dicebear.com/8.x/pixel-art/svg?seed=${avatarSeed}`;
+
   return (
     <>
       <Modal.Root isOpen={isOpen} onClose={onClose}>
@@ -66,10 +72,7 @@ export function ModalUserPerfil({
           </Modal.Header>
           <Modal.Body>
             <ProfileWrapper>
-              <ProfileAvatar
-                src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${avatarSeed}`}
-                alt="User Avatar"
-              />
+              <ProfileAvatar src={avatarSrc} alt="User Avatar" />
               <UserInfo>
                 <Username>{username}</Username>
                 {fullTag && <UserTag>{fullTag}</UserTag>}
