@@ -8,7 +8,6 @@ import {
   limit,
   doc,
   arrayUnion,
-  // A correção está aqui: Adicionado 'getDoc'
   getDoc,
   arrayRemove,
   runTransaction,
@@ -199,7 +198,6 @@ export const RankingPage = ({ onBack }: { onBack: () => void }) => {
   const [error, setError] = useState<string | null>(null);
 
   const currentUserData = useProgressStore((state) => state);
-  const { hydrateFromFirestore } = useProgressStore();
 
   useEffect(() => {
     const fetchRanking = async () => {
@@ -238,7 +236,11 @@ export const RankingPage = ({ onBack }: { onBack: () => void }) => {
       const userDocRef = doc(db, 'users', user.uid);
       const userDoc = await getDoc(userDocRef);
       if (userDoc.exists()) {
-        hydrateFromFirestore(userDoc.data() as FirestoreUserData);
+        // CORREÇÃO AQUI: Chamando a ação de hidratação através do getState()
+        // para garantir que funcione corretamente fora do ciclo de renderização do React.
+        useProgressStore
+          .getState()
+          .hydrateFromFirestore(userDoc.data() as FirestoreUserData);
       }
     }
   };
