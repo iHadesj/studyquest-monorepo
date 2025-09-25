@@ -170,6 +170,59 @@ export function MultiplayerLobbyPage({
     setHasAnswered(true);
   };
 
+  const parseText = (text: string) => {
+    if (!text) return null;
+
+    const regex = /(\*[^*]+\*)|(_[^_]+_)|(~[^~]+~)|(`[^`]+`)|(\$[^$]+\$)/g;
+
+    const parts = text.split(regex).filter(Boolean);
+
+    return parts.map((part, idx) => {
+      if (part.startsWith('*') && part.endsWith('*')) {
+        return <strong key={idx}>{part.slice(1, -1)}</strong>;
+      }
+      if (part.startsWith('_') && part.endsWith('_')) {
+        return <em key={idx}>{part.slice(1, -1)}</em>;
+      }
+      if (part.startsWith('~') && part.endsWith('~')) {
+        return <del key={idx}>{part.slice(1, -1)}</del>;
+      }
+      if (part.startsWith('`') && part.endsWith('`')) {
+        return (
+          <code
+            key={idx}
+            style={{
+              backgroundColor: '#2f3136',
+              color: '#f8f8f2',
+              padding: '0 4px',
+              borderRadius: '4px',
+              fontFamily: 'monospace',
+            }}
+          >
+            {part.slice(1, -1)}
+          </code>
+        );
+      }
+      if (part.startsWith('$') && part.endsWith('$')) {
+        return (
+          <span
+            key={idx}
+            style={{
+              fontFamily: 'monospace',
+              backgroundColor: '#1e1e1e',
+              color: '#ffd700',
+              padding: '0 4px',
+              borderRadius: '3px',
+            }}
+          >
+            {part.slice(1, -1)}
+          </span>
+        );
+      }
+      return <span key={idx}>{part}</span>;
+    });
+  };
+
   if (isGameOver) {
     return (
       <S.LobbyWrapper>
@@ -213,7 +266,14 @@ export function MultiplayerLobbyPage({
       >
         <Title>Duelo Brainstorm!</Title>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div
+          style={{
+            display: 'flex',
+            fontSize: '1.5rem',
+            alignItems: 'center',
+            gap: '0.5rem',
+          }}
+        >
           <Timer size={20} />
           <strong
             style={{
@@ -290,7 +350,7 @@ export function MultiplayerLobbyPage({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
-              <QuestionText>{currentQuestion.pergunta}</QuestionText>
+              <QuestionText>{parseText(currentQuestion.pergunta)}</QuestionText>
 
               {currentQuestion.tipo === 'multipla_escolha' && (
                 <S.OptionsContainer>

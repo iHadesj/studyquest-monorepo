@@ -78,6 +78,59 @@ const EncouragementText = styled.div`
 
 type WrongAnswer = Exercicio & { userAnswer?: string };
 
+const parseText = (text: string) => {
+  if (!text) return null;
+
+  const regex = /(\*[^*]+\*)|(_[^_]+_)|(~[^~]+~)|(`[^`]+`)|(\$[^$]+\$)/g;
+
+  const parts = text.split(regex).filter(Boolean);
+
+  return parts.map((part, idx) => {
+    if (part.startsWith('*') && part.endsWith('*')) {
+      return <strong key={idx}>{part.slice(1, -1)}</strong>;
+    }
+    if (part.startsWith('_') && part.endsWith('_')) {
+      return <em key={idx}>{part.slice(1, -1)}</em>;
+    }
+    if (part.startsWith('~') && part.endsWith('~')) {
+      return <del key={idx}>{part.slice(1, -1)}</del>;
+    }
+    if (part.startsWith('`') && part.endsWith('`')) {
+      return (
+        <code
+          key={idx}
+          style={{
+            backgroundColor: '#2f3136',
+            color: '#f8f8f2',
+            padding: '0 4px',
+            borderRadius: '4px',
+            fontFamily: 'monospace',
+          }}
+        >
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+    if (part.startsWith('$') && part.endsWith('$')) {
+      return (
+        <span
+          key={idx}
+          style={{
+            fontFamily: 'monospace',
+            backgroundColor: '#1e1e1e',
+            color: '#ffd700',
+            padding: '0 4px',
+            borderRadius: '3px',
+          }}
+        >
+          {part.slice(1, -1)}
+        </span>
+      );
+    }
+    return <span key={idx}>{part}</span>;
+  });
+};
+
 export const ExercisePage = ({
   subject,
   level,
@@ -102,59 +155,6 @@ export const ExercisePage = ({
   const { progress } = useProgressStore();
   const currentProgress = progress[subject.id]?.[level.id];
   const currentAttempts = currentProgress?.tentativas || 0;
-
-  const parseText = (text: string) => {
-    if (!text) return null;
-
-    const regex = /(\*[^*]+\*)|(_[^_]+_)|(~[^~]+~)|(`[^`]+`)|(\$[^$]+\$)/g;
-
-    const parts = text.split(regex).filter(Boolean);
-
-    return parts.map((part, idx) => {
-      if (part.startsWith('*') && part.endsWith('*')) {
-        return <strong key={idx}>{part.slice(1, -1)}</strong>;
-      }
-      if (part.startsWith('_') && part.endsWith('_')) {
-        return <em key={idx}>{part.slice(1, -1)}</em>;
-      }
-      if (part.startsWith('~') && part.endsWith('~')) {
-        return <del key={idx}>{part.slice(1, -1)}</del>;
-      }
-      if (part.startsWith('`') && part.endsWith('`')) {
-        return (
-          <code
-            key={idx}
-            style={{
-              backgroundColor: '#2f3136',
-              color: '#f8f8f2',
-              padding: '0 4px',
-              borderRadius: '4px',
-              fontFamily: 'monospace',
-            }}
-          >
-            {part.slice(1, -1)}
-          </code>
-        );
-      }
-      if (part.startsWith('$') && part.endsWith('$')) {
-        return (
-          <span
-            key={idx}
-            style={{
-              fontFamily: 'monospace',
-              backgroundColor: '#1e1e1e',
-              color: '#ffd700',
-              padding: '0 4px',
-              borderRadius: '3px',
-            }}
-          >
-            {part.slice(1, -1)}
-          </span>
-        );
-      }
-      return <span key={idx}>{part}</span>;
-    });
-  };
 
   useEffect(() => {
     if (level.exercicios.length > 10) {
