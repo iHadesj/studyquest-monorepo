@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+// CORREÇÃO: Importando 'documentId' para a query
 import {
   collection,
   doc,
@@ -8,6 +9,7 @@ import {
   runTransaction,
   arrayUnion,
   arrayRemove,
+  documentId,
   getDoc,
 } from 'firebase/firestore';
 import { Check, Sword, X } from 'phosphor-react';
@@ -16,7 +18,7 @@ import { useProgressStore } from '../../hooks/useProgressStore';
 import type { FirestoreUserData } from '../../hooks/useProgressStore';
 import { socket } from '../../services/socket';
 import * as Modal from '../Modal';
-import * as S from '../FriendsList/style';
+import * as S from './style';
 
 interface FriendsListProps {
   isOpen: boolean;
@@ -37,33 +39,33 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
   const [onlineFriends, setOnlineFriends] = useState<string[]>([]);
 
   const currentUser = useProgressStore((state) => state);
-  const { hydrateFromFirestore } = useProgressStore();
 
   useEffect(() => {
     if (!isOpen) return;
 
     const fetchUserDetails = async (uids: string[]): Promise<UserDetails[]> => {
-      if (uids.length === 0) return [];
+      if (!uids || uids.length === 0) return [];
       const usersRef = collection(db, 'users');
-      const q = query(usersRef, where('uid', 'in', uids));
+      // CORREÇÃO: A query agora usa documentId() para buscar pelos IDs dos documentos, que é mais robusto.
+      const q = query(usersRef, where(documentId(), 'in', uids));
       const querySnapshot = await getDocs(q);
       return querySnapshot.docs.map((doc) => doc.data() as UserDetails);
     };
 
-    const fetchFriends = async () => {
-      const details = await fetchUserDetails(currentUser.friends || []);
-      setFriendsDetails(details);
+    const fetchFriendsAndRequests = async () => {
+      const friendUIDs = currentUser.friends || [];
+      const requestUIDs = currentUser.friendRequestsReceived || [];
+
+      const [friendData, requestData] = await Promise.all([
+        fetchUserDetails(friendUIDs),
+        fetchUserDetails(requestUIDs),
+      ]);
+
+      setFriendsDetails(friendData);
+      setRequestsDetails(requestData);
     };
 
-    const fetchRequests = async () => {
-      const details = await fetchUserDetails(
-        currentUser.friendRequestsReceived || []
-      );
-      setRequestsDetails(details);
-    };
-
-    fetchFriends();
-    fetchRequests();
+    fetchFriendsAndRequests();
 
     // Socket listeners
     const onOnlineFriends = (onlineTags: string[]) => {
@@ -83,7 +85,9 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
       const userDocRef = doc(db, 'users', user.uid);
       const userDoc = await getDoc(userDocRef);
       if (userDoc.exists()) {
-        hydrateFromFirestore(userDoc.data() as FirestoreUserData);
+        useProgressStore
+          .getState()
+          .hydrateFromFirestore(userDoc.data() as FirestoreUserData);
       }
     }
   };
