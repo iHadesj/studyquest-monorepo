@@ -11,13 +11,20 @@ import {
   documentId,
   getDoc,
 } from 'firebase/firestore';
-import { Check, Sword, X } from 'phosphor-react';
+import { Check, Plus, Sword, X } from 'phosphor-react';
+import { z } from 'zod';
 import { db, auth } from '../../config/firebase';
 import { useProgressStore } from '../../hooks/useProgressStore';
 import type { FirestoreUserData } from '../../hooks/useProgressStore';
 import { socket } from '../../services/socket';
-import * as Modal from '../Modal';
 import * as S from './style';
+import * as Modal from '../Modal/index';
+
+const fullTagSchema = z
+  .string()
+  .trim()
+  .min(1, 'A tag não pode ser vazia.')
+  .regex(/^.+#\d{4}$/, 'A tag precisa estar no formato "nome#1234".');
 
 interface FriendsListProps {
   isOpen: boolean;
@@ -31,11 +38,28 @@ type UserDetails = {
   fullTag: string;
 };
 
+type ActiveTab = 'friends' | 'requests' | 'sent';
+
+type FeedbackModalState = {
+  isOpen: boolean;
+  message: string;
+  type: 'success' | 'error';
+};
+
 export function FriendsList({ isOpen, onClose }: FriendsListProps) {
-  const [activeTab, setActiveTab] = useState<'friends' | 'requests'>('friends');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('friends');
   const [friendsDetails, setFriendsDetails] = useState<UserDetails[]>([]);
   const [requestsDetails, setRequestsDetails] = useState<UserDetails[]>([]);
+  const [sentRequestsDetails, setSentRequestsDetails] = useState<UserDetails[]>(
+    []
+  );
   const [onlineFriends, setOnlineFriends] = useState<string[]>([]);
+  const [fullTagInput, setFullTagInput] = useState('');
+  const [feedbackModal, setFeedbackModal] = useState<FeedbackModalState>({
+    isOpen: false,
+    message: '',
+    type: 'success',
+  });
 
   const currentUser = useProgressStore((state) => state);
 
@@ -50,34 +74,37 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
       return querySnapshot.docs.map((doc) => doc.data() as UserDetails);
     };
 
-    const fetchFriendsAndRequests = async () => {
+    const fetchAllDetails = async () => {
       const friendUIDs = currentUser.friends || [];
       const requestUIDs = currentUser.friendRequestsReceived || [];
+      const sentUIDs = currentUser.friendRequestsSent || [];
 
-      const [friendData, requestData] = await Promise.all([
+      const [friendData, requestData, sentData] = await Promise.all([
         fetchUserDetails(friendUIDs),
         fetchUserDetails(requestUIDs),
+        fetchUserDetails(sentUIDs),
       ]);
 
       setFriendsDetails(friendData);
       setRequestsDetails(requestData);
+      setSentRequestsDetails(sentData);
     };
 
-    fetchFriendsAndRequests();
-  }, [isOpen, currentUser.friends, currentUser.friendRequestsReceived]);
+    fetchAllDetails();
+  }, [
+    isOpen,
+    currentUser.friends,
+    currentUser.friendRequestsReceived,
+    currentUser.friendRequestsSent,
+  ]);
 
   useEffect(() => {
     if (!isOpen || friendsDetails.length === 0) return;
-
     const friendTags = friendsDetails.map((f) => f.fullTag);
-
-    const onOnlineFriends = (onlineTags: string[]) => {
+    const onOnlineFriends = (onlineTags: string[]) =>
       setOnlineFriends(onlineTags);
-    };
-
     socket.on('online_friends', onOnlineFriends);
     socket.emit('get_online_friends', { friendTags });
-
     return () => {
       socket.off('online_friends', onOnlineFriends);
     };
@@ -96,22 +123,115 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
     }
   };
 
-  const handleRequest = async (requesterId: string, accept: boolean) => {
+  const handleSendFriendRequest = async (targetUserId: string) => {
+    const currentUserId = auth.currentUser?.uid;
+    if (!currentUserId) return;
+    try {
+      await runTransaction(db, async (transaction) => {
+        const currentUserRef = doc(db, 'users', currentUserId);
+        const targetUserRef = doc(db, 'users', targetUserId);
+        transaction.update(currentUserRef, {
+          friendRequestsSent: arrayUnion(targetUserId),
+        });
+        transaction.update(targetUserRef, {
+          friendRequestsReceived: arrayUnion(currentUserId),
+        });
+      });
+      await refreshCurrentUserState();
+    } catch (e) {
+      console.error('Erro ao enviar pedido de amizade:', e);
+    }
+  };
+
+  const handleSendRequestByTag = async (event: React.FormEvent) => {
+    event.preventDefault();
     const currentUserId = auth.currentUser?.uid;
     if (!currentUserId) return;
 
+    const validation = fullTagSchema.safeParse(fullTagInput);
+    if (!validation.success) {
+      setFeedbackModal({
+        isOpen: true,
+        message: validation.error.issues[0].message,
+        type: 'error',
+      });
+      return;
+    }
+    const targetTag = validation.data;
+
+    if (targetTag === currentUser.fullTag) {
+      setFeedbackModal({
+        isOpen: true,
+        message: 'Você não pode adicionar a si mesmo.',
+        type: 'error',
+      });
+      return;
+    }
+
+    try {
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('fullTag', '==', targetTag));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        setFeedbackModal({
+          isOpen: true,
+          message: 'Jogador não encontrado.',
+          type: 'error',
+        });
+        return;
+      }
+
+      const targetUserDoc = querySnapshot.docs[0];
+      const targetUserId = targetUserDoc.id;
+
+      if (currentUser.friends?.includes(targetUserId)) {
+        setFeedbackModal({
+          isOpen: true,
+          message: 'Vocês já são amigos.',
+          type: 'error',
+        });
+        return;
+      }
+      if (currentUser.friendRequestsSent?.includes(targetUserId)) {
+        setFeedbackModal({
+          isOpen: true,
+          message: 'Você já enviou um convite para este jogador.',
+          type: 'error',
+        });
+        return;
+      }
+
+      await handleSendFriendRequest(targetUserId);
+      setFullTagInput('');
+      setFeedbackModal({
+        isOpen: true,
+        message: 'Convite enviado com sucesso!',
+        type: 'success',
+      });
+    } catch (error) {
+      console.error('Erro ao procurar ou enviar convite:', error);
+      setFeedbackModal({
+        isOpen: true,
+        message: 'Ocorreu um erro. Tente novamente.',
+        type: 'error',
+      });
+    }
+  };
+
+  const handleRequest = async (requesterId: string, accept: boolean) => {
+    const currentUserId = auth.currentUser?.uid;
+    if (!currentUserId) return;
     try {
       await runTransaction(db, async (transaction) => {
         const currentUserRef = doc(db, 'users', currentUserId);
         const requesterRef = doc(db, 'users', requesterId);
-
         transaction.update(currentUserRef, {
           friendRequestsReceived: arrayRemove(requesterId),
         });
         transaction.update(requesterRef, {
           friendRequestsSent: arrayRemove(currentUserId),
         });
-
         if (accept) {
           transaction.update(currentUserRef, {
             friends: arrayUnion(requesterId),
@@ -132,101 +252,153 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
     onClose();
   };
 
-  // --- LÓGICA DA FOTO DO DEV AQUI ---
   const devTag = 'Edu.dev#8636';
   const getAvatarSrc = (user: UserDetails) => {
     return user.fullTag === devTag
-      ? '/Light.jpg' // <-- Sua foto na pasta /public
+      ? '/Light.jpg'
       : `https://api.dicebear.com/8.x/pixel-art/svg?seed=${user.avatarSeed}`;
   };
 
   return (
-    <Modal.Root isOpen={isOpen} onClose={onClose}>
-      <Modal.Overlay />
-      <Modal.Content>
-        <Modal.Header>
-          <Modal.Title>Amigos</Modal.Title>
-          <Modal.Close />
-        </Modal.Header>
-        <S.FriendsListWrapper>
-          <S.TabContainer>
-            <S.TabButton
-              isActive={activeTab === 'friends'}
-              onClick={() => setActiveTab('friends')}
-            >
-              Amigos ({friendsDetails.length})
-            </S.TabButton>
-            <S.TabButton
-              isActive={activeTab === 'requests'}
-              onClick={() => setActiveTab('requests')}
-            >
-              Pedidos ({requestsDetails.length})
-            </S.TabButton>
-          </S.TabContainer>
-          <S.List>
-            {activeTab === 'friends' &&
-              (friendsDetails.length > 0 ? (
-                friendsDetails.map((friend) => {
-                  const isOnline = onlineFriends.includes(friend.fullTag);
-                  return (
-                    <S.UserEntry key={friend.uid}>
-                      <S.Avatar src={getAvatarSrc(friend)} />
+    <>
+      <Modal.Root isOpen={isOpen} onClose={onClose}>
+        <Modal.Overlay />
+        <Modal.Content>
+          <Modal.Header>
+            <Modal.Title style={{ fontSize: '1.5rem' }}>Amigos</Modal.Title>
+            <Modal.Close />
+          </Modal.Header>
+          <S.FriendsListWrapper>
+            <S.TabContainer>
+              <S.TabButton
+                isActive={activeTab === 'friends'}
+                onClick={() => setActiveTab('friends')}
+              >
+                Amigos ({friendsDetails.length})
+              </S.TabButton>
+              <S.TabButton
+                isActive={activeTab === 'requests'}
+                onClick={() => setActiveTab('requests')}
+              >
+                Pedidos ({requestsDetails.length})
+              </S.TabButton>
+              <S.TabButton
+                isActive={activeTab === 'sent'}
+                onClick={() => setActiveTab('sent')}
+              >
+                Enviados ({sentRequestsDetails.length})
+              </S.TabButton>
+            </S.TabContainer>
+            <S.List>
+              {activeTab === 'friends' &&
+                (friendsDetails.length > 0 ? (
+                  friendsDetails.map((friend) => {
+                    const isOnline = onlineFriends.includes(friend.fullTag);
+                    return (
+                      <S.UserEntry key={friend.uid}>
+                        <S.Avatar src={getAvatarSrc(friend)} />
+                        <S.UserInfo>
+                          <S.Username>{friend.username}</S.Username>
+                          <S.Status isOnline={isOnline}>
+                            {isOnline ? 'Online' : 'Offline'}
+                          </S.Status>
+                        </S.UserInfo>
+                        <S.ActionButtons>
+                          <S.ActionButton
+                            variant="invite"
+                            onClick={() => handleInvite(friend.fullTag)}
+                            disabled={!isOnline}
+                            title="Convidar para Duelo"
+                          >
+                            <Sword size={18} />
+                          </S.ActionButton>
+                        </S.ActionButtons>
+                      </S.UserEntry>
+                    );
+                  })
+                ) : (
+                  <S.EmptyState>
+                    Você ainda não tem amigos. Adicione alguns!
+                  </S.EmptyState>
+                ))}
+              {activeTab === 'requests' &&
+                (requestsDetails.length > 0 ? (
+                  requestsDetails.map((request) => (
+                    <S.UserEntry key={request.uid}>
+                      <S.Avatar src={getAvatarSrc(request)} />
                       <S.UserInfo>
-                        <S.Username>{friend.username}</S.Username>
-                        <S.Status isOnline={isOnline}>
-                          {isOnline ? 'Online' : 'Offline'}
-                        </S.Status>
+                        <S.Username>{request.username}</S.Username>
                       </S.UserInfo>
                       <S.ActionButtons>
                         <S.ActionButton
-                          variant="invite"
-                          onClick={() => handleInvite(friend.fullTag)}
-                          disabled={!isOnline}
-                          title="Convidar para Duelo"
+                          variant="accept"
+                          onClick={() => handleRequest(request.uid, true)}
+                          title="Aceitar Pedido"
                         >
-                          <Sword size={18} />
+                          <Check size={18} />
+                        </S.ActionButton>
+                        <S.ActionButton
+                          variant="decline"
+                          onClick={() => handleRequest(request.uid, false)}
+                          title="Recusar Pedido"
+                        >
+                          <X size={18} />
                         </S.ActionButton>
                       </S.ActionButtons>
                     </S.UserEntry>
-                  );
-                })
-              ) : (
-                <S.EmptyState>
-                  Você ainda não tem amigos. Adicione alguns no ranking!
-                </S.EmptyState>
-              ))}
-            {activeTab === 'requests' &&
-              (requestsDetails.length > 0 ? (
-                requestsDetails.map((request) => (
-                  <S.UserEntry key={request.uid}>
-                    <S.Avatar src={getAvatarSrc(request)} />
-                    <S.UserInfo>
-                      <S.Username>{request.username}</S.Username>
-                    </S.UserInfo>
-                    <S.ActionButtons>
-                      <S.ActionButton
-                        variant="accept"
-                        onClick={() => handleRequest(request.uid, true)}
-                        title="Aceitar Pedido"
-                      >
-                        <Check size={18} />
-                      </S.ActionButton>
-                      <S.ActionButton
-                        variant="decline"
-                        onClick={() => handleRequest(request.uid, false)}
-                        title="Recusar Pedido"
-                      >
-                        <X size={18} />
-                      </S.ActionButton>
-                    </S.ActionButtons>
-                  </S.UserEntry>
-                ))
-              ) : (
-                <S.EmptyState>Nenhum pedido de amizade pendente.</S.EmptyState>
-              ))}
-          </S.List>
-        </S.FriendsListWrapper>
-      </Modal.Content>
-    </Modal.Root>
+                  ))
+                ) : (
+                  <S.EmptyState>
+                    Nenhum pedido de amizade pendente.
+                  </S.EmptyState>
+                ))}
+              {activeTab === 'sent' &&
+                (sentRequestsDetails.length > 0 ? (
+                  sentRequestsDetails.map((user) => (
+                    <S.UserEntry key={user.uid}>
+                      <S.Avatar src={getAvatarSrc(user)} />
+                      <S.UserInfo>
+                        <S.Username>{user.username}</S.Username>
+                        <S.Status isOnline={false}>Pendente</S.Status>
+                      </S.UserInfo>
+                    </S.UserEntry>
+                  ))
+                ) : (
+                  <S.EmptyState>Nenhum convite enviado.</S.EmptyState>
+                ))}
+            </S.List>
+          </S.FriendsListWrapper>
+          <S.FooterContainer as="form" onSubmit={handleSendRequestByTag}>
+            <S.AddFriendInput
+              type="text"
+              placeholder="Nome#1234"
+              value={fullTagInput}
+              onChange={(e) => setFullTagInput(e.target.value)}
+            />
+            <S.FriendActionButton type="submit">
+              Adicionar <Plus size={18} style={{ marginLeft: '0.25rem' }} />
+            </S.FriendActionButton>
+          </S.FooterContainer>
+        </Modal.Content>
+      </Modal.Root>
+
+      <Modal.Root
+        isOpen={feedbackModal.isOpen}
+        onClose={() => setFeedbackModal({ ...feedbackModal, isOpen: false })}
+      >
+        <Modal.Overlay />
+        <Modal.Content>
+          <Modal.Header>
+            <Modal.Title>
+              {feedbackModal.type === 'success' ? 'Sucesso!' : 'Opa!'}
+            </Modal.Title>
+            <Modal.Close />
+          </Modal.Header>
+          <p style={{ padding: '1rem 1.5rem', lineHeight: 1.5 }}>
+            {feedbackModal.message}
+          </p>
+        </Modal.Content>
+      </Modal.Root>
+    </>
   );
 }

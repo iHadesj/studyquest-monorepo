@@ -12,6 +12,52 @@ export const TabContainer = styled.div`
   display: flex;
   border-bottom: 1px solid #40444b;
 `;
+export const FooterContainer = styled.div`
+  display: flex;
+  align-items: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid #40444b;
+`;
+
+export const AddFriendInput = styled.input`
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  border: 1px solid #333; // Cor de exemplo
+  background-color: #111; // Cor de exemplo
+  color: #fff; // Cor de exemplo
+  margin-right: 0.5rem;
+
+  &:focus {
+    outline: none;
+    border-color: #007bff; // Cor de exemplo
+  }
+`;
+
+export const FriendActionButton = styled.button`
+  background-color: #40444b;
+  color: #dcddde;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-family: 'Fira Code', monospace;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:hover {
+    background-color: #5865f2;
+    color: white;
+  }
+
+  &:disabled {
+    background-color: #2f3136;
+    color: #72767d;
+    cursor: not-allowed;
+  }
+`;
 
 export const TabButton = styled.button<{ isActive: boolean }>`
   flex: 1;

@@ -27,7 +27,10 @@ app.use(
 app.use(express.json());
 app.use(routes);
 
+// Guarda quem está online: { fullTag => socketId }
 const onlineUsers = new Map<string, string>();
+// A "caderneta do porteiro": { tagObservada => Set<tagsDosObservadores> }
+const friendSubscriptions = new Map<string, Set<string>>();
 
 interface Player {
   tag: string;
@@ -54,7 +57,6 @@ const BASE_SCORE = 50;
 const TIME_BONUS_MULTIPLIER = 10;
 const MODE_DURATION_S = 60;
 
-// utils
 const normalizeAnswer = (s: string) =>
   s
     .trim()
@@ -139,31 +141,72 @@ const sendNextQuestion = (roomId: string) => {
 io.on("connection", (socket) => {
   console.log("✅ Novo jogador conectado! ID:", socket.id);
 
+  let currentUserTag: string | null = null;
+
+  const notifySubscribers = (tag: string, status: "online" | "offline") => {
+    const subscribers = friendSubscriptions.get(tag);
+    if (subscribers) {
+      subscribers.forEach((subscriberTag) => {
+        const subscriberSocketId = onlineUsers.get(subscriberTag);
+        if (subscriberSocketId) {
+          io.to(subscriberSocketId).emit("friend_status_update", {
+            tag,
+            status,
+          });
+          console.log(`Notificando ${subscriberTag} que ${tag} está ${status}`);
+        }
+      });
+    }
+  };
+
   socket.on("register", (fullTag: string) => {
     onlineUsers.set(fullTag, socket.id);
+    currentUserTag = fullTag;
     console.log(`Jogador ${fullTag} registrado com o socket ID ${socket.id}`);
     socket.emit("registered", { tag: fullTag });
+    notifySubscribers(fullTag, "online");
   });
 
   socket.on(
-    "get_online_friends",
+    "subscribe_to_friends_status",
     ({ friendTags }: { friendTags: string[] }) => {
-      if (!Array.isArray(friendTags)) return;
+      if (!currentUserTag || !Array.isArray(friendTags)) return;
 
-      const onlineFriends = friendTags.filter((tag) => onlineUsers.has(tag));
+      friendTags.forEach((friendTag) => {
+        if (!friendSubscriptions.has(friendTag)) {
+          friendSubscriptions.set(friendTag, new Set());
+        }
+        friendSubscriptions.get(friendTag)?.add(currentUserTag!);
+      });
 
-      socket.emit("online_friends", onlineFriends);
+      const initialOnlineFriends = friendTags.filter((tag) =>
+        onlineUsers.has(tag)
+      );
+      socket.emit("initial_friends_status", initialOnlineFriends);
+      console.log(
+        `${currentUserTag} se inscreveu para atualizações de ${friendTags.length} amigos.`
+      );
+    }
+  );
+
+  socket.on(
+    "unsubscribe_from_friends_status",
+    ({ friendTags }: { friendTags: string[] }) => {
+      if (!currentUserTag || !Array.isArray(friendTags)) return;
+
+      friendTags.forEach((friendTag) => {
+        friendSubscriptions.get(friendTag)?.delete(currentUserTag!);
+      });
+      console.log(
+        `${currentUserTag} cancelou a inscrição de ${friendTags.length} amigos.`
+      );
     }
   );
 
   socket.on("invite_player", ({ inviteeTag }: { inviteeTag: string }) => {
-    let inviterTag = "";
-    for (const [tag, id] of onlineUsers.entries()) {
-      if (id === socket.id) {
-        inviterTag = tag;
-        break;
-      }
-    }
+    const inviterTag = currentUserTag;
+    if (!inviterTag) return;
+
     const inviteeSocketId = onlineUsers.get(inviteeTag);
     if (inviteeSocketId) {
       io.to(inviteeSocketId).emit("incoming_invite", { from: inviterTag });
@@ -180,17 +223,11 @@ io.on("connection", (socket) => {
       const inviterSocketId = onlineUsers.get(inviterTag);
       if (!inviterSocketId) return;
 
-      let inviteeTag = "";
-      for (const [tag, id] of onlineUsers.entries()) {
-        if (id === socket.id) {
-          inviteeTag = tag;
-          break;
-        }
-      }
+      const inviteeTag = currentUserTag;
+      if (!inviteeTag) return;
 
       if (accepted) {
         const roomId = `game-${uuidv4()}`;
-
         const players: Player[] = [
           {
             tag: inviterTag,
@@ -219,7 +256,6 @@ io.on("connection", (socket) => {
           roomId,
           players: gameRooms.get(roomId)?.players,
         });
-
         console.log(
           `Sala criada ${roomId} entre ${inviterTag} e ${inviteeTag}`
         );
@@ -290,13 +326,6 @@ io.on("connection", (socket) => {
         const timeLeft = Math.max(0, QUESTION_TIME_LIMIT_S - timeTakenS);
         const timeBonus = timeLeft * TIME_BONUS_MULTIPLIER;
         player.score += BASE_SCORE + timeBonus;
-        console.log(
-          `Jogador ${player.tag} acertou! +${BASE_SCORE} base, +${timeBonus} bônus.`
-        );
-      } else {
-        console.log(
-          `Jogador ${player.tag} errou. Resp correta: ${room.currentQuestion.respostaCorreta}`
-        );
       }
 
       io.to(roomId).emit("answer_result", { playerTag: player.tag, isCorrect });
@@ -313,12 +342,14 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("❌ Jogador desconectou. ID:", socket.id);
 
-    for (const [tag, id] of [...onlineUsers.entries()]) {
-      if (id === socket.id) {
-        onlineUsers.delete(tag);
-        console.log(`Jogador ${tag} removido dos online.`);
-        break;
-      }
+    if (currentUserTag) {
+      onlineUsers.delete(currentUserTag);
+      notifySubscribers(currentUserTag, "offline");
+      console.log(`Jogador ${currentUserTag} removido dos online.`);
+
+      friendSubscriptions.forEach((subscribers) => {
+        subscribers.delete(currentUserTag!);
+      });
     }
 
     for (const [roomId, room] of [...gameRooms.entries()]) {

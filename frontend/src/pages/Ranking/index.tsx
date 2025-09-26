@@ -19,7 +19,7 @@ import { useProgressStore } from '../../hooks/useProgressStore';
 import type { FirestoreUserData } from '../../hooks/useProgressStore';
 
 // --- TIPOS ---
-type UserData = {
+export type UserData = {
   uid: string;
   username: string;
   avatarSeed: string;
@@ -139,7 +139,7 @@ const CenteredContainer = styled.div`
   color: #b9bbbe;
 `;
 
-const FriendActionButton = styled.button`
+export const FriendActionButton = styled.button`
   background-color: #40444b;
   color: #dcddde;
   border: none;
