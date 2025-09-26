@@ -12,7 +12,7 @@ import {
   documentId,
   getDoc,
 } from 'firebase/firestore';
-import { Chat, Check, Plus, Sword, X } from 'phosphor-react';
+import { ChatCircleDots, Check, Plus, Sword, X } from 'phosphor-react';
 import { z } from 'zod';
 import { db, auth } from '../../config/firebase';
 import { useProgressStore } from '../../hooks/useProgressStore';
@@ -20,7 +20,7 @@ import type { FirestoreUserData } from '../../hooks/useProgressStore';
 import { socket } from '../../services/socket';
 import * as S from './style';
 import * as Modal from '../Modal/index';
-import { verificarEdesbloquearConquistas } from '../../services/achievements'; // <-- 1. IMPORTA O CÉREBRO
+import { verificarEdesbloquearConquistas } from '../../services/achievements';
 
 const fullTagSchema = z
   .string()
@@ -28,17 +28,18 @@ const fullTagSchema = z
   .min(1, 'A tag não pode ser vazia.')
   .regex(/^.+#\d{4}$/, 'A tag precisa estar no formato "nome#1234".');
 
-interface FriendsListProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
 type UserDetails = {
   uid: string;
   username: string;
   avatarSeed: string;
   fullTag: string;
 };
+
+interface FriendsListProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onOpenChat: (friend: UserDetails) => void;
+}
 
 type ActiveTab = 'friends' | 'requests' | 'sent';
 
@@ -48,7 +49,7 @@ type FeedbackModalState = {
   type: 'success' | 'error';
 };
 
-export function FriendsList({ isOpen, onClose }: FriendsListProps) {
+export function FriendsList({ isOpen, onClose, onOpenChat }: FriendsListProps) {
   const [activeTab, setActiveTab] = useState<ActiveTab>('friends');
   const [friendsDetails, setFriendsDetails] = useState<UserDetails[]>([]);
   const [requestsDetails, setRequestsDetails] = useState<UserDetails[]>([]);
@@ -100,17 +101,53 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
     currentUser.friendRequestsSent,
   ]);
 
+  // --- ESTE useEffect FOI TOTALMENTE REFEITO ---
   useEffect(() => {
-    if (!isOpen || friendsDetails.length === 0) return;
+    if (!isOpen || friendsDetails.length === 0) {
+      setOnlineFriends([]); // Limpa a lista se o modal fechar ou não tiver amigos
+      return;
+    }
+
     const friendTags = friendsDetails.map((f) => f.fullTag);
-    const onOnlineFriends = (onlineTags: string[]) =>
-      setOnlineFriends(onlineTags);
-    socket.on('online_friends', onOnlineFriends);
-    socket.emit('get_online_friends', { friendTags });
-    return () => {
-      socket.off('online_friends', onOnlineFriends);
+
+    // 1. Ouvinte para a lista inicial de amigos online
+    const handleInitialStatus = (initialOnlineFriends: string[]) => {
+      setOnlineFriends(initialOnlineFriends);
     };
-  }, [isOpen, friendsDetails]);
+
+    // 2. Ouvinte para atualizações em tempo real
+    const handleStatusUpdate = ({
+      tag,
+      status,
+    }: {
+      tag: string;
+      status: 'online' | 'offline';
+    }) => {
+      setOnlineFriends((prevOnlineFriends) => {
+        const newSet = new Set(prevOnlineFriends);
+        if (status === 'online') {
+          newSet.add(tag);
+        } else {
+          newSet.delete(tag);
+        }
+        return Array.from(newSet);
+      });
+    };
+
+    // 3. Configura os ouvintes
+    socket.on('initial_friends_status', handleInitialStatus);
+    socket.on('friend_status_update', handleStatusUpdate);
+
+    // 4. Se inscreve para receber as atualizações
+    socket.emit('subscribe_to_friends_status', { friendTags });
+
+    // 5. Função de limpeza: cancela a inscrição e remove os ouvintes
+    return () => {
+      socket.emit('unsubscribe_from_friends_status', { friendTags });
+      socket.off('initial_friends_status', handleInitialStatus);
+      socket.off('friend_status_update', handleStatusUpdate);
+    };
+  }, [isOpen, friendsDetails]); // Roda sempre que o modal abre/fecha ou a lista de amigos muda
 
   const refreshCurrentUserState = async () => {
     const user = auth.currentUser;
@@ -244,11 +281,8 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
         }
       });
       await refreshCurrentUserState();
-      // <-- 2. CHAMA A VERIFICAÇÃO AQUI
       if (accept) {
-        verificarEdesbloquearConquistas('ADICIONOU_AMIGO', {
-          friendId: requesterId,
-        });
+        verificarEdesbloquearConquistas('ADICIONOU_AMIGO', {});
       }
     } catch (e) {
       console.error('Erro ao responder ao pedido:', e);
@@ -257,11 +291,6 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
 
   const handleInvite = (friendTag: string) => {
     socket.emit('invite_player', { inviteeTag: friendTag });
-    onClose();
-  };
-
-  const handleOpenChat = (friendTag: string) => {
-    socket.emit('open_chat', { friendTag });
     onClose();
   };
 
@@ -318,20 +347,19 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
                         </S.UserInfo>
                         <S.ActionButtons>
                           <S.ActionButton
+                            variant="chat"
+                            onClick={() => onOpenChat(friend)}
+                            title="Abrir Chat"
+                          >
+                            <ChatCircleDots size={18} />
+                          </S.ActionButton>
+                          <S.ActionButton
                             variant="invite"
                             onClick={() => handleInvite(friend.fullTag)}
                             disabled={!isOnline}
                             title="Convidar para Duelo"
                           >
                             <Sword size={18} />
-                          </S.ActionButton>
-                          <S.ActionButton
-                            variant="chat"
-                            onClick={() => handleOpenChat(friend.fullTag)}
-                            disabled={!isOnline}
-                            title="Conversar"
-                          >
-                            <Chat size={18} />
                           </S.ActionButton>
                         </S.ActionButtons>
                       </S.UserEntry>

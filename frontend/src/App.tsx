@@ -421,6 +421,7 @@ export default function App() {
           onClose={() => setIsIncomingInviteModalOpen(false)}
         />
         <FriendsList
+          onOpenChat={(friend) => setActiveChat(friend)}
           isOpen={isFriendsListOpen}
           onClose={() => setIsFriendsListOpen(false)}
         />
