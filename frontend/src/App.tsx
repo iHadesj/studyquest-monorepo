@@ -24,7 +24,7 @@ import { MultiplayerLobbyPage } from './pages/MultiplayerLobbyPage';
 import { ModalUserPerfil } from './components/ModalUserPerfil';
 import { InviteModal } from './components/InviteModal';
 import { FriendsList } from './components/FriendsList';
-
+import { AchievementsPage } from './pages/AchievementsPage';
 import {
   AppContainer,
   Footer,
@@ -41,6 +41,7 @@ import {
 import { House, Trophy, Users } from 'phosphor-react';
 import { socket } from './services/socket';
 import { IncomingInviteModal } from './components/IncomingInviteModal';
+import { Toaster } from 'react-hot-toast';
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -70,7 +71,7 @@ export default function App() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isIncomingInviteModalOpen, setIsIncomingInviteModalOpen] =
     useState(false);
-  const [isFriendsListOpen, setIsFriendsListOpen] = useState(false); // Estado para o novo modal
+  const [isFriendsListOpen, setIsFriendsListOpen] = useState(false);
   const [inviterTag, setInviterTag] = useState<string | null>(null);
   const [gameRoomId, setGameRoomId] = useState<string | null>(null);
 
@@ -288,6 +289,10 @@ export default function App() {
   }
 
   const renderScreen = () => {
+    // <-- 2. ADICIONA A NOVA ROTA
+    if (screen === 'achievements') {
+      return <AchievementsPage onBack={backToHome} />;
+    }
     if (screen === 'multiplayer_lobby' && gameRoomId) {
       return <MultiplayerLobbyPage roomId={gameRoomId} onGoHome={backToHome} />;
     }
@@ -348,6 +353,15 @@ export default function App() {
   return (
     <>
       <GlobalStyle />
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: '#333',
+            color: '#fff',
+          },
+        }}
+      />
       <BarWrapper>
         <TopBar onClick={() => setIsUserModalOpen(true)} />
       </BarWrapper>
@@ -384,10 +398,10 @@ export default function App() {
             </a>
           </FooterCredit>
         </FooterWrapper>
-
         <ModalUserPerfil
           isOpen={isUserModalOpen}
           onClose={() => setIsUserModalOpen(false)}
+          onNavigateToAchievements={() => setScreen('achievements')}
         />
         <InviteModal
           isOpen={isInviteModalOpen}

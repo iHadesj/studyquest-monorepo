@@ -20,6 +20,14 @@ export interface Nivel {
   exercicios: readonly Exercicio[];
 }
 
+export interface Conquista {
+  id: string;
+  nome: string;
+  descricao: string;
+  raridade: 'bronze' | 'prata' | 'ouro';
+  icon: string;
+}
+
 export interface Materia {
   id: string;
   nome: string;

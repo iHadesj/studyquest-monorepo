@@ -1,3 +1,4 @@
+// src/components/ModalUserPerfil/index.tsx
 import styled from 'styled-components';
 import { useProgressStore } from '../../hooks/useProgressStore';
 import * as Modal from '../Modal';
@@ -13,16 +14,31 @@ import {
 } from './style';
 import { useMemo, useState } from 'react';
 import { ProfileEditor } from '../ProfileEditor';
+import { Trophy } from 'phosphor-react';
 
-const EditProfileButton = styled.button`
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+`;
+
+const ActionButton = styled.button`
   background-color: #5865f2;
   color: white;
   border: none;
   border-radius: 4px;
   padding: 0.5rem 1rem;
   cursor: pointer;
-  margin-top: 1rem;
   font-family: 'Fira Code', monospace;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: bold;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #4f5bd5;
+  }
 `;
 
 const UserTag = styled.p`
@@ -37,12 +53,14 @@ const UserTag = styled.p`
 interface ModalUserPerfilProps {
   isOpen: boolean;
   onClose: () => void;
+  onNavigateToAchievements: () => void;
   rank?: number;
 }
 
 export function ModalUserPerfil({
   isOpen,
   onClose,
+  onNavigateToAchievements,
   rank,
 }: ModalUserPerfilProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -60,6 +78,11 @@ export function ModalUserPerfil({
     fullTag === devTag
       ? '/Light.jpg'
       : `https://api.dicebear.com/8.x/pixel-art/svg?seed=${avatarSeed}`;
+
+  const handleAchievementsClick = () => {
+    onNavigateToAchievements();
+    onClose();
+  };
 
   return (
     <>
@@ -96,9 +119,16 @@ export function ModalUserPerfil({
                   <StatLabel>Fases Concluídas</StatLabel>
                 </StatBox>
               </StatsContainer>
-              <EditProfileButton onClick={() => setIsEditing(true)}>
-                Editar Perfil
-              </EditProfileButton>
+              <ButtonGroup>
+                <ActionButton onClick={() => setIsEditing(true)}>
+                  Editar Perfil
+                </ActionButton>
+                {/* 3. NOVO BOTÃO */}
+                <ActionButton onClick={handleAchievementsClick}>
+                  <Trophy size={18} />
+                  Conquistas
+                </ActionButton>
+              </ButtonGroup>
             </ProfileWrapper>
           </Modal.Body>
         </Modal.Content>

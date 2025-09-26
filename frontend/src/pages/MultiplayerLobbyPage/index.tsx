@@ -18,6 +18,7 @@ import { useProgressStore } from '../../hooks/useProgressStore';
 import { Timer, Trophy } from 'phosphor-react';
 import type { Exercicio } from '../../interfaces';
 import { Radio } from '@mui/material';
+import { verificarEdesbloquearConquistas } from '../../services/achievements';
 
 type Player = { tag: string; score: number };
 type RoundResult = { status: 'CERTO!' | 'ERRADO!'; points?: number };
@@ -93,6 +94,11 @@ export function MultiplayerLobbyPage({
     };
 
     const onGameOver = ({ finalScores }: { finalScores: Player[] }) => {
+      const vencedor = finalScores[0];
+      const oponente = finalScores[1];
+      if (vencedor.tag === myTag && oponente.score === 0) {
+        verificarEdesbloquearConquistas('VENCEU_DUELO', { pontosOponente: 0 });
+      }
       setPlayers(finalScores);
       setIsGameOver(true);
       setCurrentQuestion(null);
@@ -170,13 +176,32 @@ export function MultiplayerLobbyPage({
     setHasAnswered(true);
   };
 
-  const parseText = (text: string) => {
+  const parseText = (text: string): React.ReactNode | null => {
     if (!text) return null;
 
+    // --- 1) Mapeie aqui as substituições que quiser --- //
+    // Note: cada chave é a sequência com a barra (ex: \div), que no regex vira \\div
+    const replacements: { [seq: string]: string } = {
+      '\\div': '÷',
+      '\\times': '×',
+      '\\sqrt': '√',
+      '\\pm': '±',
+      // adiciona mais conforme precisar...
+    };
+
+    // --- 2) Aplique as substituições no texto --- //
+    let processed = text;
+    for (const seq in replacements) {
+      // seq já vem como '\\div', então aqui usamos um RegExp que casa o backslash corretamente
+      const re = new RegExp(seq, 'g');
+      processed = processed.replace(re, replacements[seq]);
+    }
+
+    // --- 3) Markdown-like splitter existente --- //
     const regex = /(\*[^*]+\*)|(_[^_]+_)|(~[^~]+~)|(`[^`]+`)|(\$[^$]+\$)/g;
+    const parts = processed.split(regex).filter(Boolean);
 
-    const parts = text.split(regex).filter(Boolean);
-
+    // --- 4) Renderiza os pedaços como antes --- //
     return parts.map((part, idx) => {
       if (part.startsWith('*') && part.endsWith('*')) {
         return <strong key={idx}>{part.slice(1, -1)}</strong>;

@@ -1,3 +1,4 @@
+// src/pages/ExercisePage/index.tsx
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { doc, updateDoc, increment } from 'firebase/firestore';
@@ -23,6 +24,7 @@ import { useProgressStore } from '../../hooks/useProgressStore';
 import { CheckCircleIcon, StarIcon, XCircleIcon } from '../../style/icons';
 import type { Exercicio, Materia, Nivel } from '../../interfaces';
 import { Star } from 'phosphor-react';
+import { verificarEdesbloquearConquistas } from '../../services/achievements'; // <-- 1. IMPORTA O CÉREBRO
 
 // --- COMPONENTES ESTILIZADOS ADICIONAIS ---
 const StarsContainer = styled.div`
@@ -78,13 +80,32 @@ const EncouragementText = styled.div`
 
 type WrongAnswer = Exercicio & { userAnswer?: string };
 
-const parseText = (text: string) => {
+const parseText = (text: string): React.ReactNode | null => {
   if (!text) return null;
 
+  // --- 1) Mapeie aqui as substituições que quiser --- //
+  // Note: cada chave é a sequência com a barra (ex: \div), que no regex vira \\div
+  const replacements: { [seq: string]: string } = {
+    '\\div': '÷',
+    '\\times': '×',
+    '\\sqrt': '√',
+    '\\pm': '±',
+    // adiciona mais conforme precisar...
+  };
+
+  // --- 2) Aplique as substituições no texto --- //
+  let processed = text;
+  for (const seq in replacements) {
+    // seq já vem como '\\div', então aqui usamos um RegExp que casa o backslash corretamente
+    const re = new RegExp(seq, 'g');
+    processed = processed.replace(re, replacements[seq]);
+  }
+
+  // --- 3) Markdown-like splitter existente --- //
   const regex = /(\*[^*]+\*)|(_[^_]+_)|(~[^~]+~)|(`[^`]+`)|(\$[^$]+\$)/g;
+  const parts = processed.split(regex).filter(Boolean);
 
-  const parts = text.split(regex).filter(Boolean);
-
+  // --- 4) Renderiza os pedaços como antes --- //
   return parts.map((part, idx) => {
     if (part.startsWith('*') && part.endsWith('*')) {
       return <strong key={idx}>{part.slice(1, -1)}</strong>;
@@ -224,6 +245,16 @@ export const ExercisePage = ({
       wrongAnswers: wrongAnswersList,
     });
 
+    const xpAtual = useProgressStore.getState().xp;
+    const novoXpTotal = xpAtual + totalXp;
+    verificarEdesbloquearConquistas('GANHOU_XP', { novoXpTotal });
+    if (passou) {
+      verificarEdesbloquearConquistas('CONCLUIU_NIVEL', {
+        acertos: correctCount,
+        total: totalQuestions,
+      });
+    }
+
     const userDocRef = doc(db, 'users', user.uid);
     const bestStars = Math.max(currentProgress?.estrelas || 0, estrelas);
 
@@ -237,6 +268,11 @@ export const ExercisePage = ({
             estrelas: bestStars,
             tentativas: newAttempts,
           },
+        });
+        // <-- 2. CHAMA A VERIFICAÇÃO AQUI
+        verificarEdesbloquearConquistas('CONCLUIU_NIVEL', {
+          acertos: correctCount,
+          total: totalQuestions,
         });
       } else {
         await updateDoc(userDocRef, {

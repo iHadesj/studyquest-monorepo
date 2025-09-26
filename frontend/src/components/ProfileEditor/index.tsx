@@ -12,6 +12,7 @@ import {
   SaveButton,
   UsernameInput,
 } from './style';
+import { verificarEdesbloquearConquistas } from '../../services/achievements';
 
 function generateAvatarSeeds(count = 240) {
   const ADJS = [
@@ -119,6 +120,7 @@ export function ProfileEditor({
           username: username.trim(),
           avatarSeed: selectedAvatar,
         });
+        verificarEdesbloquearConquistas('EDITOU_PERFIL');
         onClose();
       } catch (error) {
         console.error('Erro ao atualizar o perfil:', error);

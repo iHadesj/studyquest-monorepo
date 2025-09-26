@@ -1,3 +1,4 @@
+// src/components/FriendsList/index.tsx
 import { useState, useEffect } from 'react';
 import {
   collection,
@@ -19,6 +20,7 @@ import type { FirestoreUserData } from '../../hooks/useProgressStore';
 import { socket } from '../../services/socket';
 import * as S from './style';
 import * as Modal from '../Modal/index';
+import { verificarEdesbloquearConquistas } from '../../services/achievements'; // <-- 1. IMPORTA O CÉREBRO
 
 const fullTagSchema = z
   .string()
@@ -242,6 +244,12 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
         }
       });
       await refreshCurrentUserState();
+      // <-- 2. CHAMA A VERIFICAÇÃO AQUI
+      if (accept) {
+        verificarEdesbloquearConquistas('ADICIONOU_AMIGO', {
+          friendId: requesterId,
+        });
+      }
     } catch (e) {
       console.error('Erro ao responder ao pedido:', e);
     }

@@ -177,7 +177,7 @@ export const Title = styled.h1`
   letter-spacing: -1px;
   animation: ${fadeIn} 0.5s ease-out;
   @media (max-width: 480px) {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     margin-top: 2rem;
   }
 `;
@@ -408,8 +408,8 @@ export const ModalContent = styled.div`
   @media (max-width: 480px) {
     padding: 2rem;
     overflow-y: auto;
-    max-width: 17rem;
-    margin-top: 1rem;
+    max-width: 18rem;
+    margin-top: 6rem;
     max-height: 489px;
     width: 90%;
   }

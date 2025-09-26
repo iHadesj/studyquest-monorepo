@@ -10,6 +10,7 @@ export type FirestoreUserData = {
   friends?: string[];
   friendRequestsSent?: string[];
   friendRequestsReceived?: string[];
+  unlockedAchievements?: string[];
 };
 
 type LevelProgress = {
@@ -26,6 +27,7 @@ type UserProgress = {
 };
 
 type ProgressState = FirestoreUserData & {
+  unlockedAchievements: string[];
   hydrateFromFirestore: (data: FirestoreUserData) => void;
   resetLocalStore: () => void;
 };
@@ -40,6 +42,7 @@ export const useProgressStore = create<ProgressState>()((set) => ({
   friends: [],
   friendRequestsSent: [],
   friendRequestsReceived: [],
+  unlockedAchievements: [],
 
   hydrateFromFirestore: (data) => {
     set({
@@ -52,6 +55,7 @@ export const useProgressStore = create<ProgressState>()((set) => ({
       friends: data.friends || [],
       friendRequestsSent: data.friendRequestsSent || [],
       friendRequestsReceived: data.friendRequestsReceived || [],
+      unlockedAchievements: data.unlockedAchievements || [],
     });
   },
 
@@ -66,5 +70,6 @@ export const useProgressStore = create<ProgressState>()((set) => ({
       friends: [],
       friendRequestsSent: [],
       friendRequestsReceived: [],
+      unlockedAchievements: [],
     }),
 }));
