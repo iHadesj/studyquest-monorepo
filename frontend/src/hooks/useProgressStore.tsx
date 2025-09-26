@@ -1,6 +1,8 @@
+// src/hooks/useProgressStore.tsx
 import { create } from 'zustand';
 
 export type FirestoreUserData = {
+  uid: string | null; // <-- 1. Adicionado aqui
   username: string | null;
   avatarSeed: string | null;
   xp: number;
@@ -26,13 +28,14 @@ type UserProgress = {
   };
 };
 
+// A ProgressState já herda o 'uid' da FirestoreUserData
 type ProgressState = FirestoreUserData & {
-  unlockedAchievements: string[];
   hydrateFromFirestore: (data: FirestoreUserData) => void;
   resetLocalStore: () => void;
 };
 
 export const useProgressStore = create<ProgressState>()((set) => ({
+  uid: null, // <-- 2. Adicionado ao estado inicial
   username: null,
   avatarSeed: null,
   xp: 0,
@@ -46,6 +49,7 @@ export const useProgressStore = create<ProgressState>()((set) => ({
 
   hydrateFromFirestore: (data) => {
     set({
+      uid: data.uid, // <-- 3. Adicionado à hidratação
       username: data.username,
       avatarSeed: data.avatarSeed,
       xp: data.xp,
@@ -61,6 +65,7 @@ export const useProgressStore = create<ProgressState>()((set) => ({
 
   resetLocalStore: () =>
     set({
+      uid: null, // <-- 4. Adicionado ao reset
       xp: 0,
       progress: {},
       username: null,

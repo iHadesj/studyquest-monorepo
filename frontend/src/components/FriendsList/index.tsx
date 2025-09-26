@@ -12,7 +12,7 @@ import {
   documentId,
   getDoc,
 } from 'firebase/firestore';
-import { Check, Plus, Sword, X } from 'phosphor-react';
+import { Chat, Check, Plus, Sword, X } from 'phosphor-react';
 import { z } from 'zod';
 import { db, auth } from '../../config/firebase';
 import { useProgressStore } from '../../hooks/useProgressStore';
@@ -260,6 +260,11 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
     onClose();
   };
 
+  const handleOpenChat = (friendTag: string) => {
+    socket.emit('open_chat', { friendTag });
+    onClose();
+  };
+
   const devTag = 'Edu.dev#8636';
   const getAvatarSrc = (user: UserDetails) => {
     return user.fullTag === devTag
@@ -319,6 +324,14 @@ export function FriendsList({ isOpen, onClose }: FriendsListProps) {
                             title="Convidar para Duelo"
                           >
                             <Sword size={18} />
+                          </S.ActionButton>
+                          <S.ActionButton
+                            variant="chat"
+                            onClick={() => handleOpenChat(friend.fullTag)}
+                            disabled={!isOnline}
+                            title="Conversar"
+                          >
+                            <Chat size={18} />
                           </S.ActionButton>
                         </S.ActionButtons>
                       </S.UserEntry>

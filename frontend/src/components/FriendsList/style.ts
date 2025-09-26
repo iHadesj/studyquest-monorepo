@@ -134,7 +134,7 @@ export const ActionButtons = styled.div`
 `;
 
 export const ActionButton = styled.button<{
-  variant: 'accept' | 'decline' | 'invite';
+  variant: 'accept' | 'decline' | 'invite' | 'chat';
 }>`
   border: none;
   border-radius: 50%;
@@ -151,6 +151,8 @@ export const ActionButton = styled.button<{
       ? '#43b581'
       : variant === 'decline'
       ? '#ed4245'
+      : variant === 'chat'
+      ? '#50525e'
       : '#5865f2'};
   color: white;
 

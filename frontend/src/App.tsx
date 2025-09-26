@@ -42,6 +42,7 @@ import { House, Trophy, Users } from 'phosphor-react';
 import { socket } from './services/socket';
 import { IncomingInviteModal } from './components/IncomingInviteModal';
 import { Toaster } from 'react-hot-toast';
+import { ChatWindow } from './components/ChatWindow';
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -57,6 +58,12 @@ const GlobalStyle = createGlobalStyle`
 type SubjectInfo = Omit<Materia, 'niveis'> & {
   categoria: string;
   iconName: string;
+};
+
+type FriendDetails = {
+  uid: string;
+  username: string;
+  fullTag: string;
 };
 
 export default function App() {
@@ -75,19 +82,20 @@ export default function App() {
   const [inviterTag, setInviterTag] = useState<string | null>(null);
   const [gameRoomId, setGameRoomId] = useState<string | null>(null);
 
-  const { fullTag, username, hydrateFromFirestore, resetLocalStore } =
+  const { fullTag, uid, username, hydrateFromFirestore, resetLocalStore } =
     useProgressStore();
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
+  const [activeChat, setActiveChat] = useState<FriendDetails | null>(null);
 
   useEffect(() => {
-    if (!fullTag) {
+    if (!fullTag || !uid) {
       if (socket.connected) socket.disconnect();
       return;
     }
 
     const onConnect = () => {
       console.log('Conectado ao servidor! Registrando como:', fullTag);
-      socket.emit('register', fullTag);
+      socket.emit('register', { fullTag, uid });
     };
 
     const onIncomingInvite = ({ from }: { from: string }) => {
@@ -128,7 +136,7 @@ export default function App() {
       socket.off('invite_declined', onInviteDeclined);
       if (socket.connected) socket.disconnect();
     };
-  }, [fullTag]);
+  }, [fullTag, uid]);
 
   useEffect(() => {
     let unsubscribeFirestore: (() => void) | null = null;
@@ -416,6 +424,9 @@ export default function App() {
           isOpen={isFriendsListOpen}
           onClose={() => setIsFriendsListOpen(false)}
         />
+        {activeChat && (
+          <ChatWindow friend={activeChat} onClose={() => setActiveChat(null)} />
+        )}
       </Footer>
     </>
   );
