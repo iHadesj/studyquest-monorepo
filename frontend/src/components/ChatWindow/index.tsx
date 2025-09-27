@@ -104,17 +104,18 @@ export function ChatWindow({ friend, onClose }: ChatWindowProps) {
 
   return (
     <S.ChatWrapper>
+      {' '}
       <S.ChatHeader>
-        <p>{friend.username}</p>
-        <S.CloseButton onClick={onClose}>&times;</S.CloseButton>
-      </S.ChatHeader>
+        <p>{friend.username}</p>{' '}
+        <S.CloseButton onClick={onClose}>&times;</S.CloseButton>{' '}
+      </S.ChatHeader>{' '}
       <S.MessagesContainer>
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef} />{' '}
         {messages.map((msg) => (
           <S.MessageBubble key={msg.id} $isMe={msg.senderId === myUid}>
-            {msg.text}
+            {msg.text}{' '}
           </S.MessageBubble>
-        ))}
+        ))}{' '}
       </S.MessagesContainer>
       <S.ChatInputForm onSubmit={handleSendMessage}>
         <S.ChatInput

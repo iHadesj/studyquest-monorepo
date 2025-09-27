@@ -48,10 +48,8 @@ export const MessagesContainer = styled.div`
   overflow-y: auto;
   padding: 1rem;
   display: flex;
-  /* 1. A MUDANÇA PRINCIPAL: DE 'column-reverse' para 'column' */
   flex-direction: column-reverse;
 
-  /* Isso faz o container sempre mostrar o conteúdo mais recente (o de baixo) */
   & > :first-child {
     margin-top: auto;
   }
@@ -64,7 +62,7 @@ export const MessageBubble = styled.div<{ $isMe: boolean }>`
   padding: 0.5rem 0.75rem;
   border-radius: 12px;
   max-width: 80%;
-  margin-top: 0.5rem; /* Trocado de margin-bottom para margin-top */
+  margin-bottom: 0.5rem;
   word-wrap: break-word;
 `;
 
