@@ -1,4 +1,3 @@
-// src/components/ChatWindow/index.tsx
 import { useState, useEffect, useRef } from 'react';
 import {
   collection,
@@ -14,14 +13,12 @@ import { socket } from '../../services/socket';
 import * as S from './style';
 import { PaperPlaneRight } from 'phosphor-react';
 
-// Tipo para os detalhes do amigo com quem estamos conversando
 type FriendDetails = {
   uid: string;
   username: string;
   fullTag: string;
 };
 
-// Tipo para cada mensagem
 interface Message {
   id: string;
   senderId: string;

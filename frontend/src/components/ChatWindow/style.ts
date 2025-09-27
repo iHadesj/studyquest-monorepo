@@ -34,6 +34,8 @@ export const ChatHeader = styled.div`
 export const CloseButton = styled.button`
   background: none;
   border: none;
+  width: 50px;
+  height: 30px;
   color: #b9bbbe;
   cursor: pointer;
   font-size: 1.25rem;
