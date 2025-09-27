@@ -48,7 +48,7 @@ export const MessagesContainer = styled.div`
   overflow-y: auto;
   padding: 1rem;
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
 
   & > :first-child {
     margin-top: auto;
@@ -62,7 +62,7 @@ export const MessageBubble = styled.div<{ $isMe: boolean }>`
   padding: 0.5rem 0.75rem;
   border-radius: 12px;
   max-width: 80%;
-  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
   word-wrap: break-word;
 `;
 
@@ -70,7 +70,6 @@ export const ChatInputForm = styled.form`
   display: flex;
   padding: 0.75rem;
   border-top: 1px solid #40444b;
-  /* 2. ALINHAMENTO DO INPUT E BOTÃO */
   align-items: center;
   gap: 0.5rem;
 `;
