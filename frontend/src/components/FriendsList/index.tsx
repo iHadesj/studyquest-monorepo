@@ -101,21 +101,18 @@ export function FriendsList({ isOpen, onClose, onOpenChat }: FriendsListProps) {
     currentUser.friendRequestsSent,
   ]);
 
-  // --- ESTE useEffect FOI TOTALMENTE REFEITO ---
   useEffect(() => {
     if (!isOpen || friendsDetails.length === 0) {
-      setOnlineFriends([]); // Limpa a lista se o modal fechar ou não tiver amigos
+      setOnlineFriends([]);
       return;
     }
 
     const friendTags = friendsDetails.map((f) => f.fullTag);
 
-    // 1. Ouvinte para a lista inicial de amigos online
     const handleInitialStatus = (initialOnlineFriends: string[]) => {
       setOnlineFriends(initialOnlineFriends);
     };
 
-    // 2. Ouvinte para atualizações em tempo real
     const handleStatusUpdate = ({
       tag,
       status,
@@ -134,20 +131,17 @@ export function FriendsList({ isOpen, onClose, onOpenChat }: FriendsListProps) {
       });
     };
 
-    // 3. Configura os ouvintes
     socket.on('initial_friends_status', handleInitialStatus);
     socket.on('friend_status_update', handleStatusUpdate);
 
-    // 4. Se inscreve para receber as atualizações
     socket.emit('subscribe_to_friends_status', { friendTags });
 
-    // 5. Função de limpeza: cancela a inscrição e remove os ouvintes
     return () => {
       socket.emit('unsubscribe_from_friends_status', { friendTags });
       socket.off('initial_friends_status', handleInitialStatus);
       socket.off('friend_status_update', handleStatusUpdate);
     };
-  }, [isOpen, friendsDetails]); // Roda sempre que o modal abre/fecha ou a lista de amigos muda
+  }, [isOpen, friendsDetails]);
 
   const refreshCurrentUserState = async () => {
     const user = auth.currentUser;
