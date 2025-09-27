@@ -40,48 +40,27 @@ export function ChatWindow({ friend, onClose }: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { uid: myUid, fullTag: myTag } = useProgressStore();
 
-  // Gera o ID do chat padronizado
   const chatId = [myUid, friend.uid].sort().join('_');
 
   useEffect(() => {
     if (!chatId) return;
-
-    // Query para buscar as últimas 25 mensagens do histórico
     const messagesRef = collection(db, 'chats', chatId, 'messages');
-    const q = query(messagesRef, orderBy('timestamp', 'desc'), limit(25));
+    const q = query(messagesRef, orderBy('timestamp', 'asc'), limit(50));
 
-    // onSnapshot "escuta" por mudanças no banco em tempo real
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const msgs = querySnapshot.docs
-        .map(
-          (doc) =>
-            ({
-              id: doc.id,
-              ...doc.data(),
-            } as Message)
-        )
-        .reverse(); // Invertemos pra ordem ficar correta (mais antigas primeiro)
+      const msgs = querySnapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          } as Message)
+      );
       setMessages(msgs);
     });
 
-    return () => unsubscribe(); // Limpa o listener ao desmontar o componente
+    return () => unsubscribe();
   }, [chatId]);
 
-  useEffect(() => {
-    const handleNewMessage = (message: any) => {
-      // Checa se a mensagem pertence a este chat aberto
-      if (message.chatId === chatId) {
-        setMessages((prevMessages) => [...prevMessages, message]);
-      }
-    };
-
-    socket.on('new_message', handleNewMessage);
-    return () => {
-      socket.off('new_message', handleNewMessage);
-    };
-  }, [chatId]);
-
-  // Rola pra baixo automaticamente quando chegam novas mensagens
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -89,18 +68,12 @@ export function ChatWindow({ friend, onClose }: ChatWindowProps) {
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (newMessage.trim() === '' || !myTag) return;
-
     socket.emit('private_message', {
       recipientTag: friend.fullTag,
       messageText: newMessage.trim(),
     });
-
     setNewMessage('');
   };
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
   return (
     <S.ChatWrapper>
