@@ -62,7 +62,7 @@ export function ChatWindow({ friend, onClose }: ChatWindowProps) {
   }, [chatId]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
   }, [messages]);
 
   const handleSendMessage = (e: React.FormEvent) => {
