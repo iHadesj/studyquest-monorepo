@@ -99,7 +99,6 @@ export function ChatWindow({ friend, onClose }: ChatWindowProps) {
   };
 
   useEffect(() => {
-    // A ordem: "role a tela até a âncora ficar visível"
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 

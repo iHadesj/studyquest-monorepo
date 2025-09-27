@@ -49,7 +49,7 @@ export const MessagesContainer = styled.div`
   padding: 1rem;
   display: flex;
   /* 1. A MUDANÇA PRINCIPAL: DE 'column-reverse' para 'column' */
-  flex-direction: column;
+  flex-direction: column-reverse;
 
   /* Isso faz o container sempre mostrar o conteúdo mais recente (o de baixo) */
   & > :first-child {
