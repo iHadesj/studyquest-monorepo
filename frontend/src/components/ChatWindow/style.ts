@@ -48,7 +48,13 @@ export const MessagesContainer = styled.div`
   overflow-y: auto;
   padding: 1rem;
   display: flex;
-  flex-direction: column-reverse; // Mensagens novas aparecem embaixo
+  /* 1. A MUDANÇA PRINCIPAL: DE 'column-reverse' para 'column' */
+  flex-direction: column;
+
+  /* Isso faz o container sempre mostrar o conteúdo mais recente (o de baixo) */
+  & > :first-child {
+    margin-top: auto;
+  }
 `;
 
 export const MessageBubble = styled.div<{ $isMe: boolean }>`
@@ -58,7 +64,7 @@ export const MessageBubble = styled.div<{ $isMe: boolean }>`
   padding: 0.5rem 0.75rem;
   border-radius: 12px;
   max-width: 80%;
-  margin-bottom: 0.5rem;
+  margin-top: 0.5rem; /* Trocado de margin-bottom para margin-top */
   word-wrap: break-word;
 `;
 
@@ -66,6 +72,9 @@ export const ChatInputForm = styled.form`
   display: flex;
   padding: 0.75rem;
   border-top: 1px solid #40444b;
+  /* 2. ALINHAMENTO DO INPUT E BOTÃO */
+  align-items: center;
+  gap: 0.5rem;
 `;
 
 export const ChatInput = styled.input`
@@ -76,4 +85,30 @@ export const ChatInput = styled.input`
   padding: 0.5rem 1rem;
   color: #dcddde;
   outline: none;
+`;
+
+// 3. ESTILO DO NOSSO NOVO BOTÃO DE ENVIO
+export const SendButton = styled.button`
+  background-color: #5865f2;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  flex-shrink: 0; /* Impede que o botão encolha */
+
+  &:hover {
+    background-color: #4f5bd5;
+  }
+
+  &:disabled {
+    background-color: #40444b;
+    cursor: not-allowed;
+    color: #72767d;
+  }
 `;

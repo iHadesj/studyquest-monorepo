@@ -12,6 +12,7 @@ import { db } from '../../config/firebase';
 import { useProgressStore } from '../../hooks/useProgressStore';
 import { socket } from '../../services/socket';
 import * as S from './style';
+import { PaperPlaneRight } from 'phosphor-react';
 
 // Tipo para os detalhes do amigo com quem estamos conversando
 type FriendDetails = {
@@ -118,6 +119,9 @@ export function ChatWindow({ friend, onClose }: ChatWindowProps) {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
         />
+        <S.SendButton type="submit" disabled={!newMessage.trim()}>
+          <PaperPlaneRight weight="fill" />
+        </S.SendButton>
       </S.ChatInputForm>
     </S.ChatWrapper>
   );
