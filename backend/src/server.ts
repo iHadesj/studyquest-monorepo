@@ -1,4 +1,4 @@
-// server.ts (agora com chat!)
+// server.ts (agora sim, completo e com tudo funcionando)
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -9,45 +9,46 @@ import { getRandomQuestion } from "./GameManager";
 import { Exercicio } from "./interfaces";
 import routes from "./routes/index";
 
-// --- 1. IMPORTAÇÕES DO FIREBASE ADMIN ---
+// --- IMPORTAÇÕES DO FIREBASE ADMIN ---
 import * as admin from "firebase-admin";
-// Descomente a linha abaixo e garanta que o nome do arquivo bate com a sua chave
+// Garanta que o nome do arquivo da sua chave de serviço está correto
 import serviceAccount from "./serviceAccountKey.json";
 
 dotenv.config();
+
+// --- LÓGICA DE CORS ATUALIZADA ---
+const allowedOrigins: string[] = ["http://localhost:5173"];
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
+console.log("Origens permitidas (CORS):", allowedOrigins);
+
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
   },
 });
 
-// --- 2. INICIALIZAÇÃO DO FIREBASE ADMIN ---
-
-// Descomente este bloco quando tiver o seu serviceAccountKey.json
+// --- INICIALIZAÇÃO DO FIREBASE ADMIN ---
 admin.initializeApp({
-  // O 'any' aqui é um macete pra contornar um possível erro de tipo chato do SDK
   credential: admin.credential.cert(serviceAccount as any),
 });
 const db = admin.firestore();
 console.log("🔥 Conectado ao Firestore com sucesso!");
 
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
-  })
-);
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 app.use(routes);
 
-// Guarda quem está online: { fullTag => socketId }
+// --- ESTRUTURAS DE DADOS EM MEMÓRIA ---
 const onlineUsers = new Map<string, string>();
-// Guarda os UIDs dos usuários logados: { fullTag => uid }
 const userTagsToUids = new Map<string, string>();
+const friendSubscriptions = new Map<string, Set<string>>();
 
-// ... (toda a parte de GameRooms, funções do jogo, etc. continua igual)
 interface Player {
   tag: string;
   score: number;
@@ -65,11 +66,15 @@ interface GameRoom {
   nextQuestionTimeout?: NodeJS.Timeout | null;
 }
 const gameRooms = new Map<string, GameRoom>();
+
+// --- CONSTANTES DO JOGO ---
 const QUESTION_TIME_LIMIT_S = 15;
 const NEXT_QUESTION_DELAY_MS = 3000;
 const BASE_SCORE = 50;
 const TIME_BONUS_MULTIPLIER = 10;
 const MODE_DURATION_S = 60;
+
+// --- FUNÇÕES UTILITÁRIAS DO JOGO ---
 const normalizeAnswer = (s: string) =>
   s
     .trim()
@@ -90,6 +95,7 @@ const safeClearAllTimers = (room: GameRoom) => {
     room.nextQuestionTimeout = null;
   }
 };
+
 const sendNextQuestion = (roomId: string) => {
   const room = gameRooms.get(roomId);
   if (!room) return;
@@ -113,7 +119,6 @@ const sendNextQuestion = (roomId: string) => {
   room.questionAnswered = false;
   const { respostaCorreta, ...questionForPlayers } = nextQuestion as any;
   io.to(roomId).emit("new_question", questionForPlayers);
-  console.log(`Enviando nova pergunta para a sala ${roomId}`);
   let timeLeft = QUESTION_TIME_LIMIT_S;
   io.to(roomId).emit("timer_tick", { timeLeft });
   room.questionTimer = setInterval(() => {
@@ -144,24 +149,93 @@ io.on("connection", (socket) => {
   console.log("✅ Novo jogador conectado! ID:", socket.id);
 
   let currentUserTag: string | null = null;
-  let currentUserId: string | null = null; // Guardar o UID do usuário
+  let currentUserId: string | null = null;
 
-  // Evento de registro agora também recebe o UID
+  const notifySubscribers = (tag: string, status: "online" | "offline") => {
+    const subscribers = friendSubscriptions.get(tag);
+    if (subscribers) {
+      subscribers.forEach((subscriberTag) => {
+        const subscriberSocketId = onlineUsers.get(subscriberTag);
+        if (subscriberSocketId) {
+          io.to(subscriberSocketId).emit("friend_status_update", {
+            tag,
+            status,
+          });
+        }
+      });
+    }
+  };
+
   socket.on(
     "register",
     ({ fullTag, uid }: { fullTag: string; uid: string }) => {
       onlineUsers.set(fullTag, socket.id);
-      userTagsToUids.set(fullTag, uid); // Armazena a relação tag -> uid
+      userTagsToUids.set(fullTag, uid);
       currentUserTag = fullTag;
       currentUserId = uid;
       console.log(
         `Jogador ${fullTag} (UID: ${uid}) registrado com o socket ID ${socket.id}`
       );
+      notifySubscribers(fullTag, "online");
     }
   );
 
-  // --- 3. LÓGICA DO CHAT ---
+  // --- LÓGICA DE STATUS DE AMIGOS ---
+  socket.on(
+    "subscribe_to_friends_status",
+    ({ friendTags }: { friendTags: string[] }) => {
+      if (!currentUserTag || !Array.isArray(friendTags)) {
+        console.error(
+          `[SUBSCRIBE-ERROR] Tentativa de subscribe sem estar registrado. Socket: ${socket.id}`
+        );
+        return;
+      }
 
+      console.log(
+        `[SUBSCRIBE-INFO] ${currentUserTag} está pedindo o status de:`,
+        friendTags
+      );
+
+      // Log detalhado do estado atual do servidor
+      console.log(
+        "[SUBSCRIBE-INFO] Mapa de usuários online no momento:",
+        Array.from(onlineUsers.keys())
+      );
+
+      friendTags.forEach((friendTag) => {
+        if (!friendSubscriptions.has(friendTag)) {
+          friendSubscriptions.set(friendTag, new Set());
+        }
+        friendSubscriptions.get(friendTag)?.add(currentUserTag!);
+      });
+
+      const initialOnlineFriends = friendTags.filter((tag) => {
+        const isOnline = onlineUsers.has(tag);
+        // DEDO-DURO: Vamos logar cada verificação
+        console.log(
+          `[SUBSCRIBE-CHECK] Verificando se "${tag}" está online... Resultado: ${isOnline}`
+        );
+        return isOnline;
+      });
+
+      console.log(
+        `[SUBSCRIBE-RESULT] Enviando para ${currentUserTag} a lista de amigos online:`,
+        initialOnlineFriends
+      );
+      socket.emit("initial_friends_status", initialOnlineFriends);
+    }
+  );
+  socket.on(
+    "unsubscribe_from_friends_status",
+    ({ friendTags }: { friendTags: string[] }) => {
+      if (!currentUserTag || !Array.isArray(friendTags)) return;
+      friendTags.forEach((friendTag) => {
+        friendSubscriptions.get(friendTag)?.delete(currentUserTag!);
+      });
+    }
+  );
+
+  // --- LÓGICA DO CHAT ---
   socket.on(
     "private_message",
     async ({
@@ -172,64 +246,88 @@ io.on("connection", (socket) => {
       messageText: string;
     }) => {
       if (!currentUserTag || !currentUserId) return;
-
-      // A gente precisa do UID do destinatário
-      const recipientUid = userTagsToUids.get(recipientTag);
+      let recipientUid: string | undefined = userTagsToUids.get(recipientTag);
       if (!recipientUid) {
-        // Opcional: avisar o remetente que o usuário não está online pra receber a msg
+        try {
+          const usersRef = db.collection("users");
+          const q = await usersRef
+            .where("fullTag", "==", recipientTag)
+            .limit(1)
+            .get();
+          if (!q.empty) {
+            recipientUid = q?.docs[0]?.id;
+          }
+        } catch (e) {
+          console.error("Erro ao buscar UID do destinatário offline:", e);
+          return;
+        }
+      }
+      if (!recipientUid) {
         console.log(
-          `Erro: não foi possível encontrar o UID de ${recipientTag}. Ele está online?`
+          `Erro: não foi possível encontrar o UID de ${recipientTag}.`
         );
         return;
       }
-
-      // Gera o ID do chat na ordem alfabética
       const participants = [currentUserId, recipientUid].sort();
       const chatId = participants.join("_");
-
       const messageData = {
         senderId: currentUserId,
         text: messageText,
-        timestamp: admin.firestore.FieldValue.serverTimestamp(), // Usa o timestamp do servidor
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
       };
-
       try {
         const chatRef = db.collection("chats").doc(chatId);
-        const messagesRef = chatRef.collection("messages");
-
-        // Salva a mensagem na subcoleção
-        await messagesRef.add(messageData);
-
-        // Atualiza o documento principal do chat com a última mensagem (útil pra prévias)
+        await chatRef.collection("messages").add(messageData);
         await chatRef.set(
           {
-            participants: participants,
+            participants,
             lastMessage: {
               text: messageText,
               timestamp: messageData.timestamp,
             },
           },
           { merge: true }
-        ); // 'merge: true' pra não sobrescrever outros campos
-
-        // Entrega a mensagem em tempo real se o destinatário estiver online
+        );
         const recipientSocketId = onlineUsers.get(recipientTag);
         if (recipientSocketId) {
           io.to(recipientSocketId).emit("new_message", {
             ...messageData,
-            chatId: chatId, // Envia o chatId pra o front saber de qual conversa é a msg
+            id: "temp-id-" + Date.now(),
+            chatId: chatId,
           });
         }
-        console.log(
-          `(Simulação) Mensagem de ${currentUserTag} para ${recipientTag} salva no chat ${chatId}`
-        );
       } catch (error) {
         console.error("Erro ao salvar mensagem no Firestore:", error);
       }
     }
   );
 
-  // ... (toda a lógica de 'invite_player', 'player_ready', 'submit_answer', etc. continua igual)
+  socket.on(
+    "fetch_chat_history",
+    async ({ friendUid }: { friendUid: string }) => {
+      if (!currentUserId) return;
+      const participants = [currentUserId, friendUid].sort();
+      const chatId = participants.join("_");
+      try {
+        const messagesRef = db
+          .collection("chats")
+          .doc(chatId)
+          .collection("messages");
+        const q = await messagesRef
+          .orderBy("timestamp", "desc")
+          .limit(50)
+          .get();
+        const history = q.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .reverse();
+        socket.emit("chat_history", { chatId, messages: history });
+      } catch (error) {
+        console.error(`Erro ao buscar histórico do chat ${chatId}:`, error);
+      }
+    }
+  );
+
+  // --- LÓGICA DO JOGO ---
   socket.on("invite_player", ({ inviteeTag }: { inviteeTag: string }) => {
     const inviterTag = currentUserTag;
     if (!inviterTag) return;
@@ -242,6 +340,7 @@ io.on("connection", (socket) => {
       });
     }
   });
+
   socket.on(
     "invite_response",
     ({ inviterTag, accepted }: { inviterTag: string; accepted: boolean }) => {
@@ -284,16 +383,15 @@ io.on("connection", (socket) => {
       }
     }
   );
+
   socket.on("player_ready", ({ roomId }: { roomId: string }) => {
     const room = gameRooms.get(roomId);
     if (!room) return;
     const player = room.players.find((p) => p.socketId === socket.id);
     if (player) {
       player.ready = true;
-      console.log(`Jogador ${player.tag} está pronto na sala ${roomId}.`);
     }
     if (room.players.every((p) => p.ready)) {
-      if (room.modeTimer) clearInterval(room.modeTimer);
       room.modeTimeLeft = MODE_DURATION_S;
       io.to(roomId).emit("mode_started", { duration: MODE_DURATION_S });
       room.modeTimer = setInterval(() => {
@@ -304,12 +402,12 @@ io.on("connection", (socket) => {
           safeClearAllTimers(room);
           io.to(roomId).emit("game_over", { finalScores: room.players });
           gameRooms.delete(roomId);
-          console.log(`Sala ${roomId} finalizada por tempo esgotado.`);
         }
       }, 1000);
       sendNextQuestion(roomId);
     }
   });
+
   socket.on(
     "submit_answer",
     ({ roomId, answer }: { roomId: string; answer: string }) => {
@@ -345,13 +443,11 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("❌ Jogador desconectou. ID:", socket.id);
-
     if (currentUserTag) {
       onlineUsers.delete(currentUserTag);
-      userTagsToUids.delete(currentUserTag); // Limpa o UID também
-      console.log(`Jogador ${currentUserTag} removido dos online.`);
+      userTagsToUids.delete(currentUserTag);
+      notifySubscribers(currentUserTag, "offline");
     }
-
     for (const [roomId, room] of [...gameRooms.entries()]) {
       const disconnectedPlayer = room.players.find(
         (p) => p.socketId === socket.id
@@ -362,9 +458,6 @@ io.on("connection", (socket) => {
         });
         safeClearAllTimers(room);
         gameRooms.delete(roomId);
-        console.log(
-          `Sala ${roomId} encerrada por desconexão (${disconnectedPlayer.tag}).`
-        );
       }
     }
   });
