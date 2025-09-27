@@ -98,6 +98,11 @@ export function ChatWindow({ friend, onClose }: ChatWindowProps) {
     setNewMessage('');
   };
 
+  useEffect(() => {
+    // A ordem: "role a tela até a âncora ficar visível"
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   return (
     <S.ChatWrapper>
       <S.ChatHeader>
