@@ -42,8 +42,6 @@ export interface Materia {
   niveis: readonly Nivel[];
 }
 
-// --- TIPO UNIFICADO PARA USUÁRIOS ---
-// Esse é o nosso "documento oficial" que será usado em todo o App
 export type UserProfileData = FirestoreUserData & {
   level: number;
   rank?: number;

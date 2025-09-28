@@ -13,15 +13,17 @@ import {
   Subtitle,
   Title,
   TitleExercise,
+  XPDisplayModal,
 } from '../../style/globalStyle';
 import {
   useProgressStore,
   type FirestoreUserData,
 } from '../../hooks/useProgressStore';
-import { CheckCircleIcon, XCircleIcon } from '../../style/icons';
+import { CheckCircleIcon, StarIcon, XCircleIcon } from '../../style/icons';
 import type { Exercicio, Materia, Nivel } from '../../interfaces';
 import { Star } from 'phosphor-react';
 import { verificarEdesbloquearConquistas } from '../../services/achievements';
+import { api } from '../../services/api';
 
 const shake = keyframes`
   10%, 90% { transform: translate3d(-1px, 0, 0); }
@@ -113,6 +115,34 @@ const StarsContainer = styled.div`
   margin: 1rem 0;
 `;
 
+const BonusXPText = styled.p`
+  font-size: 1rem;
+  font-weight: bold;
+  color: #43b581;
+  margin: 0;
+`;
+
+const WrongAnswersContainer = styled.div`
+  margin-top: 1.5rem;
+  text-align: left;
+  max-height: 150px;
+  overflow-y: auto;
+  background-color: #202225;
+  padding: 1rem;
+  border-radius: 4px;
+`;
+
+const WrongAnswerItem = styled.div`
+  & + & {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #40444b;
+  }
+  p {
+    margin: 0.25rem 0;
+  }
+`;
+
 const ResultsModal = ({ results, totalQuestions, onBack }: any) => {
   return (
     <ModalOverlay>
@@ -134,6 +164,38 @@ const ResultsModal = ({ results, totalQuestions, onBack }: any) => {
         <Subtitle as="p" style={{ fontSize: '1rem', marginBottom: 0 }}>
           Você acertou {results.acertos} de {totalQuestions} perguntas.
         </Subtitle>
+
+        {results.passou && (
+          <>
+            <XPDisplayModal style={{ marginTop: '1.5rem' }}>
+              <StarIcon />
+              <span>+{results.xpGanhos} XP Ganhos</span>
+            </XPDisplayModal>
+            {results.bonusXP > 0 && (
+              <BonusXPText>+{results.bonusXP} XP Bônus!</BonusXPText>
+            )}
+          </>
+        )}
+
+        {results.wrongAnswers.length > 0 && (
+          <WrongAnswersContainer>
+            <h4 style={{ marginTop: 0 }}>Questões para revisar:</h4>
+            {results.wrongAnswers.map((q: any) => (
+              <WrongAnswerItem key={q.id}>
+                <p>
+                  <strong>Pergunta:</strong> {q.pergunta}
+                </p>
+                <p style={{ color: '#ed4245' }}>
+                  <strong>Sua resposta:</strong> {q.userAnswer}
+                </p>
+                <p style={{ color: '#43b581' }}>
+                  <strong>Resposta correta:</strong> {q.correctAnswer}
+                </p>
+              </WrongAnswerItem>
+            ))}
+          </WrongAnswersContainer>
+        )}
+
         <ContinueButton onClick={onBack}>Continuar Jornada</ContinueButton>
       </ModalContent>
     </ModalOverlay>
@@ -150,39 +212,70 @@ export const ExercisePage = ({
   onBack: () => void;
 }) => {
   const [exercises, setExercises] = useState<Exercicio[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [showResultsModal, setShowResultsModal] = useState(false);
-
-  const [allAnswers, setAllAnswers] = useState<
-    { exercise: Exercicio; answer: string }[]
+  const [allUserAnswers, setAllUserAnswers] = useState<
+    {
+      exercise: Exercicio;
+      answer: string;
+      isCorrect: boolean;
+      correctAnswer?: string;
+    }[]
   >([]);
-
-  const [finalResults, setFinalResults] = useState({
-    acertos: 0,
-    estrelas: 0,
-    passou: false,
-  });
+  const [finalResults, setFinalResults] = useState<any>(null);
 
   useEffect(() => {
-    const multipleChoice = level.exercicios.filter(
-      (ex) => ex.tipo === 'multipla_escolha'
-    );
-    const shuffled = [...multipleChoice].sort(() => 0.5 - Math.random());
-    setExercises(shuffled.slice(0, 10));
-  }, [level.exercicios]);
+    const fetchExercises = async () => {
+      setIsLoading(true);
+      try {
+        const response = await api.get(
+          `/api/exercises/${subject.id}/${level.id}`
+        );
+        const multipleChoice = response.data.filter(
+          (ex: any) => ex.tipo === 'multipla_escolha'
+        );
+        const shuffled = [...multipleChoice].sort(() => 0.5 - Math.random());
+        setExercises(shuffled.slice(0, 10));
+      } catch (error) {
+        console.error('Falha ao buscar exercícios:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchExercises();
+  }, [subject.id, level.id]);
 
   const currentQuestion = exercises[currentQuestionIndex];
 
-  const handleCheckAnswer = () => {
+  const handleCheckAnswer = async () => {
     if (!selectedAnswer) return;
-
-    setAllAnswers((prev) => [
-      ...prev,
-      { exercise: currentQuestion, answer: selectedAnswer },
-    ]);
     setIsAnswered(true);
+
+    try {
+      const response = await api.post('/api/exercises/submit', {
+        subjectId: subject.id,
+        levelId: level.id,
+        exerciseId: currentQuestion.id,
+        userAnswer: selectedAnswer,
+      });
+
+      const { isCorrect, correctAnswer } = response.data;
+
+      setAllUserAnswers((prev) => [
+        ...prev,
+        {
+          exercise: currentQuestion,
+          answer: selectedAnswer,
+          isCorrect: isCorrect,
+          correctAnswer: correctAnswer,
+        },
+      ]);
+    } catch (error) {
+      console.error('Erro ao submeter resposta:', error);
+    }
   };
 
   const handleNextQuestion = () => {
@@ -199,37 +292,52 @@ export const ExercisePage = ({
     const user = auth.currentUser;
     if (!user) return;
 
-    let correctCount = 0;
-    allAnswers.forEach((item) => {
-      if (
-        item.answer.trim().toLowerCase() ===
-        item.exercise.respostaCorreta.trim().toLowerCase()
-      ) {
-        correctCount++;
-      }
-    });
+    const correctCount = allUserAnswers.filter((a) => a.isCorrect).length;
+    const wrongAnswersList = allUserAnswers
+      .filter((a) => !a.isCorrect)
+      .map((a) => ({
+        ...a.exercise,
+        userAnswer: a.answer,
+        correctAnswer: a.correctAnswer,
+      }));
 
     const totalQuestions = exercises.length;
     const percentage =
       totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
     let estrelas = 0;
-    if (percentage === 100) estrelas = 3;
-    else if (percentage >= 60) estrelas = 2;
-    else if (correctCount > 0) estrelas = 1;
+    let bonusXP = 0;
 
+    if (percentage === 100) {
+      estrelas = 3;
+      bonusXP = 50;
+    } else if (percentage >= 60) {
+      estrelas = 2;
+      bonusXP = 25;
+    } else if (correctCount > 0) {
+      estrelas = 1;
+      bonusXP = 10;
+    }
+
+    const xpGanhos = correctCount * level.xpPorAcerto;
+    const totalXp = xpGanhos + bonusXP;
     const passou =
       level.minAcertosParaDesbloquearProximo !== null &&
       correctCount >= level.minAcertosParaDesbloquearProximo;
 
-    setFinalResults({ acertos: correctCount, estrelas, passou });
+    setFinalResults({
+      acertos: correctCount,
+      xpGanhos,
+      bonusXP,
+      estrelas,
+      passou,
+      wrongAnswers: wrongAnswersList,
+    });
 
     const userDocRef = doc(db, 'users', user.uid);
     const progressPath = `progress.${subject.id}.${level.id}`;
 
-    const xpGanhos = correctCount * level.xpPorAcerto;
-
     verificarEdesbloquearConquistas('GANHOU_XP', {
-      novoXpTotal: useProgressStore.getState().xp + xpGanhos,
+      novoXpTotal: useProgressStore.getState().xp + totalXp,
     });
     if (passou) {
       verificarEdesbloquearConquistas('CONCLUIU_NIVEL', {
@@ -245,7 +353,7 @@ export const ExercisePage = ({
       ] || { acertos: 0, tentativas: 0, estrelas: 0, concluido: false };
 
       await updateDoc(userDocRef, {
-        xp: increment(xpGanhos),
+        xp: increment(totalXp),
         [progressPath]: {
           acertos: Math.max(currentProgress.acertos, correctCount),
           concluido: currentProgress.concluido || passou,
@@ -261,11 +369,23 @@ export const ExercisePage = ({
           .hydrateFromFirestore(updatedDoc.data() as FirestoreUserData);
       }
     } catch (error) {
-      console.error('Deu ruim pra salvar o progresso, chefe:', error);
+      console.error('Erro ao salvar o progresso:', error);
     }
 
     setShowResultsModal(true);
   };
+
+  if (isLoading) {
+    return (
+      <ExerciseContainer>
+        <BackButton onClick={onBack}>&larr; Voltar</BackButton>
+        <TitleExercise>Carregando...</TitleExercise>
+        <p style={{ textAlign: 'center' }}>
+          Buscando as questões no servidor... 🥋
+        </p>
+      </ExerciseContainer>
+    );
+  }
 
   if (showResultsModal) {
     return (
@@ -277,11 +397,11 @@ export const ExercisePage = ({
     );
   }
 
-  if (exercises.length === 0) {
+  if (!currentQuestion) {
     return (
       <ExerciseContainer>
         <BackButton onClick={onBack}>&larr; Voltar</BackButton>
-        <TitleExercise>Carregando...</TitleExercise>
+        <TitleExercise>Opa!</TitleExercise>
         <p style={{ textAlign: 'center' }}>
           Nenhum exercício de múltipla escolha encontrado pra esse nível.
         </p>
@@ -307,10 +427,16 @@ export const ExercisePage = ({
           {currentQuestion.opcoes?.map((option) => {
             let status: 'correct' | 'incorrect' | 'default' = 'default';
             if (isAnswered) {
-              if (option === currentQuestion.respostaCorreta) {
+              const lastAnswer = allUserAnswers[allUserAnswers.length - 1];
+              if (lastAnswer.isCorrect && option === selectedAnswer) {
                 status = 'correct';
-              } else if (option === selectedAnswer) {
+              } else if (!lastAnswer.isCorrect && option === selectedAnswer) {
                 status = 'incorrect';
+              } else if (
+                !lastAnswer.isCorrect &&
+                option === lastAnswer.correctAnswer
+              ) {
+                status = 'correct';
               }
             }
             return (
@@ -335,7 +461,7 @@ export const ExercisePage = ({
           <ActionButton onClick={handleNextQuestion}>
             {currentQuestionIndex < exercises.length - 1
               ? 'Próxima Questão'
-              : 'Finalizar'}
+              : 'Ver Resultado'}
           </ActionButton>
         ) : (
           <ActionButton onClick={handleCheckAnswer} disabled={!selectedAnswer}>

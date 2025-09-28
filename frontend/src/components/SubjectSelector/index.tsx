@@ -14,6 +14,10 @@ import {
   Leaf,
   TestTube,
   Sword,
+  Timer,
+  Question,
+  Heart,
+  Lightning,
 } from 'phosphor-react';
 import { Subtitle, Title } from '../../style/globalStyle';
 import type { Materia } from '../../interfaces';
@@ -21,6 +25,8 @@ import { useProgressStore } from '../../hooks/useProgressStore';
 import {
   BrainControls,
   BrainInfo,
+  BrainstormContent,
+  BrainstormDescription,
   BrainstormSection,
   BrainStormTitle,
   CategoryTitle,
@@ -172,66 +178,53 @@ export const SubjectSelector: React.FC<{
         </section>
       ))}
       <Separator />
-      <BrainStormTitle> {<>BrainStorm</>}</BrainStormTitle>
-      <BrainstormSection>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 12,
-            alignItems: 'stretch',
-            justifyContent: 'center',
-          }}
-        >
-          <div
-            style={{ color: '#cbd5df', textAlign: 'center', fontWeight: 700 }}
-          >
-            Modo rápido e frenético — responda o máximo que puder!
-          </div>
+
+      <BrainstormSection
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+      >
+        <BrainstormContent>
+          <BrainStormTitle>
+            <Brain size={40} weight="bold" />
+            Brainstorm
+          </BrainStormTitle>
+
+          <BrainstormDescription>
+            Modo de quiz rápido e frenético contra o relógio. Ideal para testar
+            seus conhecimentos sob pressão e ganhar XP bônus!
+          </BrainstormDescription>
 
           <BrainControls>
-            <LargeButton
-              onClick={onStartBrainstorm}
-              aria-label="Iniciar Brainstorm Solo"
-            >
+            <LargeButton onClick={onStartBrainstorm}>
               <Brain size={18} weight="bold" />
               Solo
             </LargeButton>
-
-            <LargeButton
-              variant="accent"
-              onClick={onStartMultiplayer}
-              aria-label="Iniciar Brainstorm Multiplayer"
-            >
+            <LargeButton variant="accent" onClick={onStartMultiplayer}>
               <Sword size={18} weight="bold" />
               Multiplayer
             </LargeButton>
           </BrainControls>
-        </div>
+        </BrainstormContent>
+
         <BrainInfo>
-          <div className="info-header">
-            <Flask size={18} />
-            <h4>Como funciona</h4>
-          </div>
-
-          <p className="lead">
-            Modo de quiz acelerado com tempo limitado — ideal para revisão
-            rápida. Responda o máximo que puder com agilidade e mantenha suas
-            vidas.
-          </p>
-
+          <h4>
+            <Flask size={20} weight="bold" />
+            Como funciona
+          </h4>
           <ul>
             <li>
-              <strong>60s</strong> por sessão
+              <Timer size={20} /> <strong>60s</strong> por sessão
             </li>
             <li>
-              <strong>10s</strong> por pergunta
+              <Question size={20} /> <strong>10s</strong> por pergunta
             </li>
             <li>
-              <strong>3 vidas</strong> por jogo
+              <Heart size={20} /> <strong>3 vidas</strong> por jogo
             </li>
             <li>
-              Respostas rápidas dão <strong>XP bônus</strong>
+              <Lightning size={20} /> Respostas rápidas dão{' '}
+              <strong>XP bônus</strong>
             </li>
           </ul>
         </BrainInfo>

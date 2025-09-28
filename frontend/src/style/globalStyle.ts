@@ -177,7 +177,7 @@ export const Title = styled.h1`
   letter-spacing: -1px;
   animation: ${fadeIn} 0.5s ease-out;
   @media (max-width: 480px) {
-    font-size: 1.2rem;
+    font-size: 1.7rem;
     margin-top: 2rem;
   }
 `;

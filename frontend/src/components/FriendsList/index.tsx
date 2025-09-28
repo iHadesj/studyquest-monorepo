@@ -77,7 +77,6 @@ export function FriendsList({
       const querySnapshot = await getDocs(q);
       return querySnapshot.docs.map((doc) => {
         const data = doc.data() as FirestoreUserData;
-        // Simulamos level e rank, pois não são cruciais para a lista de amigos em si
         return { ...data, uid: doc.id, level: 0, rank: undefined };
       });
     };

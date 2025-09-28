@@ -10,7 +10,7 @@
       "minAcertosParaDesbloquearProximo": 5,
       "conteudo": {
         "titulo": "Células e Reinos dos Seres Vivos",
-        "resumo": "A Biologia é o estudo da vida! A unidade básica da vida é a célula. Vamos ver organelas, tipos de células e os principais reinos dos seres vivos."
+       "resumo": "A Biologia é a ciência que estuda a vida em todas as suas formas e níveis de organização. A menor unidade da vida é a célula, que pode ser classificada em dois grandes tipos: procarióticas, sem núcleo definido (como as bactérias), e eucarióticas, que possuem núcleo organizado (como as células animais e vegetais). Dentro das células encontramos diferentes organelas, cada uma com funções específicas, como a mitocôndria, responsável pela produção de energia; os ribossomos, que participam da síntese de proteínas; o retículo endoplasmático, que auxilia no transporte e na produção de moléculas; e os lisossomos, que realizam digestão intracelular. Além das células, a Biologia organiza os seres vivos em reinos: Monera (bactérias), Protista (protozoários e algas unicelulares), Fungi (fungos), Plantae (plantas) e Animalia (animais). Cada reino possui características próprias, como forma de nutrição, tipo celular e organização estrutural. Entender essas bases é fundamental para compreender como a vida se organiza e se mantém em equilíbrio."
       },
       "exercicios": [
         { "id": 1, "tipo": "multipla_escolha", "pergunta": "Qual organela é conhecida como 'usina de energia' da célula?", "opcoes": ["Núcleo", "Mitocôndria", "Lisossomo"], "respostaCorreta": "Mitocôndria" },
@@ -42,7 +42,7 @@
       "minAcertosParaDesbloquearProximo": 6,
       "conteudo": {
         "titulo": "Genética e Corpo Humano",
-        "resumo": "Genética: DNA, genes e herança. Sistemas do corpo humano: circulação, respiração, digestão e funcionamento básico."
+       "resumo": "A evolução biológica é o processo de mudança nas características hereditárias das populações ao longo do tempo. Charles Darwin propôs a teoria da seleção natural, segundo a qual indivíduos com características vantajosas sobrevivem e se reproduzem mais, transmitindo seus genes para as próximas gerações. A evolução também é explicada por mutações, recombinação genética e deriva genética, que afetam a diversidade das populações. Já a ecologia estuda as interações entre organismos e o ambiente, incluindo relações como mutualismo, parasitismo, predação e competição. Os seres vivos se organizam em níveis tróficos: produtores (que fazem fotossíntese), consumidores (que se alimentam de outros organismos) e decompositores (que reciclam nutrientes). Ecossistemas funcionam com base em ciclos biogeoquímicos, como o do carbono, do nitrogênio e da água, que mantêm a vida em equilíbrio. Questões ambientais, como desmatamento, poluição, fragmentação de habitats e mudanças climáticas, impactam diretamente a biodiversidade. Por isso, a conservação e a restauração ecológica são fundamentais para garantir a sustentabilidade do planeta."
       },
       "exercicios": [
         { "id": 1, "tipo": "multipla_escolha", "pergunta": "Qual molécula carrega a informação genética?", "opcoes": ["RNA", "DNA", "Proteína"], "respostaCorreta": "DNA" },

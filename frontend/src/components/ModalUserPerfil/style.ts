@@ -64,6 +64,7 @@ export const UserInfo = styled(motion.div)`
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+  user-select: text;
   margin-top: 80px;
 `;
 

@@ -49,6 +49,7 @@ const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
     font-family: 'Fira Code', monospace;
+    scrollbar-color: #5865f2 #202225;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
       -webkit-user-select: none; 
@@ -90,6 +91,10 @@ export default function App() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, [screen]);
+
+  useEffect(() => {
+    if (screen === 'exercise') setActiveChat(null);
   }, [screen]);
 
   useEffect(() => {
@@ -322,9 +327,11 @@ export default function App() {
             <RankingButton onClick={() => setScreen('ranking')}>
               <Trophy weight="bold" /> Ranking
             </RankingButton>
-            <FriendsButton onClick={() => setIsFriendsListOpen(true)}>
-              <Users weight="bold" /> Amigos
-            </FriendsButton>
+            {screen !== 'multiplayer_lobby' && screen !== 'exercise' && (
+              <FriendsButton onClick={() => setIsFriendsListOpen(true)}>
+                <Users weight="bold" /> Amigos
+              </FriendsButton>
+            )}
           </div>
           {screen !== 'subject' && (
             <HomeButton onClick={backToHome} title="Voltar ao menu principal">

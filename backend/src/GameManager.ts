@@ -26,7 +26,7 @@ const musicaData = musicaDataRaw as unknown as Materia;
 const programacaoData = programacaoDataRaw as unknown as Materia;
 const quimicaData = quimicaDataRaw as unknown as Materia;
 
-const subjectDataMap: { [key: string]: Materia } = {
+export const subjectDataMap: { [key: string]: Materia } = {
   biologia: biologiaData,
   ciencias: cienciasData,
   filosofia: filosofiaData,

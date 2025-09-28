@@ -76,10 +76,9 @@ export const Header = StyledHeader;
 export const Title = StyledTitle;
 export const Body = StyledBody;
 
-// --- Exemplo de como usar ---
+// --- como usar (eu sempre esqueço) ---
 /*
 import { useState } from 'react';
-// A única mudança é aqui no import!
 import * as Modal from './components/Modal'; 
 
 function MeuComponente() {

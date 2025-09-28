@@ -7,7 +7,7 @@
       "id": "iniciante",
       "nome": "Iniciante",
       "xpPorAcerto": 15,
-      "minAcertosParaDesbloquearProximo": 15,
+      "minAcertosParaDesbloquearProximo": 5,
       "conteudo": {
         "titulo": "O Alfabeto e as Cores do Som",
         "resumo": "A música é a arte de combinar sons e silêncios. Para começar, vamos conhecer seu alfabeto (as notas), suas cores (o timbre) e suas ferramentas (os instrumentos).\n\n**As Notas Musicais**\nSão a base de toda melodia. Existem **sete** notas principais que se repetem em diferentes alturas (mais graves ou mais agudas). A sequência padrão é:\n**Dó - Ré - Mi - Fá - Sol - Lá - Si**\nElas também podem ser representadas por letras: C - D - E - F - G - A - B.\n\n**Timbre: A 'Cor' do Som**\nÉ a qualidade que nos faz diferenciar dois instrumentos tocando a mesma nota. É o 'DNA' do som, o que faz um violão soar como um violão e uma flauta soar como uma flauta.\n\n**Famílias de Instrumentos**\n- **Cordas:** O som nasce da vibração de cordas. Ex: **Violão**, violino, harpa, contrabaixo.\n- **Sopro:** O som é produzido pela vibração do ar dentro de um tubo. Podem ser de *madeira* (flauta, clarinete) ou *metal* (trompete, trombone).\n- **Percussão:** O som é gerado ao ser percutido (batido), raspado ou agitado. Ex: Bateria, tambor, pandeiro, xilofone.\n- **Teclas:** O som é ativado ao pressionar teclas. Ex: **Piano**, teclado eletrônico, órgão."
@@ -39,7 +39,7 @@
       "id": "intermediario",
       "nome": "Intermediário",
       "xpPorAcerto": 25,
-      "minAcertosParaDesbloquearProximo": 15,
+      "minAcertosParaDesbloquearProximo": 6,
       "conteudo": {
         "titulo": "Explorando os Gêneros Musicais",
         "resumo": "A música se manifesta de inúmeras formas. Os gêneros musicais nos ajudam a classificar estilos com características, instrumentação e origens culturais semelhantes.\n\n**Música Clássica**\nUm gênero amplo, associado a orquestras, complexidade harmônica e estrutura formal. Compositores como **Bach**, **Mozart** e **Beethoven** são pilares deste estilo, que abrange desde o período Barroco ao Contemporâneo.\n\n**Rock**\nNascido nos anos 50, o Rock é marcado pela atitude e pelo uso de instrumentos como a **guitarra elétrica**, o contrabaixo e a bateria. Bandas como **The Beatles** e **Led Zeppelin** definiram suas bases.\n\n**Jazz**\nOriginário das comunidades afro-americanas de Nova Orleans (EUA), o **Jazz** tem a **improvisação** como sua alma. Músicos como **Louis Armstrong** e **Miles Davis** são ícones do gênero, que valoriza a liberdade de criação espontânea.\n\n**Samba**\nSímbolo da música brasileira, o Samba tem suas raízes na cultura africana. É um gênero rico em ritmo, com forte presença de instrumentos de **percussão** (como surdo e pandeiro) e do violão de 7 cordas. **Cartola** é um de seus maiores poetas.\n\n**Pop**\nAbreviatura de 'música popular', o Pop visa alcançar um grande público. Suas características são melodias fáceis de lembrar (refrões 'chiclete'), ritmo dançante e produção musical polida. **Michael Jackson** é aclamado como o 'Rei do Pop'."
@@ -71,7 +71,7 @@
       "id": "avancado",
       "nome": "Avançado",
       "xpPorAcerto": 40,
-      "minAcertosParaDesbloquearProximo": null,
+      "minAcertosParaDesbloquearProximo": 7,
       "conteudo": {
         "titulo": "A Estrutura da Música",
         "resumo": "Para entender a música em um nível mais profundo, precisamos analisar seus elementos constituintes e como ela é organizada no tempo e no espaço sonoro.\n\n**Os Três Elementos Essenciais**\n- **Melodia:** É a sucessão de notas organizadas de forma horizontal, criando uma linha musical que podemos cantarolar. É a 'personagem principal' da música.\n- **Harmonia:** É a combinação de notas tocadas simultaneamente, de forma vertical, para criar uma base sonora. Um **acorde** (três ou mais notas) é a unidade fundamental da harmonia. Ela pode ser *consonante* (soa estável) ou *dissonante* (gera tensão).\n- **Ritmo:** É a organização dos sons e silêncios no tempo. O ritmo é definido pela duração das notas (representadas por **figuras rítmicas** como semibreve, mínima, semínima) e pela sua acentuação.\n\n**Organização e Percepção**\n- **Andamento:** É a velocidade da música (ex: *Lento*, *Moderato*, *Allegro*).\n- **Compasso:** É a divisão da música em pequenas unidades de tempo. O compasso **4/4**, o mais comum, agrupa os tempos de 4 em 4. Já uma valsa usa o compasso **3/4**.\n- **Intervalo:** É a distância de altura entre duas notas (ex: a distância entre Dó e Sol é um intervalo de 5ª)."

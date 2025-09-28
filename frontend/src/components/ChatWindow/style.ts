@@ -62,6 +62,7 @@ export const MessageBubble = styled.div<{ $isMe: boolean }>`
   align-self: ${({ $isMe }) => ($isMe ? 'flex-end' : 'flex-start')};
   color: #dcddde;
   padding: 0.5rem 0.75rem;
+  user-select: text;
   border-radius: 12px;
   max-width: 80%;
   margin-top: 0.5rem;
