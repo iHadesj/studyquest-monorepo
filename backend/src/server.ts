@@ -256,7 +256,10 @@ io.on("connection", (socket) => {
       messageText: string;
     }) => {
       if (!currentUserTag || !currentUserId) return;
+
       let recipientUid: string | undefined = userTagsToUids.get(recipientTag);
+
+      // A lógica para encontrar o UID continua a mesma...
       if (!recipientUid) {
         try {
           const usersRef = db.collection("users");
@@ -278,13 +281,16 @@ io.on("connection", (socket) => {
         );
         return;
       }
+
       const participants = [currentUserId, recipientUid].sort();
       const chatId = participants.join("_");
+
       const messageData = {
         senderId: currentUserId,
         text: messageText,
         timestamp: admin.firestore.FieldValue.serverTimestamp(),
       };
+
       try {
         const chatRef = db.collection("chats").doc(chatId);
         await chatRef.collection("messages").add(messageData);
@@ -298,14 +304,18 @@ io.on("connection", (socket) => {
           },
           { merge: true }
         );
-        const recipientSocketId = onlineUsers.get(recipientTag);
+
+        // <<< MUDANÇA PRINCIPAL: ESTA PARTE FOI REMOVIDA >>>
+        /* const recipientSocketId = onlineUsers.get(recipientTag);
         if (recipientSocketId) {
+          // NÃO PRECISAMOS MAIS AVISAR VIA SOCKET. O FIRESTORE JÁ FAZ ISSO.
           io.to(recipientSocketId).emit("new_message", {
             ...messageData,
             id: "temp-id-" + Date.now(),
             chatId: chatId,
           });
         }
+        */
       } catch (error) {
         console.error("Erro ao salvar mensagem no Firestore:", error);
       }
