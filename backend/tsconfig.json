@@ -43,5 +43,10 @@
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force"
-  }
+  },
+  "include": ["src/**/*"], // É bom ter isso pra ser explícito
+  "exclude": [
+    "node_modules",
+    "../frontend" // <<< A MÁGICA TÁ AQUI
+  ]
 }
