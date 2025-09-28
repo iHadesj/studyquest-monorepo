@@ -12,6 +12,7 @@ import routes from "./routes/index";
 import * as admin from "firebase-admin";
 import serviceAccount from "./serviceAccountKey.json";
 import exerciseRoutes from "./routes/exerciseRoutes";
+import subjectRoutes from "./routes/subjectRoutes";
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 app.use(routes);
 app.use("/api/exercises", exerciseRoutes);
+app.use("/api/subjects", subjectRoutes);
 
 const onlineUsers = new Map<string, string>();
 const userTagsToUids = new Map<string, string>();

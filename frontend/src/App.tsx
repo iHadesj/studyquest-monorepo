@@ -38,6 +38,7 @@ import {
 } from './style/globalStyle';
 import { House, Trophy, Users } from 'phosphor-react';
 import { socket } from './services/socket';
+import { api } from './services/api';
 import { Toaster } from 'react-hot-toast';
 import { calculateLevelInfo } from './style/level';
 import { RankingPage } from './pages/Ranking';
@@ -52,9 +53,9 @@ const GlobalStyle = createGlobalStyle`
     scrollbar-color: #5865f2 #202225;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-      -webkit-user-select: none; 
-  -ms-user-select: none; 
-  user-select: none; 
+    -webkit-user-select: none; 
+    -ms-user-select: none; 
+    user-select: none; 
     background-color: #36393f;
     color: #dcddde;
   }
@@ -157,11 +158,10 @@ export default function App() {
   useEffect(() => {
     const fetchSubjectsList = async () => {
       try {
-        const response = await fetch('/data/materias.json');
-        const data = await response.json();
-        setSubjectsList(data);
+        const response = await api.get('/api/subjects');
+        setSubjectsList(response.data);
       } catch (error) {
-        console.error('Falha ao carregar a lista de matérias:', error);
+        console.error('Falha ao carregar a lista de matérias via API:', error);
       }
     };
     fetchSubjectsList();
@@ -169,12 +169,14 @@ export default function App() {
 
   const handleSelectSubject = async (subjectInfo: SubjectInfo) => {
     try {
-      const response = await fetch(`/data/${subjectInfo.id}.json`);
-      const subjectDetails: Materia = await response.json();
-      setSelectedSubject(subjectDetails);
+      const response = await api.get(`/api/subjects/${subjectInfo.id}`);
+      setSelectedSubject(response.data);
       setScreen('level');
     } catch (error) {
-      console.error(`Falha ao carregar a matéria ${subjectInfo.nome}:`, error);
+      console.error(
+        `Falha ao carregar a matéria ${subjectInfo.nome} via API:`,
+        error
+      );
     }
   };
 
@@ -185,13 +187,16 @@ export default function App() {
     }
     try {
       const subjectPromises = subjectsList.map((subjectInfo) =>
-        fetch(`/data/${subjectInfo.id}.json`).then((res) => res.json())
+        api.get(`/api/subjects/${subjectInfo.id}`).then((res) => res.data)
       );
       const allSubjects = await Promise.all(subjectPromises);
       setAllSubjectsData(allSubjects as Materia[]);
       setScreen('brainstorm');
     } catch (error) {
-      console.error('Falha ao carregar dados para o modo Brainstorm:', error);
+      console.error(
+        'Falha ao carregar dados para o Brainstorm via API:',
+        error
+      );
     }
   };
 
