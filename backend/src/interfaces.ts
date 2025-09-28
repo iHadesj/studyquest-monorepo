@@ -1,6 +1,35 @@
-import { FirestoreUserData } from "./../../frontend/src/hooks/useProgressStore";
-// src/interfaces/index.tsx
+// src/interfaces.ts (NO BACKEND)
 
+// Tipos que eram do frontend, agora definidos aqui para desacoplar.
+type LevelProgress = {
+  acertos: number;
+  concluido: boolean;
+  estrelas: number;
+  tentativas: number;
+};
+
+type UserProgress = {
+  [materiaId: string]: {
+    [nivelId: string]: LevelProgress;
+  };
+};
+
+// O tipo principal que a gente precisava.
+export type FirestoreUserData = {
+  uid: string | null;
+  username: string | null;
+  avatarSeed: string | null;
+  xp: number;
+  progress: UserProgress;
+  userTag?: number;
+  fullTag?: string;
+  friends?: string[];
+  friendRequestsSent?: string[];
+  friendRequestsReceived?: string[];
+  unlockedAchievements?: string[];
+};
+
+// O resto das suas interfaces que já estavam aqui, sem mudança.
 export interface Exercicio {
   id: number;
   tipo: "multipla_escolha" | "preenchimento";
