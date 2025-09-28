@@ -51,6 +51,9 @@ const GlobalStyle = createGlobalStyle`
     font-family: 'Fira Code', monospace;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+      -webkit-user-select: none; 
+  -ms-user-select: none; 
+  user-select: none; 
     background-color: #36393f;
     color: #dcddde;
   }
@@ -84,6 +87,10 @@ export default function App() {
       level: level,
     };
   }, [currentUserStoreData]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [screen]);
 
   useEffect(() => {
     let unsubscribeFirestore: (() => void) | null = null;

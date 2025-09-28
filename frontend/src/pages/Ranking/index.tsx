@@ -6,6 +6,7 @@ import { BackButton, Title } from '../../style/globalStyle';
 import { Crown } from 'phosphor-react';
 import type { FirestoreUserData } from '../../hooks/useProgressStore';
 import type { UserProfileData } from '../../interfaces';
+import { Avatar as BaseAvatar } from '../../components/TopBar';
 
 const neonGold = keyframes`
   0%, 100% { box-shadow: 0 0 3px #f1c40f, 0 0 6px #f1c40f, 0 0 9px #f1c40f; }
@@ -30,6 +31,7 @@ const RankingContainer = styled.div`
 const UserRow = styled.div<{ rank: number; isCurrentUser: boolean }>`
   display: flex;
   align-items: center;
+  gap: 0.5rem;
   background-color: ${(props) => (props.isCurrentUser ? '#3a3e45' : '#2f3136')};
   padding: 0.75rem 1rem;
   border-radius: 8px;
@@ -68,12 +70,11 @@ const Rank = styled.div`
   text-align: center;
 `;
 
-const Avatar = styled.img`
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  margin: 0 1rem;
-  object-fit: cover;
+export const Avatar = styled(BaseAvatar)`
+  width: 40px;
+  height: 40px;
+  border: 4px solid #4f545c;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 `;
 
 const UserInfo = styled.div`

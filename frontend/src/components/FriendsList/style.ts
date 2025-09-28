@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { Avatar as BaseAvatar } from '../TopBar/index';
 
 export const FriendsListWrapper = styled.div`
   display: flex;
@@ -23,14 +24,14 @@ export const AddFriendInput = styled.input`
   flex: 1;
   padding: 0.5rem 0.75rem;
   border-radius: 4px;
-  border: 1px solid #333; // Cor de exemplo
-  background-color: #111; // Cor de exemplo
-  color: #fff; // Cor de exemplo
+  border: 1px solid #333;
+  background-color: #111;
+  color: #fff;
   margin-right: 0.5rem;
 
   &:focus {
     outline: none;
-    border-color: #007bff; // Cor de exemplo
+    border-color: #007bff;
   }
 `;
 
@@ -95,10 +96,11 @@ export const UserEntry = styled.div`
   gap: 1rem;
 `;
 
-export const Avatar = styled.img`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+export const Avatar = styled(BaseAvatar)`
+  width: 50px;
+  height: 50px;
+  border: 4px solid #4f545c;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 `;
 
 export const UserInfo = styled.div`

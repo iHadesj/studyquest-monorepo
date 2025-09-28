@@ -1,21 +1,28 @@
 import { BookOpen } from 'phosphor-react';
+import { type Variants } from 'framer-motion';
 import type { Nivel } from '../../interfaces';
-import { BackButton, ContentBox, Title } from '../../style/globalStyle';
-import { ContentWrapper, StartExercisesButton, SummaryText } from './style';
+import { BackButton, Title } from '../../style/globalStyle';
+import { ContentWrapper, StartExercisesButton, ContentCard } from './style';
 
-// --- FUNÇÃO AUXILIAR PARA FORMATAR O TEXTO ---
 const formatText = (text: string) => {
-  const parts = text.split(/(\*\*.*?\*\*)/g);
-
-  return parts.map((part, index) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={index}>{part.slice(2, -2)}</strong>;
-    }
-    return part;
-  });
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`(.*?)`/g, '<code>$1</code>');
 };
 
-// --- COMPONENTE PRINCIPAL ---
+const cardVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.1,
+      duration: 0.5,
+      ease: 'easeOut',
+    },
+  }),
+};
+
 export const ContentPage = ({
   level,
   onBack,
@@ -25,26 +32,39 @@ export const ContentPage = ({
   onBack: () => void;
   onStartExercises: () => void;
 }) => {
+  const contentParagraphs = level.conteudo.resumo
+    .split('\n')
+    .filter((p) => p.trim() !== '');
+
   return (
     <ContentWrapper>
       <BackButton onClick={onBack}>&larr; Voltar</BackButton>
-      <ContentBox>
-        <Title
-          as="h1"
-          style={{
-            textAlign: 'left',
-            border: 'none',
-            padding: 0,
-          }}
-        >
-          {level.conteudo.titulo}
-        </Title>
-        {/* Usamos a nova função para renderizar o resumo formatado */}
-        <SummaryText>{formatText(level.conteudo.resumo)}</SummaryText>
-      </ContentBox>
+      <Title
+        as="h1"
+        style={{
+          textAlign: 'left',
+          border: 'none',
+          padding: 0,
+          marginBottom: '2rem',
+        }}
+      >
+        {level.conteudo.titulo}
+      </Title>
+
+      {contentParagraphs.map((paragraph, index) => (
+        <ContentCard
+          key={index}
+          custom={index}
+          initial="hidden"
+          animate="visible"
+          variants={cardVariants}
+          dangerouslySetInnerHTML={{ __html: formatText(paragraph) }}
+        />
+      ))}
+
       <StartExercisesButton onClick={onStartExercises}>
         <BookOpen weight="bold" />
-        Começar Exercícios
+        Bora pros Exercícios!
       </StartExercisesButton>
     </ContentWrapper>
   );

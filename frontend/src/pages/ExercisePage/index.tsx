@@ -1,31 +1,110 @@
 import { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
+import { motion } from 'framer-motion';
 import { doc, updateDoc, increment, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../config/firebase';
 import {
   BackButton,
   ContinueButton,
   ExerciseBox,
-  LessonWrapper,
   ModalContent,
   ModalOverlay,
-  OptionLabel,
   QuestionText,
-  RadioInput,
-  SubmitButton,
   Subtitle,
   Title,
   TitleExercise,
-  XPDisplayModal,
 } from '../../style/globalStyle';
 import {
   useProgressStore,
   type FirestoreUserData,
 } from '../../hooks/useProgressStore';
-import { CheckCircleIcon, StarIcon, XCircleIcon } from '../../style/icons';
+import { CheckCircleIcon, XCircleIcon } from '../../style/icons';
 import type { Exercicio, Materia, Nivel } from '../../interfaces';
 import { Star } from 'phosphor-react';
 import { verificarEdesbloquearConquistas } from '../../services/achievements';
+
+const shake = keyframes`
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+`;
+
+const ExerciseContainer = styled.div`
+  max-width: 48rem;
+  margin: 0 auto;
+`;
+
+const QuestionCounter = styled.div`
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #b9bbbe;
+  margin-bottom: 2rem;
+`;
+
+const OptionLabel = styled(motion.label)<{
+  $status: 'correct' | 'incorrect' | 'default';
+}>`
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: #36393f;
+  border-radius: 4px;
+  border: 2px solid #40444b;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    ${({ $status }) => $status === 'default' && `border-color: #5865f2;`}
+  }
+
+  ${({ $status }) =>
+    $status === 'correct' &&
+    css`
+      background-color: #43b581;
+      border-color: #3aa570;
+      color: white;
+      transform: scale(1.02);
+    `}
+
+  ${({ $status }) =>
+    $status === 'incorrect' &&
+    css`
+      background-color: #ed4245;
+      border-color: #d83c3e;
+      color: white;
+      animation: ${shake} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    `}
+`;
+
+const RadioInput = styled.input`
+  margin-right: 0.75rem;
+  accent-color: #5865f2;
+`;
+
+const ActionButton = styled.button`
+  background-color: #5865f2;
+  color: #ffffff;
+  font-family: 'Fira Code', monospace;
+  font-weight: bold;
+  padding: 0.75rem 3rem;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 2rem;
+
+  &:disabled {
+    background-color: #40444b;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: #4f5bd5;
+  }
+`;
 
 const StarsContainer = styled.div`
   display: flex;
@@ -34,115 +113,31 @@ const StarsContainer = styled.div`
   margin: 1rem 0;
 `;
 
-const XPResultsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-`;
-
-const BonusXPText = styled.p`
-  font-size: 1rem;
-  font-weight: bold;
-  color: #43b581;
-  margin: 0;
-`;
-
-const WrongAnswersContainer = styled.div`
-  margin-top: 1.5rem;
-  text-align: left;
-  max-height: 150px;
-  overflow-y: auto;
-  background-color: #202225;
-  padding: 1rem;
-  border-radius: 4px;
-`;
-
-const WrongAnswerItem = styled.div`
-  & + & {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #40444b;
-  }
-  p {
-    margin: 0.25rem 0;
-  }
-`;
-
-const EncouragementText = styled.div`
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background-color: #202225;
-  border-radius: 4px;
-  color: #b9bbbe;
-`;
-
-type WrongAnswer = Exercicio & { userAnswer?: string };
-
-const parseText = (text: string): React.ReactNode | null => {
-  if (!text) return null;
-
-  const replacements: { [seq: string]: string } = {
-    '\\div': '÷',
-    '\\times': '×',
-    '\\sqrt': '√',
-    '\\pm': '±',
-  };
-
-  let processed = text;
-  for (const seq in replacements) {
-    const re = new RegExp(seq, 'g');
-    processed = processed.replace(re, replacements[seq]);
-  }
-
-  const regex = /(\*[^*]+\*)|(_[^_]+_)|(~[^~]+~)|(`[^`]+`)|(\$[^$]+\$)/g;
-  const parts = processed.split(regex).filter(Boolean);
-
-  return parts.map((part, idx) => {
-    if (part.startsWith('*') && part.endsWith('*')) {
-      return <strong key={idx}>{part.slice(1, -1)}</strong>;
-    }
-    if (part.startsWith('_') && part.endsWith('_')) {
-      return <em key={idx}>{part.slice(1, -1)}</em>;
-    }
-    if (part.startsWith('~') && part.endsWith('~')) {
-      return <del key={idx}>{part.slice(1, -1)}</del>;
-    }
-    if (part.startsWith('`') && part.endsWith('`')) {
-      return (
-        <code
-          key={idx}
-          style={{
-            backgroundColor: '#2f3136',
-            color: '#f8f8f2',
-            padding: '0 4px',
-            borderRadius: '4px',
-            fontFamily: 'monospace',
-          }}
-        >
-          {part.slice(1, -1)}
-        </code>
-      );
-    }
-    if (part.startsWith('$') && part.endsWith('$')) {
-      return (
-        <span
-          key={idx}
-          style={{
-            fontFamily: 'monospace',
-            backgroundColor: '#1e1e1e',
-            color: '#ffd700',
-            padding: '0 4px',
-            borderRadius: '3px',
-          }}
-        >
-          {part.slice(1, -1)}
-        </span>
-      );
-    }
-    return <span key={idx}>{part}</span>;
-  });
+const ResultsModal = ({ results, totalQuestions, onBack }: any) => {
+  return (
+    <ModalOverlay>
+      <ModalContent>
+        {results.passou ? <CheckCircleIcon /> : <XCircleIcon />}
+        <Title as="h2" style={{ fontSize: '1.875rem', marginTop: '1rem' }}>
+          {results.passou ? 'Nível Concluído!' : 'Tente Novamente!'}
+        </Title>
+        <StarsContainer>
+          {[1, 2, 3].map((i) => (
+            <Star
+              key={i}
+              size={40}
+              color={i <= results.estrelas ? '#f1c40f' : '#72767d'}
+              weight="fill"
+            />
+          ))}
+        </StarsContainer>
+        <Subtitle as="p" style={{ fontSize: '1rem', marginBottom: 0 }}>
+          Você acertou {results.acertos} de {totalQuestions} perguntas.
+        </Subtitle>
+        <ContinueButton onClick={onBack}>Continuar Jornada</ContinueButton>
+      </ModalContent>
+    </ModalOverlay>
+  );
 };
 
 export const ExercisePage = ({
@@ -154,39 +149,50 @@ export const ExercisePage = ({
   level: Nivel;
   onBack: () => void;
 }) => {
-  const [shuffledExercises, setShuffledExercises] = useState<Exercicio[]>([]);
-  const [answers, setAnswers] = useState<{ [key: number]: string }>({});
-  const [showResults, setShowResults] = useState(false);
-  const [results, setResults] = useState({
+  const [exercises, setExercises] = useState<Exercicio[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [isAnswered, setIsAnswered] = useState(false);
+  const [showResultsModal, setShowResultsModal] = useState(false);
+
+  const [allAnswers, setAllAnswers] = useState<
+    { exercise: Exercicio; answer: string }[]
+  >([]);
+
+  const [finalResults, setFinalResults] = useState({
     acertos: 0,
-    xpGanhos: 0,
-    bonusXP: 0,
     estrelas: 0,
     passou: false,
-    wrongAnswers: [] as WrongAnswer[],
   });
 
-  const { progress } = useProgressStore();
-  const currentProgress = progress[subject.id]?.[level.id];
-  const currentAttempts = currentProgress?.tentativas || 0;
-
   useEffect(() => {
-    const multipleChoiceExercises = level.exercicios.filter(
+    const multipleChoice = level.exercicios.filter(
       (ex) => ex.tipo === 'multipla_escolha'
     );
-
-    if (multipleChoiceExercises.length > 10) {
-      const shuffled = [...multipleChoiceExercises].sort(
-        () => 0.5 - Math.random()
-      );
-      setShuffledExercises(shuffled.slice(0, 10));
-    } else {
-      setShuffledExercises([...multipleChoiceExercises]);
-    }
+    const shuffled = [...multipleChoice].sort(() => 0.5 - Math.random());
+    setExercises(shuffled.slice(0, 10));
   }, [level.exercicios]);
 
-  const handleAnswerChange = (exerciseId: number, answer: string) => {
-    setAnswers((prev) => ({ ...prev, [exerciseId]: answer }));
+  const currentQuestion = exercises[currentQuestionIndex];
+
+  const handleCheckAnswer = () => {
+    if (!selectedAnswer) return;
+
+    setAllAnswers((prev) => [
+      ...prev,
+      { exercise: currentQuestion, answer: selectedAnswer },
+    ]);
+    setIsAnswered(true);
+  };
+
+  const handleNextQuestion = () => {
+    if (currentQuestionIndex < exercises.length - 1) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+      setSelectedAnswer(null);
+      setIsAnswered(false);
+    } else {
+      handleSubmit();
+    }
   };
 
   const handleSubmit = async () => {
@@ -194,60 +200,37 @@ export const ExercisePage = ({
     if (!user) return;
 
     let correctCount = 0;
-    const wrongAnswersList: WrongAnswer[] = [];
-
-    shuffledExercises.forEach((ex) => {
-      const userAnswer = answers[ex.id]?.trim().toLowerCase();
-      const correctAnswer = ex.respostaCorreta.trim().toLowerCase();
-      if (userAnswer === correctAnswer) {
+    allAnswers.forEach((item) => {
+      if (
+        item.answer.trim().toLowerCase() ===
+        item.exercise.respostaCorreta.trim().toLowerCase()
+      ) {
         correctCount++;
-      } else {
-        wrongAnswersList.push({
-          ...ex,
-          userAnswer: answers[ex.id] || 'Não respondido',
-        });
       }
     });
 
-    const totalQuestions = shuffledExercises.length;
+    const totalQuestions = exercises.length;
     const percentage =
       totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
     let estrelas = 0;
-    let bonusXP = 0;
+    if (percentage === 100) estrelas = 3;
+    else if (percentage >= 60) estrelas = 2;
+    else if (correctCount > 0) estrelas = 1;
 
-    if (percentage === 100) {
-      estrelas = 3;
-      bonusXP = 50;
-    } else if (percentage >= 60) {
-      estrelas = 2;
-      bonusXP = 25;
-    } else if (correctCount > 0) {
-      estrelas = 1;
-      bonusXP = 10;
-    }
-
-    const xpEarned = correctCount * level.xpPorAcerto;
-    const totalXp = xpEarned + bonusXP;
-    const newAttempts = currentAttempts + 1;
-
-    const passouNosAcertos =
+    const passou =
       level.minAcertosParaDesbloquearProximo !== null &&
       correctCount >= level.minAcertosParaDesbloquearProximo;
-    const pontuacaoPerfeita = correctCount === totalQuestions;
-    const passou = passouNosAcertos || pontuacaoPerfeita;
 
-    setResults({
-      acertos: correctCount,
-      xpGanhos: xpEarned,
-      bonusXP,
-      estrelas,
-      passou,
-      wrongAnswers: wrongAnswersList,
+    setFinalResults({ acertos: correctCount, estrelas, passou });
+
+    const userDocRef = doc(db, 'users', user.uid);
+    const progressPath = `progress.${subject.id}.${level.id}`;
+
+    const xpGanhos = correctCount * level.xpPorAcerto;
+
+    verificarEdesbloquearConquistas('GANHOU_XP', {
+      novoXpTotal: useProgressStore.getState().xp + xpGanhos,
     });
-
-    const xpAtual = useProgressStore.getState().xp;
-    const novoXpTotal = xpAtual + totalXp;
-    verificarEdesbloquearConquistas('GANHOU_XP', { novoXpTotal });
     if (passou) {
       verificarEdesbloquearConquistas('CONCLUIU_NIVEL', {
         acertos: correctCount,
@@ -255,184 +238,111 @@ export const ExercisePage = ({
       });
     }
 
-    const userDocRef = doc(db, 'users', user.uid);
-    const bestStars = Math.max(currentProgress?.estrelas || 0, estrelas);
-
     try {
-      if (passou) {
-        await updateDoc(userDocRef, {
-          xp: increment(totalXp),
-          [`progress.${subject.id}.${level.id}`]: {
-            acertos: correctCount,
-            concluido: true,
-            estrelas: bestStars,
-            tentativas: newAttempts,
-          },
-        });
-      } else {
-        await updateDoc(userDocRef, {
-          [`progress.${subject.id}.${level.id}`]: {
-            acertos: correctCount,
-            concluido: false,
-            estrelas: bestStars,
-            tentativas: newAttempts,
-          },
-        });
-      }
+      const userDoc = await getDoc(userDocRef);
+      const currentProgress = userDoc.data()?.progress?.[subject.id]?.[
+        level.id
+      ] || { acertos: 0, tentativas: 0, estrelas: 0, concluido: false };
 
-      const updatedUserDoc = await getDoc(userDocRef);
-      if (updatedUserDoc.exists()) {
+      await updateDoc(userDocRef, {
+        xp: increment(xpGanhos),
+        [progressPath]: {
+          acertos: Math.max(currentProgress.acertos, correctCount),
+          concluido: currentProgress.concluido || passou,
+          estrelas: Math.max(currentProgress.estrelas, estrelas),
+          tentativas: increment(1),
+        },
+      });
+
+      const updatedDoc = await getDoc(userDocRef);
+      if (updatedDoc.exists()) {
         useProgressStore
           .getState()
-          .hydrateFromFirestore(updatedUserDoc.data() as FirestoreUserData);
+          .hydrateFromFirestore(updatedDoc.data() as FirestoreUserData);
       }
     } catch (error) {
-      console.error('Erro ao guardar o progresso:', error);
+      console.error('Deu ruim pra salvar o progresso, chefe:', error);
     }
 
-    setShowResults(true);
+    setShowResultsModal(true);
   };
 
-  const allAnswered = Object.keys(answers).length === shuffledExercises.length;
-
-  if (showResults) {
+  if (showResultsModal) {
     return (
-      <ModalOverlay>
-        <ModalContent>
-          {results.passou ? <CheckCircleIcon /> : <XCircleIcon />}
-          <Title as="h2" style={{ fontSize: '1.875rem', marginTop: '1rem' }}>
-            {results.passou ? 'Nível Concluído!' : 'Tente Novamente!'}
-          </Title>
-          <StarsContainer>
-            {[1, 2, 3].map((i) => (
-              <Star
-                key={i}
-                size={40}
-                color={i <= results.estrelas ? '#f1c40f' : '#72767d'}
-                weight="fill"
-              />
-            ))}
-          </StarsContainer>
-          <Subtitle as="p" style={{ fontSize: '1rem', marginBottom: 0 }}>
-            Você acertou {results.acertos} de {shuffledExercises.length}{' '}
-            perguntas.
-          </Subtitle>
-          {results.passou && (
-            <XPResultsContainer>
-              <XPDisplayModal style={{ margin: 0 }}>
-                <StarIcon />
-                <span>+{results.xpGanhos} XP Ganhos</span>
-              </XPDisplayModal>
-              {results.bonusXP > 0 && (
-                <BonusXPText>+{results.bonusXP} XP Bônus!</BonusXPText>
-              )}
-            </XPResultsContainer>
-          )}
-          {results.passou && results.wrongAnswers.length > 0 && (
-            <WrongAnswersContainer>
-              <h4 style={{ marginTop: 0 }}>Questões para revisar:</h4>
-              {results.wrongAnswers.map((q) => (
-                <WrongAnswerItem key={q.id}>
-                  <p>
-                    <strong>Pergunta:</strong> {parseText(q.pergunta)}
-                  </p>
-                  <p style={{ color: '#ed4245' }}>
-                    <strong>Sua resposta:</strong> {q.userAnswer}
-                  </p>
-                  <p style={{ color: '#43b581' }}>
-                    <strong>Resposta correta:</strong> {q.respostaCorreta}
-                  </p>
-                </WrongAnswerItem>
-              ))}
-            </WrongAnswersContainer>
-          )}
-          {!results.passou && (
-            <EncouragementText>
-              <p>
-                Reveja o material de estudo para encontrar as respostas corretas
-                e tente novamente!
-              </p>
-            </EncouragementText>
-          )}
-          <ContinueButton onClick={onBack}>Continuar Jornada</ContinueButton>
-        </ModalContent>
-      </ModalOverlay>
+      <ResultsModal
+        results={finalResults}
+        totalQuestions={exercises.length}
+        onBack={onBack}
+      />
     );
   }
 
-  if (shuffledExercises.length === 0) {
+  if (exercises.length === 0) {
     return (
-      <LessonWrapper>
+      <ExerciseContainer>
         <BackButton onClick={onBack}>&larr; Voltar</BackButton>
-        <TitleExercise
-          as="h2"
-          style={{
-            border: 'none',
-            padding: 0,
-            textAlign: 'left',
-            marginBottom: '1.5rem',
-          }}
-        >
-          Exercícios: {level.nome}
-        </TitleExercise>
-        <EncouragementText style={{ textAlign: 'center' }}>
-          <p>
-            Ainda não há exercícios de múltipla escolha para este nível. Volte
-            em breve!
-          </p>
-        </EncouragementText>
-      </LessonWrapper>
+        <TitleExercise>Carregando...</TitleExercise>
+        <p style={{ textAlign: 'center' }}>
+          Nenhum exercício de múltipla escolha encontrado pra esse nível.
+        </p>
+      </ExerciseContainer>
     );
   }
 
   return (
-    <LessonWrapper>
+    <ExerciseContainer>
       <BackButton onClick={onBack}>&larr; Voltar</BackButton>
-      <TitleExercise
-        as="h2"
-        style={{
-          border: 'none',
-          padding: 0,
-          textAlign: 'left',
-          marginBottom: '1.5rem',
-        }}
-      >
-        Exercícios: {level.nome} ({3 - currentAttempts} tentativas restantes)
+      <TitleExercise as="h2" style={{ border: 'none', padding: 0 }}>
+        Exercícios: {level.nome}
       </TitleExercise>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-        {shuffledExercises.map((ex, index) => (
-          <ExerciseBox key={ex.id}>
-            <QuestionText>
-              {index + 1}. {parseText(ex.pergunta)}
-            </QuestionText>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.75rem',
-              }}
-            >
-              {ex.opcoes?.map((option) => (
-                <OptionLabel key={option}>
-                  <RadioInput
-                    type="radio"
-                    name={`ex-${ex.id}`}
-                    value={option}
-                    checked={answers[ex.id] === option}
-                    onChange={(e) => handleAnswerChange(ex.id, e.target.value)}
-                  />
-                  <span>{option}</span>
-                </OptionLabel>
-              ))}
-            </div>
-          </ExerciseBox>
-        ))}
+      <QuestionCounter>
+        Questão {currentQuestionIndex + 1} de {exercises.length}
+      </QuestionCounter>
+
+      <ExerciseBox>
+        <QuestionText>{currentQuestion.pergunta}</QuestionText>
+        <div
+          style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+        >
+          {currentQuestion.opcoes?.map((option) => {
+            let status: 'correct' | 'incorrect' | 'default' = 'default';
+            if (isAnswered) {
+              if (option === currentQuestion.respostaCorreta) {
+                status = 'correct';
+              } else if (option === selectedAnswer) {
+                status = 'incorrect';
+              }
+            }
+            return (
+              <OptionLabel key={option} $status={status}>
+                <RadioInput
+                  type="radio"
+                  name={`ex-${currentQuestion.id}`}
+                  value={option}
+                  checked={selectedAnswer === option}
+                  onChange={(e) => setSelectedAnswer(e.target.value)}
+                  disabled={isAnswered}
+                />
+                <span>{option}</span>
+              </OptionLabel>
+            );
+          })}
+        </div>
+      </ExerciseBox>
+
+      <div style={{ textAlign: 'center' }}>
+        {isAnswered ? (
+          <ActionButton onClick={handleNextQuestion}>
+            {currentQuestionIndex < exercises.length - 1
+              ? 'Próxima Questão'
+              : 'Finalizar'}
+          </ActionButton>
+        ) : (
+          <ActionButton onClick={handleCheckAnswer} disabled={!selectedAnswer}>
+            Verificar Resposta
+          </ActionButton>
+        )}
       </div>
-      <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-        <SubmitButton onClick={handleSubmit} disabled={!allAnswered}>
-          Finalizar e Corrigir
-        </SubmitButton>
-      </div>
-    </LessonWrapper>
+    </ExerciseContainer>
   );
 };

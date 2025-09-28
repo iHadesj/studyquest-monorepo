@@ -1,25 +1,43 @@
+import { useState, useMemo } from 'react';
 import styled from 'styled-components';
+import { motion, type Variants } from 'framer-motion';
+import {
+  Trophy,
+  UserPlus,
+  Check,
+  X,
+  Star,
+  Swatches,
+  Crown,
+} from 'phosphor-react';
+
 import * as Modal from '../Modal';
 import { ProfileEditor } from '../ProfileEditor';
-import { useMemo, useState } from 'react';
-import { Trophy, UserPlus, Check, X } from 'phosphor-react';
+import { useFriendship } from '../../hooks/useFriendship';
+import type { UserProfileData } from '../../interfaces';
+
 import {
-  ProfileWrapper,
+  ProfileCard,
+  ProfileHeader,
   ProfileAvatar,
   UserInfo,
   Username,
+  UserTag,
   StatsContainer,
   StatBox,
+  StatIcon,
+  StatInfo,
   StatValue,
   StatLabel,
+  CloseButton,
 } from './style';
-import type { UserProfileData } from '../../interfaces';
-import { useFriendship } from '../../hooks/useFriendship';
 
-const ButtonGroup = styled.div`
+const ButtonGroup = styled(motion.div)`
   display: flex;
+  justify-content: center;
   gap: 1rem;
   margin-top: 1.5rem;
+  min-height: 38px;
 `;
 
 const ActionButton = styled.button<{
@@ -42,30 +60,36 @@ const ActionButton = styled.button<{
   gap: 0.5rem;
   font-weight: bold;
   transition: background-color 0.2s;
-
   &:hover:not(:disabled) {
     filter: brightness(1.1);
   }
-
   &:disabled {
     background-color: #40444b;
     cursor: not-allowed;
   }
 `;
 
-const UserTag = styled.p`
-  color: #b9bbbe;
-  font-size: 0.9rem;
-  margin: -0.5rem 0 0 0;
-  background-color: #202225;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-`;
+const containerVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      delayChildren: 0.2,
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: { y: 0, opacity: 1 },
+};
 
 interface ModalUserPerfilProps {
   isOpen: boolean;
   onClose: () => void;
-  onNavigateToAchievements?: () => void;
+  onNavigateToAchievements: () => void;
   user: UserProfileData | null;
 }
 
@@ -79,7 +103,6 @@ export function ModalUserPerfil({
   const { friendshipStatus, sendRequest, cancelRequest, handleRequest } =
     useFriendship(user?.uid || null);
 
-  // O useMemo VEM PRA CIMA, pra ser chamado em toda renderização
   const completedTasks = useMemo(() => {
     if (!user?.progress) return 0;
     return Object.values(user.progress)
@@ -87,14 +110,10 @@ export function ModalUserPerfil({
       .filter((level: any) => level.concluido).length;
   }, [user?.progress]);
 
-  // Agora o IF vem depois, sem problemas
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   const isMyProfile = friendshipStatus === 'MYSELF';
   const unlockedAchievementsCount = user.unlockedAchievements?.length || 0;
-
   const devTag = 'Edu.dev#8636';
   const avatarSrc =
     user.fullTag === devTag
@@ -102,7 +121,7 @@ export function ModalUserPerfil({
       : `https://api.dicebear.com/8.x/pixel-art/svg?seed=${user.avatarSeed}`;
 
   const handleAchievementsClick = () => {
-    if (onNavigateToAchievements) onNavigateToAchievements();
+    onNavigateToAchievements();
     onClose();
   };
 
@@ -143,41 +162,88 @@ export function ModalUserPerfil({
     <>
       <Modal.Root isOpen={isOpen} onClose={onClose}>
         <Modal.Overlay />
-        <Modal.Content>
-          <Modal.Header>
-            <Modal.Title>
-              {isMyProfile ? 'Seu Perfil' : `Perfil de ${user.username}`}
-            </Modal.Title>
-            <Modal.Close />
-          </Modal.Header>
-          <Modal.Body>
-            <ProfileWrapper>
-              <ProfileAvatar src={avatarSrc} alt="User Avatar" />
-              <UserInfo>
+        <Modal.Content
+          style={{
+            padding: 0,
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
+          }}
+        >
+          <ProfileCard
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <CloseButton onClick={onClose} aria-label="Fechar modal">
+              <X size={20} />
+            </CloseButton>
+            <ProfileHeader variants={itemVariants} />
+            <ProfileAvatar
+              src={avatarSrc}
+              alt="User Avatar"
+              variants={itemVariants}
+              initial={{ scale: 0.5, y: -50 }}
+              animate={{ scale: 1, y: 0 }}
+              transition={{
+                type: 'spring',
+                stiffness: 260,
+                damping: 20,
+                delay: 0.2,
+              }}
+            />
+            <div
+              style={{
+                padding: '0 1.5rem 1.5rem',
+                width: '90%',
+              }}
+            >
+              <UserInfo variants={itemVariants}>
                 <Username>{user.username}</Username>
                 {user.fullTag && <UserTag>{user.fullTag}</UserTag>}
               </UserInfo>
-              <StatsContainer>
+
+              <StatsContainer variants={itemVariants}>
                 <StatBox>
-                  <StatValue>{user.xp.toLocaleString('pt-BR')}</StatValue>
-                  <StatLabel>Total XP</StatLabel>
+                  <StatIcon>
+                    <Star size={24} />
+                  </StatIcon>
+                  <StatInfo>
+                    <StatValue>{user.xp.toLocaleString('pt-BR')}</StatValue>
+                    <StatLabel>Total XP</StatLabel>
+                  </StatInfo>
                 </StatBox>
                 <StatBox>
-                  <StatValue>{unlockedAchievementsCount}</StatValue>
-                  <StatLabel>Conquistas</StatLabel>
+                  <StatIcon>
+                    <Trophy size={24} />
+                  </StatIcon>
+                  <StatInfo>
+                    <StatValue>{unlockedAchievementsCount}</StatValue>
+                    <StatLabel>Conquistas</StatLabel>
+                  </StatInfo>
                 </StatBox>
                 <StatBox>
-                  <StatValue>{completedTasks}</StatValue>
-                  <StatLabel>Fases Concluídas</StatLabel>
+                  <StatIcon>
+                    <Swatches size={24} />
+                  </StatIcon>
+                  <StatInfo>
+                    <StatValue>{completedTasks}</StatValue>
+                    <StatLabel>Fases Concluídas</StatLabel>
+                  </StatInfo>
                 </StatBox>
                 {user.rank && (
                   <StatBox>
-                    <StatValue>#{user.rank}</StatValue>
-                    <StatLabel>Ranking</StatLabel>
+                    <StatIcon>
+                      <Crown size={24} />
+                    </StatIcon>
+                    <StatInfo>
+                      <StatValue>#{user.rank}</StatValue>
+                      <StatLabel>Ranking</StatLabel>
+                    </StatInfo>
                   </StatBox>
                 )}
               </StatsContainer>
-              <ButtonGroup>
+
+              <ButtonGroup variants={itemVariants}>
                 {isMyProfile ? (
                   <>
                     <ActionButton onClick={() => setIsEditing(true)}>
@@ -192,8 +258,8 @@ export function ModalUserPerfil({
                   renderFriendshipButton()
                 )}
               </ButtonGroup>
-            </ProfileWrapper>
-          </Modal.Body>
+            </div>
+          </ProfileCard>
         </Modal.Content>
       </Modal.Root>
       <ProfileEditor isOpen={isEditing} onClose={() => setIsEditing(false)} />

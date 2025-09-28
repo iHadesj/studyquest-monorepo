@@ -46,9 +46,10 @@ export function Overlay() {
 
 interface ContentProps {
   children: React.ReactNode;
+  style?: React.CSSProperties;
 }
 
-export function Content({ children }: ContentProps) {
+export function Content({ children, style }: ContentProps) {
   const contentRef = useRef<HTMLDivElement>(null);
 
   const handleContentClick = (e: React.MouseEvent) => {
@@ -56,7 +57,7 @@ export function Content({ children }: ContentProps) {
   };
 
   return (
-    <ModalContent ref={contentRef} onClick={handleContentClick}>
+    <ModalContent ref={contentRef} onClick={handleContentClick} style={style}>
       {children}
     </ModalContent>
   );
