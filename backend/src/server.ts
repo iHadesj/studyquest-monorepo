@@ -15,7 +15,10 @@ import exerciseRoutes from "./routes/exerciseRoutes";
 
 dotenv.config();
 
-const allowedOrigins: string[] = ["http://localhost:5173"];
+const allowedOrigins: string[] = [
+  "http://localhost:5173",
+  "https://go-studyquest.vercel.app",
+];
 if (process.env.FRONTEND_URL) {
   allowedOrigins.push(process.env.FRONTEND_URL);
 }
