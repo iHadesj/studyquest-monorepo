@@ -1,11 +1,9 @@
-// backend/src/controllers/SubjectController.ts
 import { Request, Response } from "express";
 import materiasIndex from "../data/materias.json";
 import { subjectDataMap } from "../GameManager";
-import { Materia, Nivel, Exercicio } from "../interfaces";
+import { Materia, Nivel } from "../interfaces";
 
 export const getSubjectsList = (req: Request, res: Response) => {
-  // Retorna apenas a lista de matérias, sem os detalhes
   res.json(materiasIndex);
 };
 
@@ -18,19 +16,19 @@ export const getSubjectDetails = (req: Request, res: Response) => {
   const subjectData = subjectDataMap[subjectId];
 
   if (subjectData) {
-    // AQUI ESTÁ A MÁGICA DA SEGURANÇA
-    // Criamos uma cópia do objeto para não alterar o original no servidor
     const subjectDataCopy: Materia = JSON.parse(JSON.stringify(subjectData));
 
-    // Iteramos em cada nível da matéria para limpar os exercícios
     const sanitizedNiveis = subjectDataCopy.niveis.map((nivel: Nivel) => {
-      // Apagamos completamente a chave 'exercicios'
-      // O frontend vai buscar isso depois na rota segura /api/exercises
+      // 1. CONTA os exercícios antes de remover
+      const totalExercicios = nivel.exercicios ? nivel.exercicios.length : 0;
+
+      // 2. REMOVE a lista de exercícios com as respostas
       delete (nivel as any).exercicios;
-      return nivel;
+
+      // 3. RETORNA o nível com a contagem adicionada
+      return { ...nivel, totalExercicios };
     });
 
-    // Montamos o objeto final só com o conteúdo e os níveis (sem exercícios)
     const sanitizedSubjectData = {
       ...subjectDataCopy,
       niveis: sanitizedNiveis,

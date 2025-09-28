@@ -1,4 +1,3 @@
-// src/interfaces/index.tsx
 import type { FirestoreUserData } from '../hooks/useProgressStore';
 
 export interface Exercicio {
@@ -18,7 +17,8 @@ export interface Nivel {
     titulo: string;
     resumo: string;
   };
-  exercicios: readonly Exercicio[];
+  exercicios?: readonly Exercicio[];
+  totalExercicios?: number;
 }
 
 export interface Conquista {

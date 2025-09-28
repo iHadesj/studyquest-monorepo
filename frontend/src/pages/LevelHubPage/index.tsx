@@ -20,13 +20,16 @@ export const LevelHubPage = ({
   const progress = useProgressStore((state) => state.progress);
   const levelProgress = progress[subject.id]?.[level.id];
 
-  const totalExercicios = level.exercicios.length;
+  const totalExercicios = level.totalExercicios ?? 10;
+
   const passouNosAcertos =
     level.minAcertosParaDesbloquearProximo !== null &&
     levelProgress &&
     levelProgress.acertos >= level.minAcertosParaDesbloquearProximo;
+
   const pontuacaoPerfeita =
     levelProgress && levelProgress.acertos === totalExercicios;
+
   const passou = passouNosAcertos || pontuacaoPerfeita;
 
   const tentativasRestantes = 3 - (levelProgress?.tentativas || 0);
