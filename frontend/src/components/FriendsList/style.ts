@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { motion } from 'framer-motion'; // Importa o motion
 import { Avatar as BaseAvatar } from '../TopBar/index';
 
 export const FriendsListWrapper = styled.div`
@@ -7,12 +8,71 @@ export const FriendsListWrapper = styled.div`
   gap: 1rem;
   min-height: 400px;
   max-height: 60vh;
+  overflow: hidden; // Ajuda a conter a animação
 `;
 
 export const TabContainer = styled.div`
   display: flex;
   border-bottom: 1px solid #40444b;
+  position: relative; // Necessário para a barrinha animada
 `;
+
+// <<< MUDANÇA: Adicionamos a barrinha que vai animar
+export const Underline = styled(motion.div)`
+  position: absolute;
+  bottom: -1px;
+  height: 2px;
+  background-color: #5865f2;
+`;
+
+export const TabButton = styled.button<{ $isActive: boolean }>`
+  // Usa $
+  flex: 1;
+  padding: 0.75rem;
+  background-color: transparent;
+  border: none;
+  color: ${({ $isActive }) => ($isActive ? '#ffffff' : '#b9bbbe')};
+  font-family: 'Fira Code', monospace;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s;
+  position: relative;
+
+  &:hover {
+    color: #ffffff;
+  }
+`;
+
+// <<< MUDANÇA: A lista agora é um motion.div
+export const ListContainer = styled(motion.div)`
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+`;
+
+export const Status = styled.div<{ $isOnline: boolean }>`
+  // Usa $
+  font-size: 0.85rem;
+  color: ${({ $isOnline }) => ($isOnline ? '#43b581' : '#72767d')};
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  &::before {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: ${({ $isOnline }) => ($isOnline ? '#43b581' : '#72767d')};
+  }
+`;
+
+// O resto do style.ts continua igual...
 export const FooterContainer = styled.div`
   display: flex;
   align-items: flex-end;
@@ -60,33 +120,6 @@ export const FriendActionButton = styled.button`
   }
 `;
 
-export const TabButton = styled.button<{ isActive: boolean }>`
-  flex: 1;
-  padding: 0.75rem;
-  background-color: ${(props) => (props.isActive ? '#2f3136' : 'transparent')};
-  border: none;
-  color: ${(props) => (props.isActive ? '#ffffff' : '#b9bbbe')};
-  font-family: 'Fira Code', monospace;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  border-bottom: 2px solid
-    ${(props) => (props.isActive ? '#5865f2' : 'transparent')};
-  transition: all 0.2s;
-
-  &:hover {
-    background-color: #40444b;
-  }
-`;
-
-export const List = styled.div`
-  overflow-y: auto;
-  padding-right: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-`;
-
 export const UserEntry = styled.div`
   display: flex;
   align-items: center;
@@ -111,23 +144,6 @@ export const Username = styled.p`
   margin: 0;
   font-weight: bold;
   color: #ffffff;
-`;
-
-export const Status = styled.div<{ isOnline: boolean }>`
-  font-size: 0.75rem;
-  color: ${(props) => (props.isOnline ? '#43b581' : '#72767d')};
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-
-  &::before {
-    content: '';
-    display: block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: ${(props) => (props.isOnline ? '#43b581' : '#72767d')};
-  }
 `;
 
 export const ActionButtons = styled.div`
@@ -172,4 +188,33 @@ export const EmptyState = styled.div`
   text-align: center;
   color: #72767d;
   padding: 3rem 1rem;
+`;
+
+export const CancelButton = styled.button<{
+  variant?: 'primary' | 'success' | 'danger';
+}>`
+  background-color: ${({ variant }) =>
+    variant === 'success'
+      ? '#43b581'
+      : variant === 'danger'
+      ? '#ed4245'
+      : '#5865f2'};
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem;
+  cursor: pointer;
+  font-family: 'Fira Code', monospace;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: bold;
+  transition: background-color 0.2s;
+  &:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+  &:disabled {
+    background-color: #40444b;
+    cursor: not-allowed;
+  }
 `;

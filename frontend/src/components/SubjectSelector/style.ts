@@ -87,7 +87,7 @@ export const SubjectCard = styled.button<{ bg: string; text: string }>`
   }
   .meta {
     font-size: 0.82rem;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 1);
     opacity: 0.92;
   }
   .progress-wrap {

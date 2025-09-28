@@ -20,6 +20,7 @@ export const CloseButton = styled.button`
 
   &:hover {
     background: rgba(0, 0, 0, 0.6);
+    color: #ff0000;
     transform: scale(1.1);
   }
 `;

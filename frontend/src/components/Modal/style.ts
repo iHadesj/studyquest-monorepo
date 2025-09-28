@@ -66,18 +66,23 @@ export const CloseButton = styled.button`
   position: absolute;
   top: 1rem;
   right: 1rem;
-
-  background: transparent;
+  background: rgba(0, 0, 0, 0.3);
   border: none;
-  cursor: pointer;
-  color: #b9bbbe;
-
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  transition: all 0.2s;
+  z-index: 10;
 
   &:hover {
-    color: #ff0000ff;
+    background: rgba(0, 0, 0, 0.6);
+    color: #ff0000;
+    transform: scale(1.1);
   }
 `;
 

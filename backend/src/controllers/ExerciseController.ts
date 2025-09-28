@@ -1,4 +1,3 @@
-// src/controllers/ExerciseController.ts
 import { Request, Response } from "express";
 import { z } from "zod";
 import { subjectDataMap } from "../GameManager";
@@ -59,5 +58,14 @@ export const submitAnswer = async (req: Request, res: Response) => {
     exercise.respostaCorreta.trim().toLowerCase() ===
     userAnswer.trim().toLowerCase();
 
-  return res.json({ isCorrect });
+  // <<< MUDANÇA PRINCIPAL AQUI >>>
+  if (isCorrect) {
+    return res.json({ isCorrect: true });
+  } else {
+    // Se errou, a gente devolve o gabarito junto!
+    return res.json({
+      isCorrect: false,
+      correctAnswer: exercise.respostaCorreta,
+    });
+  }
 };

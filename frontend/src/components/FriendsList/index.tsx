@@ -21,6 +21,7 @@ import * as S from './style';
 import * as Modal from '../Modal/index';
 import { verificarEdesbloquearConquistas } from '../../services/achievements';
 import type { UserProfileData } from '../../interfaces';
+import { AnimatePresence, type Variants } from 'framer-motion';
 
 const fullTagSchema = z
   .string()
@@ -41,6 +42,12 @@ type FeedbackModalState = {
   isOpen: boolean;
   message: string;
   type: 'success' | 'error';
+};
+
+const listVariants: Variants = {
+  hidden: { opacity: 0, x: 50 },
+  visible: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -50 },
 };
 
 export function FriendsList({
@@ -285,6 +292,26 @@ export function FriendsList({
     }
   };
 
+  const handleCancelSentRequest = async (targetUserId: string) => {
+    const currentUserId = auth.currentUser?.uid;
+    if (!currentUserId) return;
+    try {
+      await runTransaction(db, async (transaction) => {
+        const currentUserRef = doc(db, 'users', currentUserId);
+        const targetUserRef = doc(db, 'users', targetUserId);
+        transaction.update(currentUserRef, {
+          friendRequestsSent: arrayRemove(targetUserId),
+        });
+        transaction.update(targetUserRef, {
+          friendRequestsReceived: arrayRemove(currentUserId),
+        });
+      });
+      await refreshCurrentUserState();
+    } catch (e) {
+      console.error('Erro ao cancelar o pedido:', e);
+    }
+  };
+
   const handleInvite = (friendTag: string | undefined) => {
     if (!friendTag) return;
     socket.emit('invite_player', { inviteeTag: friendTag });
@@ -296,6 +323,126 @@ export function FriendsList({
     return user.fullTag === devTag
       ? '/Light.jpg'
       : `https://api.dicebear.com/8.x/pixel-art/svg?seed=${user.avatarSeed}`;
+  };
+
+  const renderListContent = () => {
+    switch (activeTab) {
+      case 'friends':
+        return friendsDetails.length > 0 ? (
+          friendsDetails.map((friend) => {
+            const isOnline = friend.fullTag
+              ? onlineFriends.includes(friend.fullTag)
+              : false;
+            return (
+              <S.UserEntry key={friend.uid}>
+                <S.Avatar
+                  src={getAvatarSrc(friend)}
+                  onClick={() => onViewProfile(friend)}
+                  style={{ cursor: 'pointer' }}
+                />
+                <S.UserInfo
+                  onClick={() => onViewProfile(friend)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <S.Username>{friend.username}</S.Username>
+                  <S.Status $isOnline={isOnline}>
+                    {isOnline ? 'Online' : 'Offline'}
+                  </S.Status>
+                </S.UserInfo>
+                <S.ActionButtons>
+                  <S.ActionButton
+                    variant="chat"
+                    onClick={() => onOpenChat(friend)}
+                    title="Abrir Chat"
+                  >
+                    <ChatCircleDots size={18} />
+                  </S.ActionButton>
+                  <S.ActionButton
+                    variant="invite"
+                    onClick={() => handleInvite(friend.fullTag)}
+                    disabled={!isOnline}
+                    title="Convidar para Duelo"
+                  >
+                    <Sword size={18} />
+                  </S.ActionButton>
+                </S.ActionButtons>
+              </S.UserEntry>
+            );
+          })
+        ) : (
+          <S.EmptyState>
+            Você ainda não tem amigos. Adicione alguns!
+          </S.EmptyState>
+        );
+      case 'requests':
+        return requestsDetails.length > 0 ? (
+          requestsDetails.map((request) => (
+            <S.UserEntry key={request.uid}>
+              <S.Avatar
+                src={getAvatarSrc(request)}
+                onClick={() => onViewProfile(request)}
+                style={{ cursor: 'pointer' }}
+              />
+              <S.UserInfo
+                onClick={() => onViewProfile(request)}
+                style={{ cursor: 'pointer' }}
+              >
+                <S.Username>{request.username}</S.Username>
+              </S.UserInfo>
+              <S.ActionButtons>
+                <S.ActionButton
+                  variant="accept"
+                  onClick={() => handleRequest(request.uid, true)}
+                  title="Aceitar Pedido"
+                >
+                  <Check size={18} />
+                </S.ActionButton>
+                <S.ActionButton
+                  variant="decline"
+                  onClick={() => handleRequest(request.uid, false)}
+                  title="Recusar Pedido"
+                >
+                  <X size={18} />
+                </S.ActionButton>
+              </S.ActionButtons>
+            </S.UserEntry>
+          ))
+        ) : (
+          <S.EmptyState>Nenhum pedido de amizade pendente.</S.EmptyState>
+        );
+      case 'sent':
+        return sentRequestsDetails.length > 0 ? (
+          sentRequestsDetails.map((user) => (
+            <S.UserEntry key={user.uid}>
+              <S.Avatar
+                src={getAvatarSrc(user)}
+                onClick={() => onViewProfile(user)}
+                style={{ cursor: 'pointer' }}
+              />
+              <S.UserInfo
+                onClick={() => onViewProfile(user)}
+                style={{ cursor: 'pointer' }}
+              >
+                <S.Username>{user.username}</S.Username>
+                <S.Status $isOnline={false}>Pendente</S.Status>
+              </S.UserInfo>
+              <S.ActionButtons>
+                <S.ActionButton
+                  variant="decline"
+                  onClick={() => handleCancelSentRequest(user.uid)}
+                  title="Cancelar Convite"
+                >
+                  <X size={18} />
+                </S.ActionButton>
+              </S.ActionButtons>
+            </S.UserEntry>
+          ))
+        ) : (
+          <S.EmptyState>Nenhum convite enviado.</S.EmptyState>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
@@ -310,134 +457,37 @@ export function FriendsList({
           <S.FriendsListWrapper>
             <S.TabContainer>
               <S.TabButton
-                isActive={activeTab === 'friends'}
+                $isActive={activeTab === 'friends'}
                 onClick={() => setActiveTab('friends')}
               >
                 Amigos ({friendsDetails.length})
               </S.TabButton>
               <S.TabButton
-                isActive={activeTab === 'requests'}
+                $isActive={activeTab === 'requests'}
                 onClick={() => setActiveTab('requests')}
               >
                 Pedidos ({requestsDetails.length})
               </S.TabButton>
               <S.TabButton
-                isActive={activeTab === 'sent'}
+                $isActive={activeTab === 'sent'}
                 onClick={() => setActiveTab('sent')}
               >
                 Enviados ({sentRequestsDetails.length})
               </S.TabButton>
             </S.TabContainer>
-            <S.List>
-              {activeTab === 'friends' &&
-                (friendsDetails.length > 0 ? (
-                  friendsDetails.map((friend) => {
-                    const isOnline = friend.fullTag
-                      ? onlineFriends.includes(friend.fullTag)
-                      : false;
-                    return (
-                      <S.UserEntry key={friend.uid}>
-                        <S.Avatar
-                          src={getAvatarSrc(friend)}
-                          onClick={() => onViewProfile(friend)}
-                          style={{ cursor: 'pointer' }}
-                        />
-                        <S.UserInfo
-                          onClick={() => onViewProfile(friend)}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          <S.Username>{friend.username}</S.Username>
-                          <S.Status isOnline={isOnline}>
-                            {isOnline ? 'Online' : 'Offline'}
-                          </S.Status>
-                        </S.UserInfo>
-                        <S.ActionButtons>
-                          <S.ActionButton
-                            variant="chat"
-                            onClick={() => onOpenChat(friend)}
-                            title="Abrir Chat"
-                          >
-                            <ChatCircleDots size={18} />
-                          </S.ActionButton>
-                          <S.ActionButton
-                            variant="invite"
-                            onClick={() => handleInvite(friend.fullTag)}
-                            disabled={!isOnline}
-                            title="Convidar para Duelo"
-                          >
-                            <Sword size={18} />
-                          </S.ActionButton>
-                        </S.ActionButtons>
-                      </S.UserEntry>
-                    );
-                  })
-                ) : (
-                  <S.EmptyState>
-                    Você ainda não tem amigos. Adicione alguns!
-                  </S.EmptyState>
-                ))}
 
-              {activeTab === 'requests' &&
-                (requestsDetails.length > 0 ? (
-                  requestsDetails.map((request) => (
-                    <S.UserEntry key={request.uid}>
-                      <S.Avatar
-                        src={getAvatarSrc(request)}
-                        onClick={() => onViewProfile(request)}
-                        style={{ cursor: 'pointer' }}
-                      />
-                      <S.UserInfo
-                        onClick={() => onViewProfile(request)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        <S.Username>{request.username}</S.Username>
-                      </S.UserInfo>
-                      <S.ActionButtons>
-                        <S.ActionButton
-                          variant="accept"
-                          onClick={() => handleRequest(request.uid, true)}
-                          title="Aceitar Pedido"
-                        >
-                          <Check size={18} />
-                        </S.ActionButton>
-                        <S.ActionButton
-                          variant="decline"
-                          onClick={() => handleRequest(request.uid, false)}
-                          title="Recusar Pedido"
-                        >
-                          <X size={18} />
-                        </S.ActionButton>
-                      </S.ActionButtons>
-                    </S.UserEntry>
-                  ))
-                ) : (
-                  <S.EmptyState>
-                    Nenhum pedido de amizade pendente.
-                  </S.EmptyState>
-                ))}
-
-              {activeTab === 'sent' &&
-                (sentRequestsDetails.length > 0 ? (
-                  sentRequestsDetails.map((user) => (
-                    <S.UserEntry key={user.uid}>
-                      <S.Avatar
-                        src={getAvatarSrc(user)}
-                        onClick={() => onViewProfile(user)}
-                        style={{ cursor: 'pointer' }}
-                      />
-                      <S.UserInfo
-                        onClick={() => onViewProfile(user)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        <S.Username>{user.username}</S.Username>
-                        <S.Status isOnline={false}>Pendente</S.Status>
-                      </S.UserInfo>
-                    </S.UserEntry>
-                  ))
-                ) : (
-                  <S.EmptyState>Nenhum convite enviado.</S.EmptyState>
-                ))}
-            </S.List>
+            <AnimatePresence mode="wait">
+              <S.ListContainer
+                key={activeTab}
+                variants={listVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                transition={{ duration: 0.1 }}
+              >
+                {renderListContent()}
+              </S.ListContainer>
+            </AnimatePresence>
           </S.FriendsListWrapper>
           <S.FooterContainer as="form" onSubmit={handleSendRequestByTag}>
             <S.AddFriendInput

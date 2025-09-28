@@ -227,6 +227,8 @@ export const ExercisePage = ({
   >([]);
   const [finalResults, setFinalResults] = useState<any>(null);
 
+  const progress = useProgressStore((state) => state.progress);
+
   useEffect(() => {
     const fetchExercises = async () => {
       setIsLoading(true);
@@ -293,14 +295,23 @@ export const ExercisePage = ({
     const user = auth.currentUser;
     if (!user) return;
 
+    // <<< MUDANÇA PRINCIPAL AQUI >>>
+    const levelProgress = progress[subject.id]?.[level.id];
+    const tentativasFeitas = levelProgress?.tentativas || 0;
+    const ehUltimaTentativa = tentativasFeitas + 1 >= 3;
+
     const correctCount = allUserAnswers.filter((a) => a.isCorrect).length;
-    const wrongAnswersList = allUserAnswers
-      .filter((a) => !a.isCorrect)
-      .map((a) => ({
-        ...a.exercise,
-        userAnswer: a.answer,
-        correctAnswer: a.correctAnswer,
-      }));
+
+    // O gabarito só é montado se for a última tentativa!
+    const wrongAnswersList = ehUltimaTentativa
+      ? allUserAnswers
+          .filter((a) => !a.isCorrect)
+          .map((a) => ({
+            ...a.exercise,
+            userAnswer: a.answer,
+            correctAnswer: a.correctAnswer,
+          }))
+      : [];
 
     const totalQuestions = exercises.length;
     const percentage =
