@@ -277,7 +277,7 @@ export default function App() {
           <SubjectSelector {...subjectSelectorProps} />
         );
       case 'content':
-        return selectedLevel ? (
+        return selectedSubject && selectedLevel ? (
           <ContentPage
             level={selectedLevel}
             onBack={backToHub}
