@@ -9,14 +9,11 @@ import { getRandomQuestion } from "./GameManager";
 import { Exercicio } from "./interfaces";
 import routes from "./routes/index";
 
-// --- IMPORTAÇÕES DO FIREBASE ADMIN ---
 import * as admin from "firebase-admin";
-// Garanta que o nome do arquivo da sua chave de serviço está correto
 import serviceAccount from "./serviceAccountKey.json";
 
 dotenv.config();
 
-// --- LÓGICA DE CORS ATUALIZADA ---
 const allowedOrigins: string[] = ["http://localhost:5173"];
 if (process.env.FRONTEND_URL) {
   allowedOrigins.push(process.env.FRONTEND_URL);
@@ -33,7 +30,6 @@ const io = new Server(httpServer, {
   },
 });
 
-// --- INICIALIZAÇÃO DO FIREBASE ADMIN ---
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as any),
 });
@@ -44,7 +40,6 @@ app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 app.use(routes);
 
-// --- ESTRUTURAS DE DADOS EM MEMÓRIA ---
 const onlineUsers = new Map<string, string>();
 const userTagsToUids = new Map<string, string>();
 const friendSubscriptions = new Map<string, Set<string>>();
@@ -67,14 +62,12 @@ interface GameRoom {
 }
 const gameRooms = new Map<string, GameRoom>();
 
-// --- CONSTANTES DO JOGO ---
 const QUESTION_TIME_LIMIT_S = 15;
 const NEXT_QUESTION_DELAY_MS = 3000;
 const BASE_SCORE = 50;
 const TIME_BONUS_MULTIPLIER = 10;
 const MODE_DURATION_S = 60;
 
-// --- FUNÇÕES UTILITÁRIAS DO JOGO ---
 const normalizeAnswer = (s: string) =>
   s
     .trim()
@@ -144,7 +137,6 @@ const sendNextQuestion = (roomId: string) => {
   }, 1000);
 };
 
-// --- O CORAÇÃO DO SERVIDOR ---
 io.on("connection", (socket) => {
   console.log("✅ Novo jogador conectado! ID:", socket.id);
 
@@ -180,7 +172,6 @@ io.on("connection", (socket) => {
     }
   );
 
-  // --- LÓGICA DE STATUS DE AMIGOS ---
   socket.on(
     "subscribe_to_friends_status",
     ({ friendTags }: { friendTags: string[] }) => {
@@ -196,7 +187,6 @@ io.on("connection", (socket) => {
         friendTags
       );
 
-      // Log detalhado do estado atual do servidor
       console.log(
         "[SUBSCRIBE-INFO] Mapa de usuários online no momento:",
         Array.from(onlineUsers.keys())
@@ -211,7 +201,6 @@ io.on("connection", (socket) => {
 
       const initialOnlineFriends = friendTags.filter((tag) => {
         const isOnline = onlineUsers.has(tag);
-        // DEDO-DURO: Vamos logar cada verificação
         console.log(
           `[SUBSCRIBE-CHECK] Verificando se "${tag}" está online... Resultado: ${isOnline}`
         );
@@ -235,7 +224,6 @@ io.on("connection", (socket) => {
     }
   );
 
-  // --- LÓGICA DO CHAT ---
   socket.on(
     "private_message",
     async ({
@@ -327,7 +315,6 @@ io.on("connection", (socket) => {
     }
   );
 
-  // --- LÓGICA DO JOGO ---
   socket.on("invite_player", ({ inviteeTag }: { inviteeTag: string }) => {
     const inviterTag = currentUserTag;
     if (!inviterTag) return;

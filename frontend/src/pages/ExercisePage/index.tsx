@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { doc, updateDoc, increment } from 'firebase/firestore';
+import { doc, updateDoc, increment, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../config/firebase';
 import {
   BackButton,
@@ -18,7 +18,10 @@ import {
   TitleExercise,
   XPDisplayModal,
 } from '../../style/globalStyle';
-import { useProgressStore } from '../../hooks/useProgressStore';
+import {
+  useProgressStore,
+  type FirestoreUserData,
+} from '../../hooks/useProgressStore';
 import { CheckCircleIcon, StarIcon, XCircleIcon } from '../../style/icons';
 import type { Exercicio, Materia, Nivel } from '../../interfaces';
 import { Star } from 'phosphor-react';
@@ -168,7 +171,6 @@ export const ExercisePage = ({
   const currentAttempts = currentProgress?.tentativas || 0;
 
   useEffect(() => {
-    // 1. FILTRAMOS PARA PEGAR APENAS EXERCÍCIOS DE MÚLTIPLA ESCOLHA
     const multipleChoiceExercises = level.exercicios.filter(
       (ex) => ex.tipo === 'multipla_escolha'
     );
@@ -276,6 +278,13 @@ export const ExercisePage = ({
             tentativas: newAttempts,
           },
         });
+      }
+
+      const updatedUserDoc = await getDoc(userDocRef);
+      if (updatedUserDoc.exists()) {
+        useProgressStore
+          .getState()
+          .hydrateFromFirestore(updatedUserDoc.data() as FirestoreUserData);
       }
     } catch (error) {
       console.error('Erro ao guardar o progresso:', error);

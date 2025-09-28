@@ -276,7 +276,7 @@ export default function App() {
           <ExercisePage
             subject={selectedSubject}
             level={selectedLevel}
-            onBack={backToHub}
+            onBack={backToLevels}
           />
         ) : (
           <SubjectSelector {...subjectSelectorProps} />

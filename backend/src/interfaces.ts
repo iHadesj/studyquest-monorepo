@@ -42,7 +42,6 @@ export interface Materia {
   niveis: readonly Nivel[];
 }
 
-// --- TIPO UNIFICADO PARA USUÁRIOS ---
 export type UserProfileData = FirestoreUserData & {
   level: number;
   rank?: number;

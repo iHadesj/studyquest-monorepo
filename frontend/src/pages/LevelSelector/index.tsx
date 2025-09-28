@@ -101,9 +101,7 @@ export const LevelSelector = ({
                 <h2>{level.nome}</h2>
                 {levelProgress && (
                   <>
-                    <p>
-                      Acertos: {levelProgress.acertos}/{level.exercicios.length}
-                    </p>
+                    <p>Acertos: {levelProgress.acertos}/10</p>
                     <StarsDisplay>
                       {[1, 2, 3].map((i) => (
                         <Star
