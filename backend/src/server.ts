@@ -1,4 +1,3 @@
-// server.ts (agora sim, completo e com tudo funcionando)
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -8,7 +7,6 @@ import { v4 as uuidv4 } from "uuid";
 import { getRandomQuestion } from "./GameManager";
 import { Exercicio } from "./interfaces";
 import routes from "./routes/index";
-
 import * as admin from "firebase-admin";
 import serviceAccount from "./serviceAccountKey.json";
 import exerciseRoutes from "./routes/exerciseRoutes";
@@ -16,24 +14,39 @@ import subjectRoutes from "./routes/subjectRoutes";
 
 dotenv.config();
 
-const allowedOrigins: string[] = [
+const app = express();
+const httpServer = createServer(app);
+
+// --- CONFIGURAÇÃO DE CORS REFORÇADA ---
+const allowedOrigins = [
   "http://localhost:5173",
   "https://go-studyquest.vercel.app",
 ];
-if (process.env.FRONTEND_URL) {
-  allowedOrigins.push(process.env.FRONTEND_URL);
-}
 
-console.log("Origens permitidas (CORS):", allowedOrigins);
-
-const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST"],
+const corsOptions = {
+  origin: (
+    origin: string | undefined,
+    callback: (err: Error | null, allow?: boolean) => void
+  ) => {
+    // Permite requisições sem 'origin' (ex: Postman, apps mobile) ou que estejam na nossa lista
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.error(`CORS NEGADO: Origem "${origin}" não permitida.`);
+      callback(new Error("Não permitido pelo CORS"));
+    }
   },
+  methods: ["GET", "POST"],
+  credentials: true, // Importante para o Socket.IO
+};
+
+// --- APLICANDO O CORS ---
+app.use(cors(corsOptions)); // Aplica as opções de CORS para todas as rotas Express
+
+const io = new Server(httpServer, {
+  cors: corsOptions, // Aplica as mesmas opções de CORS para o Socket.IO
 });
+// --- FIM DA CONFIGURAÇÃO DE CORS ---
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as any),
@@ -41,11 +54,13 @@ admin.initializeApp({
 const db = admin.firestore();
 console.log("🔥 Conectado ao Firestore com sucesso!");
 
-app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 app.use(routes);
 app.use("/api/exercises", exerciseRoutes);
 app.use("/api/subjects", subjectRoutes);
+
+// O resto do seu código do server.ts continua aqui, sem alterações...
+// (const onlineUsers, gameRooms, funções de jogo, io.on('connection', ...))
 
 const onlineUsers = new Map<string, string>();
 const userTagsToUids = new Map<string, string>();
