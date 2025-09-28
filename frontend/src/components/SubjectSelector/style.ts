@@ -112,8 +112,8 @@ export const ProgressBarContainer = styled.div`
   border: 1px solid rgba(0, 0, 0, 0.15);
 `;
 
-export const ProgressBarFill = styled.div<{ percent: number }>`
-  width: ${(p) => Math.max(0, Math.min(100, p.percent))}%;
+export const ProgressBarFill = styled.div<{ $percent: number }>`
+  width: ${(p) => Math.max(0, Math.min(100, p.$percent))}%;
   height: 100%;
   background: linear-gradient(
     90deg,
@@ -193,9 +193,10 @@ export const BrainControls = styled.div`
   margin-top: 1rem;
 `;
 
-export const LargeButton = styled.button<{ variant?: 'primary' | 'accent' }>`
-  --color-primary: ${(p) => (p.variant === 'accent' ? '#f05a4a' : '#4f5bd5')};
-  --color-secondary: ${(p) => (p.variant === 'accent' ? '#f7b84a' : '#44c284')};
+export const LargeButton = styled.button<{ $variant?: 'primary' | 'accent' }>`
+  --color-primary: ${(p) => (p.$variant === 'accent' ? '#f05a4a' : '#4f5bd5')};
+  --color-secondary: ${(p) =>
+    p.$variant === 'accent' ? '#f7b84a' : '#44c284'};
 
   position: relative;
   overflow: hidden;

@@ -52,14 +52,15 @@ export const AvatarGrid = styled.div`
   padding-right: 0.5rem;
 `;
 
-export const AvatarOption = styled.button<{ isSelected: boolean }>`
+export const AvatarOption = styled.button<{ $isSelected: boolean }>`
   background-color: #36393f;
-  border: 2px solid ${(props) => (props.isSelected ? '#5865f2' : 'transparent')};
+  border: 2px solid
+    ${(props) => (props.$isSelected ? '#5865f2' : 'transparent')};
   border-radius: 8px;
   padding: 0.5rem;
   cursor: pointer;
   transition: all 0.2s;
-  transform: ${(props) => (props.isSelected ? 'scale(1.1)' : 'scale(1)')};
+  transform: ${(props) => (props.$isSelected ? 'scale(1.1)' : 'scale(1)')};
 
   &:hover {
     border-color: #5865f2;

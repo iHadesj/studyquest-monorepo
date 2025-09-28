@@ -165,7 +165,7 @@ export const SubjectSelector: React.FC<{
                     aria-label={`${subject.nome} progresso`}
                   >
                     <ProgressBarContainer>
-                      <ProgressBarFill percent={percent} />
+                      <ProgressBarFill $percent={percent} />
                     </ProgressBarContainer>
                     <ProgressLabel>
                       <span style={{ opacity: 0.9 }}>{percent}%</span>
@@ -200,7 +200,7 @@ export const SubjectSelector: React.FC<{
               <Brain size={18} weight="bold" />
               Solo
             </LargeButton>
-            <LargeButton variant="accent" onClick={onStartMultiplayer}>
+            <LargeButton $variant="accent" onClick={onStartMultiplayer}>
               <Sword size={18} weight="bold" />
               Multiplayer
             </LargeButton>

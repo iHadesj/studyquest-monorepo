@@ -252,7 +252,6 @@ export const ExercisePage = ({
 
   const handleCheckAnswer = async () => {
     if (!selectedAnswer) return;
-    setIsAnswered(true);
 
     try {
       const response = await api.post('/api/exercises/submit', {
@@ -275,6 +274,8 @@ export const ExercisePage = ({
       ]);
     } catch (error) {
       console.error('Erro ao submeter resposta:', error);
+    } finally {
+      setIsAnswered(true);
     }
   };
 
@@ -426,8 +427,8 @@ export const ExercisePage = ({
         >
           {currentQuestion.opcoes?.map((option) => {
             let status: 'correct' | 'incorrect' | 'default' = 'default';
-            if (isAnswered) {
-              const lastAnswer = allUserAnswers[allUserAnswers.length - 1];
+            const lastAnswer = allUserAnswers[allUserAnswers.length - 1];
+            if (isAnswered && lastAnswer) {
               if (lastAnswer.isCorrect && option === selectedAnswer) {
                 status = 'correct';
               } else if (!lastAnswer.isCorrect && option === selectedAnswer) {

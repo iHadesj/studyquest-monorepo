@@ -151,7 +151,7 @@ export function ProfileEditor({
             {avatarSeeds.map((seed) => (
               <AvatarOption
                 key={seed}
-                isSelected={selectedAvatar === seed}
+                $isSelected={selectedAvatar === seed}
                 onClick={() => setSelectedAvatar(seed)}
                 title={seed}
               >

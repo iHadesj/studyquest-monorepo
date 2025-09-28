@@ -95,8 +95,8 @@ export const AvatarContainer = styled.div`
   cursor: pointer;
 `;
 
-export const ProgressBarFill = styled.div<{ progress: number }>`
-  width: ${(props) => props.progress}%;
+export const ProgressBarFill = styled.div<{ $progress: number }>`
+  width: ${(props) => props.$progress}%;
   height: 100%;
   background: linear-gradient(90deg, #43b581, #5865f2);
   transition: width 0.5s ease-in-out;
@@ -172,7 +172,7 @@ export const TopBar = ({ onClick }: TopBarProps) => {
       <LevelBarContainer>
         <LevelDisplay title={`Nível ${level}`}>{level}</LevelDisplay>
         <ProgressBarContainer>
-          <ProgressBarFill progress={progress} />
+          <ProgressBarFill $progress={progress} />
           <XPText>{`${xpInCurrentLevel} / ${xpNeededForLevel} XP`}</XPText>
         </ProgressBarContainer>
       </LevelBarContainer>
