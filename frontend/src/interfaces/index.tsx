@@ -1,4 +1,5 @@
-// --- TIPOS PARA OS DADOS DO JOGO ---
+// src/interfaces/index.tsx
+import type { FirestoreUserData } from '../hooks/useProgressStore';
 
 export interface Exercicio {
   id: number;
@@ -40,3 +41,10 @@ export interface Materia {
   };
   niveis: readonly Nivel[];
 }
+
+// --- TIPO UNIFICADO PARA USUÁRIOS ---
+// Esse é o nosso "documento oficial" que será usado em todo o App
+export type UserProfileData = FirestoreUserData & {
+  level: number;
+  rank?: number;
+};

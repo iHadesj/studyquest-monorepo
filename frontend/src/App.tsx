@@ -1,48 +1,49 @@
-// App.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, type JSX } from 'react';
 import { createGlobalStyle } from 'styled-components';
 import { onAuthStateChanged, type User } from 'firebase/auth';
-import { doc, onSnapshot, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './config/firebase';
 import {
   useProgressStore,
   type FirestoreUserData,
 } from './hooks/useProgressStore';
-import type { Materia, Nivel } from './interfaces';
-
-import { ExercisePage } from './pages/ExercisePage';
-import { LevelSelector } from './pages/LevelSelector';
-import { SubjectSelector } from './components/SubjectSelector';
-import { LevelHubPage } from './pages/LevelHubPage';
-import { ContentPage } from './pages/ContentPage';
+import type { Materia, Nivel, UserProfileData } from './interfaces';
+import { AuthPage } from './pages/AuthPage';
 import { ProfileSetup } from './components/ProfileSetup';
 import { TopBar } from './components/TopBar';
-import { AuthPage } from './pages/AuthPage';
-import { RankingPage } from './pages/Ranking';
+import { SubjectSelector } from './components/SubjectSelector';
+import { LevelSelector } from './pages/LevelSelector';
+import { LevelHubPage } from './pages/LevelHubPage';
+import { ContentPage } from './pages/ContentPage';
+import { ExercisePage } from './pages/ExercisePage';
 import { BrainStorm } from './pages/BrainStorm';
 import { MultiplayerLobbyPage } from './pages/MultiplayerLobbyPage';
+import { AchievementsPage } from './pages/AchievementsPage';
+import { ChatWindow } from './components/ChatWindow';
 import { ModalUserPerfil } from './components/ModalUserPerfil';
 import { InviteModal } from './components/InviteModal';
-import { FriendsList } from './components/FriendsList';
-import { AchievementsPage } from './pages/AchievementsPage';
+import { IncomingInviteModal } from './components/IncomingInviteModal';
 import {
   AppContainer,
-  Footer,
-  MainContent,
   BarWrapper,
+  Footer,
+  FooterCredit,
   FooterWrapper,
-  RankingButton,
   FriendsButton,
   HomeButton,
   LoadingContainer,
   LoadingSpinner,
-  FooterCredit,
+  MainContent,
+  RankingButton,
 } from './style/globalStyle';
 import { House, Trophy, Users } from 'phosphor-react';
 import { socket } from './services/socket';
-import { IncomingInviteModal } from './components/IncomingInviteModal';
 import { Toaster } from 'react-hot-toast';
-import { ChatWindow } from './components/ChatWindow';
+import { calculateLevelInfo } from './style/level';
+import { RankingPage } from './pages/Ranking';
+import { FriendsList } from './components/FriendsList';
+
+type SubjectInfo = Omit<Materia, 'niveis'>;
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -55,167 +56,91 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-type SubjectInfo = Omit<Materia, 'niveis'> & {
-  categoria: string;
-  iconName: string;
-};
-
-type FriendDetails = {
-  uid: string;
-  username: string;
-  fullTag: string;
-};
-
 export default function App() {
   const [screen, setScreen] = useState('subject');
   const [isInitializing, setIsInitializing] = useState(true);
+  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   const [subjectsList, setSubjectsList] = useState<SubjectInfo[]>([]);
+  const [allSubjectsData, setAllSubjectsData] = useState<Materia[]>([]);
   const [selectedSubject, setSelectedSubject] = useState<Materia | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<Nivel | null>(null);
-  const [allSubjectsData, setAllSubjectsData] = useState<Materia[]>([]);
-
-  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [isFriendsListOpen, setIsFriendsListOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isIncomingInviteModalOpen, setIsIncomingInviteModalOpen] =
     useState(false);
-  const [isFriendsListOpen, setIsFriendsListOpen] = useState(false);
   const [inviterTag, setInviterTag] = useState<string | null>(null);
   const [gameRoomId, setGameRoomId] = useState<string | null>(null);
+  const [activeChat, setActiveChat] = useState<UserProfileData | null>(null);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [viewedUser, setViewedUser] = useState<UserProfileData | null>(null);
 
-  const { fullTag, uid, username, hydrateFromFirestore, resetLocalStore } =
-    useProgressStore();
-  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
-  const [activeChat, setActiveChat] = useState<FriendDetails | null>(null);
+  const currentUserStoreData = useProgressStore((state) => state);
+  const { hydrateFromFirestore, resetLocalStore } = useProgressStore();
 
-  useEffect(() => {
-    if (!fullTag || !uid) {
-      if (socket.connected) socket.disconnect();
-      return;
-    }
-
-    const onConnect = () => {
-      console.log('Conectado ao servidor! Registrando como:', fullTag);
-      socket.emit('register', { fullTag, uid });
+  const currentUserProfile: UserProfileData = useMemo(() => {
+    const { level } = calculateLevelInfo(currentUserStoreData.xp);
+    return {
+      ...currentUserStoreData,
+      level: level,
     };
-
-    const onIncomingInvite = ({ from }: { from: string }) => {
-      setInviterTag(from);
-      setIsIncomingInviteModalOpen(true);
-    };
-
-    const onInviteError = ({ message }: { message: string }) => {
-      alert(`Erro no convite: ${message}`);
-    };
-
-    const onGameStarted = ({ roomId }: { roomId: string }) => {
-      setIsInviteModalOpen(false);
-      setIsIncomingInviteModalOpen(false);
-      setGameRoomId(roomId);
-      setScreen('multiplayer_lobby');
-    };
-
-    const onInviteDeclined = ({ from }: { from: string }) => {
-      alert(`O jogador ${from} recusou seu convite.`);
-      setIsIncomingInviteModalOpen(false);
-    };
-
-    socket.on('connect', onConnect);
-    socket.on('incoming_invite', onIncomingInvite);
-    socket.on('invite_error', onInviteError);
-    socket.on('game_started', onGameStarted);
-    socket.on('invite_declined', onInviteDeclined);
-
-    if (!socket.connected) socket.connect();
-
-    return () => {
-      console.log('Limpando listeners e desconectando o socket...');
-      socket.off('connect', onConnect);
-      socket.off('incoming_invite', onIncomingInvite);
-      socket.off('invite_error', onInviteError);
-      socket.off('game_started', onGameStarted);
-      socket.off('invite_declined', onInviteDeclined);
-      if (socket.connected) socket.disconnect();
-    };
-  }, [fullTag, uid]);
+  }, [currentUserStoreData]);
 
   useEffect(() => {
     let unsubscribeFirestore: (() => void) | null = null;
-    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setFirebaseUser(user);
-
       if (!user) {
         resetLocalStore();
+        if (socket.connected) socket.disconnect();
         setIsInitializing(false);
         return;
       }
-
       const userDocRef = doc(db, 'users', user.uid);
-
-      try {
-        await user.getIdToken(true);
-
-        const snap = await getDoc(userDocRef);
-        if (snap.exists()) {
-          hydrateFromFirestore(snap.data() as FirestoreUserData);
-        } else {
-          console.log('Usuário novo (sem doc). abrindo ProfileSetup...');
+      unsubscribeFirestore = onSnapshot(userDocRef, (docSnap) => {
+        if (docSnap.exists()) {
+          hydrateFromFirestore(docSnap.data() as FirestoreUserData);
         }
-      } catch (err: unknown) {
-        console.error('Erro ao buscar doc do usuário:', err);
-        if (
-          typeof err === 'object' &&
-          err !== null &&
-          ('code' in err || 'message' in err)
-        ) {
-          const code = (err as { code?: string }).code;
-          const message = (err as { message?: string }).message;
-          if (
-            code === 'permission-denied' ||
-            (typeof message === 'string' &&
-              message.includes('permission-denied'))
-          ) {
-            resetLocalStore();
-          }
-        }
-      } finally {
-        setIsInitializing(false);
-      }
-
-      unsubscribeFirestore = onSnapshot(
-        userDocRef,
-        (d) => {
-          try {
-            if (d.exists()) {
-              hydrateFromFirestore(d.data() as FirestoreUserData);
-            } else {
-              console.warn('Doc do usuário não existe (onSnapshot).');
-            }
-          } catch (err) {
-            console.error('Erro no snapshot do usuário (handler):', err);
-          }
-        },
-        (snapshotErr: unknown) => {
-          console.error('Erro no snapshot listener:', snapshotErr);
-          if (
-            typeof snapshotErr === 'object' &&
-            snapshotErr !== null &&
-            'code' in snapshotErr &&
-            (snapshotErr as { code?: string }).code === 'permission-denied'
-          ) {
-            console.warn(
-              'Sem permissão para escutar o doc do usuário. Abrindo setup.'
-            );
-            resetLocalStore();
-          }
-        }
-      );
+      });
+      setIsInitializing(false);
     });
-
     return () => {
       unsubscribeAuth();
       if (unsubscribeFirestore) unsubscribeFirestore();
     };
   }, [hydrateFromFirestore, resetLocalStore]);
+
+  useEffect(() => {
+    if (!currentUserStoreData.fullTag || !currentUserStoreData.uid) {
+      if (socket.connected) socket.disconnect();
+      return;
+    }
+    if (!socket.connected) {
+      socket.connect();
+    }
+    socket.on('connect', () => {
+      socket.emit('register', {
+        fullTag: currentUserStoreData.fullTag,
+        uid: currentUserStoreData.uid,
+      });
+    });
+    socket.on('incoming_invite', ({ from }: { from: string }) => {
+      setInviterTag(from);
+      setIsIncomingInviteModalOpen(true);
+    });
+    socket.on('game_started', ({ roomId }: { roomId: string }) => {
+      setIsInviteModalOpen(false);
+      setIsIncomingInviteModalOpen(false);
+      setGameRoomId(roomId);
+      setScreen('multiplayer_lobby');
+    });
+
+    return () => {
+      socket.off('connect');
+      socket.off('incoming_invite');
+      socket.off('game_started');
+      if (socket.connected) socket.disconnect();
+    };
+  }, [currentUserStoreData.fullTag, currentUserStoreData.uid]);
 
   useEffect(() => {
     const fetchSubjectsList = async () => {
@@ -229,10 +154,6 @@ export default function App() {
     };
     fetchSubjectsList();
   }, []);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [screen]);
 
   const handleSelectSubject = async (subjectInfo: SubjectInfo) => {
     try {
@@ -274,12 +195,21 @@ export default function App() {
     setGameRoomId(null);
   };
 
-  const backToLevels = () => {
-    setScreen('level');
+  const backToLevels = () => setScreen('level');
+  const backToHub = () => setScreen('hub');
+
+  const handleViewProfile = (userToShow: UserProfileData) => {
+    setViewedUser(userToShow);
+    setIsUserModalOpen(true);
   };
 
-  const backToHub = () => {
-    setScreen('hub');
+  const handleOpenMyProfile = () => {
+    handleViewProfile(currentUserProfile);
+  };
+
+  const handleCloseProfile = () => {
+    setIsUserModalOpen(false);
+    setTimeout(() => setViewedUser(null), 300);
   };
 
   if (isInitializing) {
@@ -292,70 +222,78 @@ export default function App() {
   if (!firebaseUser) {
     return <AuthPage />;
   }
-  if (!username) {
+  if (!currentUserStoreData.username) {
     return <ProfileSetup />;
   }
 
-  const renderScreen = () => {
-    // <-- 2. ADICIONA A NOVA ROTA
-    if (screen === 'achievements') {
-      return <AchievementsPage onBack={backToHome} />;
+  const renderScreen = (): JSX.Element => {
+    const subjectSelectorProps = {
+      subjects: subjectsList,
+      onSelect: handleSelectSubject,
+      onStartBrainstorm: handleOnStartBrainstorm,
+      onStartMultiplayer: () => setIsInviteModalOpen(true),
+    };
+
+    switch (screen) {
+      case 'ranking':
+        return (
+          <RankingPage onBack={backToHome} onViewProfile={handleViewProfile} />
+        );
+      case 'achievements':
+        return <AchievementsPage onBack={backToHome} />;
+      case 'multiplayer_lobby':
+        return gameRoomId ? (
+          <MultiplayerLobbyPage roomId={gameRoomId} onGoHome={backToHome} />
+        ) : (
+          <SubjectSelector {...subjectSelectorProps} />
+        );
+      case 'hub':
+        return selectedSubject && selectedLevel ? (
+          <LevelHubPage
+            subject={selectedSubject}
+            level={selectedLevel}
+            onBack={backToLevels}
+            onSelectStudy={() => setScreen('content')}
+            onSelectPractice={() => setScreen('exercise')}
+          />
+        ) : (
+          <SubjectSelector {...subjectSelectorProps} />
+        );
+      case 'content':
+        return selectedLevel ? (
+          <ContentPage
+            level={selectedLevel}
+            onBack={backToHub}
+            onStartExercises={() => setScreen('exercise')}
+          />
+        ) : (
+          <SubjectSelector {...subjectSelectorProps} />
+        );
+      case 'brainstorm':
+        return <BrainStorm subjects={allSubjectsData} onBack={backToHome} />;
+      case 'exercise':
+        return selectedSubject && selectedLevel ? (
+          <ExercisePage
+            subject={selectedSubject}
+            level={selectedLevel}
+            onBack={backToHub}
+          />
+        ) : (
+          <SubjectSelector {...subjectSelectorProps} />
+        );
+      case 'level':
+        return selectedSubject ? (
+          <LevelSelector
+            subject={selectedSubject}
+            onSelect={handleSelectLevel}
+            onBack={backToHome}
+          />
+        ) : (
+          <SubjectSelector {...subjectSelectorProps} />
+        );
+      default:
+        return <SubjectSelector {...subjectSelectorProps} />;
     }
-    if (screen === 'multiplayer_lobby' && gameRoomId) {
-      return <MultiplayerLobbyPage roomId={gameRoomId} onGoHome={backToHome} />;
-    }
-    if (screen === 'ranking') {
-      return <RankingPage onBack={backToHome} />;
-    }
-    if (screen === 'hub' && selectedSubject && selectedLevel) {
-      return (
-        <LevelHubPage
-          subject={selectedSubject}
-          level={selectedLevel}
-          onBack={backToLevels}
-          onSelectStudy={() => setScreen('content')}
-          onSelectPractice={() => setScreen('exercise')}
-        />
-      );
-    }
-    if (screen === 'content' && selectedSubject && selectedLevel) {
-      return (
-        <ContentPage
-          level={selectedLevel}
-          onBack={backToHub}
-          onStartExercises={() => setScreen('exercise')}
-        />
-      );
-    }
-    if (screen === 'brainstorm') {
-      return <BrainStorm subjects={allSubjectsData} onBack={backToHome} />;
-    }
-    if (screen === 'exercise' && selectedSubject && selectedLevel) {
-      return (
-        <ExercisePage
-          subject={selectedSubject}
-          level={selectedLevel}
-          onBack={backToHub}
-        />
-      );
-    }
-    if (screen === 'level' && selectedSubject) {
-      return (
-        <LevelSelector
-          subject={selectedSubject}
-          onSelect={handleSelectLevel}
-          onBack={backToHome}
-        />
-      );
-    }
-    return (
-      <SubjectSelector
-        onStartBrainstorm={handleOnStartBrainstorm}
-        subjects={subjectsList}
-        onSelect={handleSelectSubject}
-        onStartMultiplayer={() => setIsInviteModalOpen(true)}
-      />
-    );
   };
 
   return (
@@ -363,21 +301,14 @@ export default function App() {
       <GlobalStyle />
       <Toaster
         position="top-center"
-        toastOptions={{
-          style: {
-            background: '#333',
-            color: '#fff',
-          },
-        }}
+        toastOptions={{ style: { background: '#333', color: '#fff' } }}
       />
       <BarWrapper>
-        <TopBar onClick={() => setIsUserModalOpen(true)} />
+        <TopBar onClick={handleOpenMyProfile} />
       </BarWrapper>
-
       <AppContainer>
         <MainContent>{renderScreen()}</MainContent>
       </AppContainer>
-
       <Footer>
         <FooterWrapper>
           <div style={{ display: 'flex', gap: '1rem' }}>
@@ -388,13 +319,11 @@ export default function App() {
               <Users weight="bold" /> Amigos
             </FriendsButton>
           </div>
-
-          {screen !== 'subject' && screen !== 'ranking' && (
+          {screen !== 'subject' && (
             <HomeButton onClick={backToHome} title="Voltar ao menu principal">
               <House size={24} weight="bold" />
             </HomeButton>
           )}
-
           <FooterCredit>
             Desenvolvido por:{' '}
             <a
@@ -406,29 +335,34 @@ export default function App() {
             </a>
           </FooterCredit>
         </FooterWrapper>
-        <ModalUserPerfil
-          isOpen={isUserModalOpen}
-          onClose={() => setIsUserModalOpen(false)}
-          onNavigateToAchievements={() => setScreen('achievements')}
-        />
-        <InviteModal
-          isOpen={isInviteModalOpen}
-          onClose={() => setIsInviteModalOpen(false)}
-        />
-        <IncomingInviteModal
-          isOpen={isIncomingInviteModalOpen}
-          inviterTag={inviterTag}
-          onClose={() => setIsIncomingInviteModalOpen(false)}
-        />
-        <FriendsList
-          onOpenChat={(friend) => setActiveChat(friend)}
-          isOpen={isFriendsListOpen}
-          onClose={() => setIsFriendsListOpen(false)}
-        />
-        {activeChat && (
-          <ChatWindow friend={activeChat} onClose={() => setActiveChat(null)} />
-        )}
       </Footer>
+      <FriendsList
+        isOpen={isFriendsListOpen}
+        onClose={() => setIsFriendsListOpen(false)}
+        onOpenChat={setActiveChat}
+        onViewProfile={handleViewProfile}
+      />
+      {activeChat && (
+        <ChatWindow friend={activeChat} onClose={() => setActiveChat(null)} />
+      )}
+      <ModalUserPerfil
+        isOpen={isUserModalOpen}
+        onClose={handleCloseProfile}
+        user={viewedUser}
+        onNavigateToAchievements={() => {
+          handleCloseProfile();
+          setScreen('achievements');
+        }}
+      />
+      <InviteModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+      />
+      <IncomingInviteModal
+        isOpen={isIncomingInviteModalOpen}
+        inviterTag={inviterTag}
+        onClose={() => setIsIncomingInviteModalOpen(false)}
+      />
     </>
   );
 }

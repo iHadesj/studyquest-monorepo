@@ -12,12 +12,7 @@ import { useProgressStore } from '../../hooks/useProgressStore';
 import { socket } from '../../services/socket';
 import * as S from './style';
 import { PaperPlaneRight } from 'phosphor-react';
-
-type FriendDetails = {
-  uid: string;
-  username: string;
-  fullTag: string;
-};
+import type { UserProfileData } from '../../interfaces';
 
 interface Message {
   id: string;
@@ -27,7 +22,7 @@ interface Message {
 }
 
 interface ChatWindowProps {
-  friend: FriendDetails;
+  friend: UserProfileData;
   onClose: () => void;
 }
 
@@ -41,6 +36,7 @@ export function ChatWindow({ friend, onClose }: ChatWindowProps) {
 
   useEffect(() => {
     if (!chatId) return;
+
     const messagesRef = collection(db, 'chats', chatId, 'messages');
     const q = query(messagesRef, orderBy('timestamp', 'asc'), limit(50));
 
@@ -59,16 +55,18 @@ export function ChatWindow({ friend, onClose }: ChatWindowProps) {
   }, [chatId]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newMessage.trim() === '' || !myTag) return;
+    if (newMessage.trim() === '' || !myTag || !friend.fullTag) return;
+
     socket.emit('private_message', {
       recipientTag: friend.fullTag,
       messageText: newMessage.trim(),
     });
+
     setNewMessage('');
   };
 

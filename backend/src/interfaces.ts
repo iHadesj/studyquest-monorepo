@@ -1,3 +1,6 @@
+import { FirestoreUserData } from "./../../frontend/src/hooks/useProgressStore";
+// src/interfaces/index.tsx
+
 export interface Exercicio {
   id: number;
   tipo: "multipla_escolha" | "preenchimento";
@@ -9,8 +12,21 @@ export interface Exercicio {
 export interface Nivel {
   id: string;
   nome: string;
+  xpPorAcerto: number;
+  minAcertosParaDesbloquearProximo: number | null;
+  conteudo: {
+    titulo: string;
+    resumo: string;
+  };
   exercicios: readonly Exercicio[];
-  // Adicione outros campos se precisar
+}
+
+export interface Conquista {
+  id: string;
+  nome: string;
+  descricao: string;
+  raridade: "bronze" | "prata" | "ouro";
+  icon: string;
 }
 
 export interface Materia {
@@ -25,3 +41,9 @@ export interface Materia {
   };
   niveis: readonly Nivel[];
 }
+
+// --- TIPO UNIFICADO PARA USUÁRIOS ---
+export type UserProfileData = FirestoreUserData & {
+  level: number;
+  rank?: number;
+};

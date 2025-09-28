@@ -1,4 +1,3 @@
-// src/components/FriendsList/index.tsx
 import { useState, useEffect } from 'react';
 import {
   collection,
@@ -21,6 +20,7 @@ import { socket } from '../../services/socket';
 import * as S from './style';
 import * as Modal from '../Modal/index';
 import { verificarEdesbloquearConquistas } from '../../services/achievements';
+import type { UserProfileData } from '../../interfaces';
 
 const fullTagSchema = z
   .string()
@@ -28,17 +28,11 @@ const fullTagSchema = z
   .min(1, 'A tag não pode ser vazia.')
   .regex(/^.+#\d{4}$/, 'A tag precisa estar no formato "nome#1234".');
 
-type UserDetails = {
-  uid: string;
-  username: string;
-  avatarSeed: string;
-  fullTag: string;
-};
-
 interface FriendsListProps {
   isOpen: boolean;
   onClose: () => void;
-  onOpenChat: (friend: UserDetails) => void;
+  onOpenChat: (friend: UserProfileData) => void;
+  onViewProfile: (user: UserProfileData) => void;
 }
 
 type ActiveTab = 'friends' | 'requests' | 'sent';
@@ -49,13 +43,18 @@ type FeedbackModalState = {
   type: 'success' | 'error';
 };
 
-export function FriendsList({ isOpen, onClose, onOpenChat }: FriendsListProps) {
+export function FriendsList({
+  isOpen,
+  onClose,
+  onOpenChat,
+  onViewProfile,
+}: FriendsListProps) {
   const [activeTab, setActiveTab] = useState<ActiveTab>('friends');
-  const [friendsDetails, setFriendsDetails] = useState<UserDetails[]>([]);
-  const [requestsDetails, setRequestsDetails] = useState<UserDetails[]>([]);
-  const [sentRequestsDetails, setSentRequestsDetails] = useState<UserDetails[]>(
-    []
-  );
+  const [friendsDetails, setFriendsDetails] = useState<UserProfileData[]>([]);
+  const [requestsDetails, setRequestsDetails] = useState<UserProfileData[]>([]);
+  const [sentRequestsDetails, setSentRequestsDetails] = useState<
+    UserProfileData[]
+  >([]);
   const [onlineFriends, setOnlineFriends] = useState<string[]>([]);
   const [fullTagInput, setFullTagInput] = useState('');
   const [feedbackModal, setFeedbackModal] = useState<FeedbackModalState>({
@@ -69,12 +68,18 @@ export function FriendsList({ isOpen, onClose, onOpenChat }: FriendsListProps) {
   useEffect(() => {
     if (!isOpen) return;
 
-    const fetchUserDetails = async (uids: string[]): Promise<UserDetails[]> => {
+    const fetchUserDetails = async (
+      uids: string[]
+    ): Promise<UserProfileData[]> => {
       if (!uids || uids.length === 0) return [];
       const usersRef = collection(db, 'users');
       const q = query(usersRef, where(documentId(), 'in', uids));
       const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map((doc) => doc.data() as UserDetails);
+      return querySnapshot.docs.map((doc) => {
+        const data = doc.data() as FirestoreUserData;
+        // Simulamos level e rank, pois não são cruciais para a lista de amigos em si
+        return { ...data, uid: doc.id, level: 0, rank: undefined };
+      });
     };
 
     const fetchAllDetails = async () => {
@@ -107,7 +112,9 @@ export function FriendsList({ isOpen, onClose, onOpenChat }: FriendsListProps) {
       return;
     }
 
-    const friendTags = friendsDetails.map((f) => f.fullTag);
+    const friendTags = friendsDetails
+      .map((f) => f.fullTag)
+      .filter(Boolean) as string[];
 
     const handleInitialStatus = (initialOnlineFriends: string[]) => {
       setOnlineFriends(initialOnlineFriends);
@@ -122,18 +129,14 @@ export function FriendsList({ isOpen, onClose, onOpenChat }: FriendsListProps) {
     }) => {
       setOnlineFriends((prevOnlineFriends) => {
         const newSet = new Set(prevOnlineFriends);
-        if (status === 'online') {
-          newSet.add(tag);
-        } else {
-          newSet.delete(tag);
-        }
+        if (status === 'online') newSet.add(tag);
+        else newSet.delete(tag);
         return Array.from(newSet);
       });
     };
 
     socket.on('initial_friends_status', handleInitialStatus);
     socket.on('friend_status_update', handleStatusUpdate);
-
     socket.emit('subscribe_to_friends_status', { friendTags });
 
     return () => {
@@ -283,13 +286,14 @@ export function FriendsList({ isOpen, onClose, onOpenChat }: FriendsListProps) {
     }
   };
 
-  const handleInvite = (friendTag: string) => {
+  const handleInvite = (friendTag: string | undefined) => {
+    if (!friendTag) return;
     socket.emit('invite_player', { inviteeTag: friendTag });
     onClose();
   };
 
   const devTag = 'Edu.dev#8636';
-  const getAvatarSrc = (user: UserDetails) => {
+  const getAvatarSrc = (user: UserProfileData) => {
     return user.fullTag === devTag
       ? '/Light.jpg'
       : `https://api.dicebear.com/8.x/pixel-art/svg?seed=${user.avatarSeed}`;
@@ -329,11 +333,20 @@ export function FriendsList({ isOpen, onClose, onOpenChat }: FriendsListProps) {
               {activeTab === 'friends' &&
                 (friendsDetails.length > 0 ? (
                   friendsDetails.map((friend) => {
-                    const isOnline = onlineFriends.includes(friend.fullTag);
+                    const isOnline = friend.fullTag
+                      ? onlineFriends.includes(friend.fullTag)
+                      : false;
                     return (
                       <S.UserEntry key={friend.uid}>
-                        <S.Avatar src={getAvatarSrc(friend)} />
-                        <S.UserInfo>
+                        <S.Avatar
+                          src={getAvatarSrc(friend)}
+                          onClick={() => onViewProfile(friend)}
+                          style={{ cursor: 'pointer' }}
+                        />
+                        <S.UserInfo
+                          onClick={() => onViewProfile(friend)}
+                          style={{ cursor: 'pointer' }}
+                        >
                           <S.Username>{friend.username}</S.Username>
                           <S.Status isOnline={isOnline}>
                             {isOnline ? 'Online' : 'Offline'}
@@ -364,12 +377,20 @@ export function FriendsList({ isOpen, onClose, onOpenChat }: FriendsListProps) {
                     Você ainda não tem amigos. Adicione alguns!
                   </S.EmptyState>
                 ))}
+
               {activeTab === 'requests' &&
                 (requestsDetails.length > 0 ? (
                   requestsDetails.map((request) => (
                     <S.UserEntry key={request.uid}>
-                      <S.Avatar src={getAvatarSrc(request)} />
-                      <S.UserInfo>
+                      <S.Avatar
+                        src={getAvatarSrc(request)}
+                        onClick={() => onViewProfile(request)}
+                        style={{ cursor: 'pointer' }}
+                      />
+                      <S.UserInfo
+                        onClick={() => onViewProfile(request)}
+                        style={{ cursor: 'pointer' }}
+                      >
                         <S.Username>{request.username}</S.Username>
                       </S.UserInfo>
                       <S.ActionButtons>
@@ -395,12 +416,20 @@ export function FriendsList({ isOpen, onClose, onOpenChat }: FriendsListProps) {
                     Nenhum pedido de amizade pendente.
                   </S.EmptyState>
                 ))}
+
               {activeTab === 'sent' &&
                 (sentRequestsDetails.length > 0 ? (
                   sentRequestsDetails.map((user) => (
                     <S.UserEntry key={user.uid}>
-                      <S.Avatar src={getAvatarSrc(user)} />
-                      <S.UserInfo>
+                      <S.Avatar
+                        src={getAvatarSrc(user)}
+                        onClick={() => onViewProfile(user)}
+                        style={{ cursor: 'pointer' }}
+                      />
+                      <S.UserInfo
+                        onClick={() => onViewProfile(user)}
+                        style={{ cursor: 'pointer' }}
+                      >
                         <S.Username>{user.username}</S.Username>
                         <S.Status isOnline={false}>Pendente</S.Status>
                       </S.UserInfo>

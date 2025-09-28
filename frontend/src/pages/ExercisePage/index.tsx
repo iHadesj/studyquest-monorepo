@@ -1,4 +1,3 @@
-// src/pages/ExercisePage/index.tsx
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { doc, updateDoc, increment } from 'firebase/firestore';
@@ -15,7 +14,6 @@ import {
   RadioInput,
   SubmitButton,
   Subtitle,
-  TextInput,
   Title,
   TitleExercise,
   XPDisplayModal,
@@ -24,9 +22,8 @@ import { useProgressStore } from '../../hooks/useProgressStore';
 import { CheckCircleIcon, StarIcon, XCircleIcon } from '../../style/icons';
 import type { Exercicio, Materia, Nivel } from '../../interfaces';
 import { Star } from 'phosphor-react';
-import { verificarEdesbloquearConquistas } from '../../services/achievements'; // <-- 1. IMPORTA O CÉREBRO
+import { verificarEdesbloquearConquistas } from '../../services/achievements';
 
-// --- COMPONENTES ESTILIZADOS ADICIONAIS ---
 const StarsContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -83,29 +80,22 @@ type WrongAnswer = Exercicio & { userAnswer?: string };
 const parseText = (text: string): React.ReactNode | null => {
   if (!text) return null;
 
-  // --- 1) Mapeie aqui as substituições que quiser --- //
-  // Note: cada chave é a sequência com a barra (ex: \div), que no regex vira \\div
   const replacements: { [seq: string]: string } = {
     '\\div': '÷',
     '\\times': '×',
     '\\sqrt': '√',
     '\\pm': '±',
-    // adiciona mais conforme precisar...
   };
 
-  // --- 2) Aplique as substituições no texto --- //
   let processed = text;
   for (const seq in replacements) {
-    // seq já vem como '\\div', então aqui usamos um RegExp que casa o backslash corretamente
     const re = new RegExp(seq, 'g');
     processed = processed.replace(re, replacements[seq]);
   }
 
-  // --- 3) Markdown-like splitter existente --- //
   const regex = /(\*[^*]+\*)|(_[^_]+_)|(~[^~]+~)|(`[^`]+`)|(\$[^$]+\$)/g;
   const parts = processed.split(regex).filter(Boolean);
 
-  // --- 4) Renderiza os pedaços como antes --- //
   return parts.map((part, idx) => {
     if (part.startsWith('*') && part.endsWith('*')) {
       return <strong key={idx}>{part.slice(1, -1)}</strong>;
@@ -178,11 +168,18 @@ export const ExercisePage = ({
   const currentAttempts = currentProgress?.tentativas || 0;
 
   useEffect(() => {
-    if (level.exercicios.length > 10) {
-      const shuffled = [...level.exercicios].sort(() => 0.5 - Math.random());
+    // 1. FILTRAMOS PARA PEGAR APENAS EXERCÍCIOS DE MÚLTIPLA ESCOLHA
+    const multipleChoiceExercises = level.exercicios.filter(
+      (ex) => ex.tipo === 'multipla_escolha'
+    );
+
+    if (multipleChoiceExercises.length > 10) {
+      const shuffled = [...multipleChoiceExercises].sort(
+        () => 0.5 - Math.random()
+      );
       setShuffledExercises(shuffled.slice(0, 10));
     } else {
-      setShuffledExercises([...level.exercicios]);
+      setShuffledExercises([...multipleChoiceExercises]);
     }
   }, [level.exercicios]);
 
@@ -211,7 +208,8 @@ export const ExercisePage = ({
     });
 
     const totalQuestions = shuffledExercises.length;
-    const percentage = (correctCount / totalQuestions) * 100;
+    const percentage =
+      totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
     let estrelas = 0;
     let bonusXP = 0;
 
@@ -269,11 +267,6 @@ export const ExercisePage = ({
             tentativas: newAttempts,
           },
         });
-        // <-- 2. CHAMA A VERIFICAÇÃO AQUI
-        verificarEdesbloquearConquistas('CONCLUIU_NIVEL', {
-          acertos: correctCount,
-          total: totalQuestions,
-        });
       } else {
         await updateDoc(userDocRef, {
           [`progress.${subject.id}.${level.id}`]: {
@@ -301,7 +294,6 @@ export const ExercisePage = ({
           <Title as="h2" style={{ fontSize: '1.875rem', marginTop: '1rem' }}>
             {results.passou ? 'Nível Concluído!' : 'Tente Novamente!'}
           </Title>
-
           <StarsContainer>
             {[1, 2, 3].map((i) => (
               <Star
@@ -312,12 +304,10 @@ export const ExercisePage = ({
               />
             ))}
           </StarsContainer>
-
           <Subtitle as="p" style={{ fontSize: '1rem', marginBottom: 0 }}>
             Você acertou {results.acertos} de {shuffledExercises.length}{' '}
             perguntas.
           </Subtitle>
-
           {results.passou && (
             <XPResultsContainer>
               <XPDisplayModal style={{ margin: 0 }}>
@@ -329,7 +319,6 @@ export const ExercisePage = ({
               )}
             </XPResultsContainer>
           )}
-
           {results.passou && results.wrongAnswers.length > 0 && (
             <WrongAnswersContainer>
               <h4 style={{ marginTop: 0 }}>Questões para revisar:</h4>
@@ -348,7 +337,6 @@ export const ExercisePage = ({
               ))}
             </WrongAnswersContainer>
           )}
-
           {!results.passou && (
             <EncouragementText>
               <p>
@@ -357,10 +345,34 @@ export const ExercisePage = ({
               </p>
             </EncouragementText>
           )}
-
           <ContinueButton onClick={onBack}>Continuar Jornada</ContinueButton>
         </ModalContent>
       </ModalOverlay>
+    );
+  }
+
+  if (shuffledExercises.length === 0) {
+    return (
+      <LessonWrapper>
+        <BackButton onClick={onBack}>&larr; Voltar</BackButton>
+        <TitleExercise
+          as="h2"
+          style={{
+            border: 'none',
+            padding: 0,
+            textAlign: 'left',
+            marginBottom: '1.5rem',
+          }}
+        >
+          Exercícios: {level.nome}
+        </TitleExercise>
+        <EncouragementText style={{ textAlign: 'center' }}>
+          <p>
+            Ainda não há exercícios de múltipla escolha para este nível. Volte
+            em breve!
+          </p>
+        </EncouragementText>
+      </LessonWrapper>
     );
   }
 
@@ -379,42 +391,31 @@ export const ExercisePage = ({
         Exercícios: {level.nome} ({3 - currentAttempts} tentativas restantes)
       </TitleExercise>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-        {/* Map over the shuffled exercises instead of the full list */}
         {shuffledExercises.map((ex, index) => (
           <ExerciseBox key={ex.id}>
             <QuestionText>
               {index + 1}. {parseText(ex.pergunta)}
             </QuestionText>
-            {ex.tipo === 'multipla_escolha' && (
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.75rem',
-                }}
-              >
-                {ex.opcoes?.map((option) => (
-                  <OptionLabel key={option}>
-                    <RadioInput
-                      type="radio"
-                      name={`ex-${ex.id}`}
-                      value={option}
-                      onChange={(e) =>
-                        handleAnswerChange(ex.id, e.target.value)
-                      }
-                    />
-                    <span>{option}</span>
-                  </OptionLabel>
-                ))}
-              </div>
-            )}
-            {ex.tipo === 'preenchimento' && (
-              <TextInput
-                type="text"
-                onChange={(e) => handleAnswerChange(ex.id, e.target.value)}
-                placeholder="Digite sua resposta aqui"
-              />
-            )}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.75rem',
+              }}
+            >
+              {ex.opcoes?.map((option) => (
+                <OptionLabel key={option}>
+                  <RadioInput
+                    type="radio"
+                    name={`ex-${ex.id}`}
+                    value={option}
+                    checked={answers[ex.id] === option}
+                    onChange={(e) => handleAnswerChange(ex.id, e.target.value)}
+                  />
+                  <span>{option}</span>
+                </OptionLabel>
+              ))}
+            </div>
           </ExerciseBox>
         ))}
       </div>

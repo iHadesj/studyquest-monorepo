@@ -1,35 +1,12 @@
 import { useState, useEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
-import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  limit,
-  doc,
-  arrayUnion,
-  getDoc,
-  arrayRemove,
-  runTransaction,
-} from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db, auth } from '../../config/firebase';
 import { BackButton, Title } from '../../style/globalStyle';
-import { Crown, UserPlus } from 'phosphor-react';
-import { useProgressStore } from '../../hooks/useProgressStore';
+import { Crown } from 'phosphor-react';
 import type { FirestoreUserData } from '../../hooks/useProgressStore';
+import type { UserProfileData } from '../../interfaces';
 
-// --- TIPOS ---
-export type UserData = {
-  uid: string;
-  username: string;
-  avatarSeed: string;
-  xp: number;
-  level: number;
-  fullTag?: string; // Adicionado para a verificação do dev
-};
-
-// --- ANIMAÇÕES DE NEON ---
-// (o restante das animações e estilos permanece o mesmo)
 const neonGold = keyframes`
   0%, 100% { box-shadow: 0 0 3px #f1c40f, 0 0 6px #f1c40f, 0 0 9px #f1c40f; }
   50% { box-shadow: 0 0 6px #f1c40f, 0 0 18px #f1c40f, 0 0 6px #f1c40f; }
@@ -45,7 +22,6 @@ const neonBronze = keyframes`
   50% { box-shadow: 0 0 6px #cd7f32, 0 0 18px #cd7f32, 0 0 6px #cd7f32; }
 `;
 
-// --- ESTILOS ---
 const RankingContainer = styled.div`
   max-width: 600px;
   margin: 0 auto;
@@ -59,9 +35,9 @@ const UserRow = styled.div<{ rank: number; isCurrentUser: boolean }>`
   border-radius: 8px;
   margin-bottom: 0.75rem;
   transition: transform 0.2s ease-in-out;
-
   border: 2px solid
     ${(props) => (props.isCurrentUser ? '#5865f2' : 'transparent')};
+  cursor: pointer;
 
   animation: ${(props) => {
     if (props.rank === 1)
@@ -97,7 +73,7 @@ const Avatar = styled.img`
   height: 50px;
   border-radius: 50%;
   margin: 0 1rem;
-  object-fit: cover; // Adicionado para sua foto não distorcer
+  object-fit: cover;
 `;
 
 const UserInfo = styled.div`
@@ -139,67 +115,25 @@ const CenteredContainer = styled.div`
   color: #b9bbbe;
 `;
 
-export const FriendActionButton = styled.button`
-  background-color: #40444b;
-  color: #dcddde;
-  border: none;
-  border-radius: 4px;
-  padding: 0.5rem 1rem;
-  font-family: 'Fira Code', monospace;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  &:hover {
-    background-color: #5865f2;
-    color: white;
-  }
-
-  &:disabled {
-    background-color: #2f3136;
-    color: #72767d;
-    cursor: not-allowed;
-  }
-`;
-
-// --- LÓGICA UTILITÁRIA ---
-type LevelInfo = {
-  level: number;
-  progress: number;
-  xpInCurrentLevel: number;
-  xpNeededForLevel: number;
-};
-
-function calculateLevel(xp: number): LevelInfo {
+function calculateLevel(xp: number): number {
   let level = 1;
-  let xpForCurrentLevel = 0;
   let xpForNextLevel = 150;
-
   while (xp >= xpForNextLevel) {
     level++;
-    xpForCurrentLevel = xpForNextLevel;
     xpForNextLevel += 150 * level;
   }
-
-  const xpInCurrentLevel = xp - xpForCurrentLevel;
-  const xpNeededForLevel = xpForNextLevel - xpForCurrentLevel;
-  const rawProgress =
-    xpNeededForLevel > 0 ? (xpInCurrentLevel / xpNeededForLevel) * 100 : 0;
-
-  const progress = Math.max(0, Math.min(100, rawProgress));
-
-  return { level, progress, xpInCurrentLevel, xpNeededForLevel };
+  return level;
 }
 
-// --- COMPONENTE PRINCIPAL ---
-export const RankingPage = ({ onBack }: { onBack: () => void }) => {
-  const [ranking, setRanking] = useState<UserData[]>([]);
+interface RankingPageProps {
+  onBack: () => void;
+  onViewProfile: (user: UserProfileData) => void;
+}
+
+export const RankingPage = ({ onBack, onViewProfile }: RankingPageProps) => {
+  const [ranking, setRanking] = useState<UserProfileData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const currentUserData = useProgressStore((state) => state);
 
   useEffect(() => {
     const fetchRanking = async () => {
@@ -208,17 +142,17 @@ export const RankingPage = ({ onBack }: { onBack: () => void }) => {
         const q = query(usersCollection, orderBy('xp', 'desc'), limit(50));
         const querySnapshot = await getDocs(q);
 
-        const usersData: UserData[] = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            uid: doc.id,
-            username: data.username || 'Anônimo',
-            avatarSeed: data.avatarSeed || 'default',
-            xp: data.xp || 0,
-            level: calculateLevel(data.xp || 0).level,
-            fullTag: data.fullTag || '', // Buscando a fullTag
-          };
-        });
+        const usersData: UserProfileData[] = querySnapshot.docs.map(
+          (doc, index) => {
+            const data = doc.data() as FirestoreUserData;
+            return {
+              ...data,
+              uid: doc.id,
+              level: calculateLevel(data.xp || 0),
+              rank: index + 1,
+            };
+          }
+        );
         setRanking(usersData);
       } catch (err) {
         console.error('Erro ao buscar o ranking:', err);
@@ -232,97 +166,6 @@ export const RankingPage = ({ onBack }: { onBack: () => void }) => {
 
     fetchRanking();
   }, []);
-
-  const refreshCurrentUserState = async () => {
-    const user = auth.currentUser;
-    if (user) {
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDoc = await getDoc(userDocRef);
-      if (userDoc.exists()) {
-        useProgressStore
-          .getState()
-          .hydrateFromFirestore(userDoc.data() as FirestoreUserData);
-      }
-    }
-  };
-
-  const handleSendFriendRequest = async (targetUserId: string) => {
-    const currentUserId = auth.currentUser?.uid;
-    if (!currentUserId) return;
-
-    try {
-      await runTransaction(db, async (transaction) => {
-        const currentUserRef = doc(db, 'users', currentUserId);
-        const targetUserRef = doc(db, 'users', targetUserId);
-
-        transaction.update(currentUserRef, {
-          friendRequestsSent: arrayUnion(targetUserId),
-        });
-        transaction.update(targetUserRef, {
-          friendRequestsReceived: arrayUnion(currentUserId),
-        });
-      });
-      await refreshCurrentUserState();
-    } catch (e) {
-      console.error('Erro ao enviar pedido de amizade:', e);
-    }
-  };
-
-  const handleAcceptFriendRequest = async (requesterId: string) => {
-    const currentUserId = auth.currentUser?.uid;
-    if (!currentUserId) return;
-
-    try {
-      await runTransaction(db, async (transaction) => {
-        const currentUserRef = doc(db, 'users', currentUserId);
-        const requesterRef = doc(db, 'users', requesterId);
-
-        transaction.update(currentUserRef, {
-          friends: arrayUnion(requesterId),
-          friendRequestsReceived: arrayRemove(requesterId),
-        });
-        transaction.update(requesterRef, {
-          friends: arrayUnion(currentUserId),
-          friendRequestsSent: arrayRemove(currentUserId),
-        });
-      });
-      await refreshCurrentUserState();
-    } catch (e) {
-      console.error('Erro ao aceitar pedido de amizade:', e);
-    }
-  };
-
-  const renderFriendButton = (user: UserData) => {
-    const currentUserId = auth.currentUser?.uid;
-    if (!currentUserData || user.uid === currentUserId) return null;
-
-    const isFriend = currentUserData.friends?.includes(user.uid);
-    const hasSentRequest = currentUserData.friendRequestsSent?.includes(
-      user.uid
-    );
-    const hasReceivedRequest = currentUserData.friendRequestsReceived?.includes(
-      user.uid
-    );
-
-    if (isFriend) {
-      return <FriendActionButton disabled>Amigos</FriendActionButton>;
-    }
-    if (hasSentRequest) {
-      return <FriendActionButton disabled>Pendente</FriendActionButton>;
-    }
-    if (hasReceivedRequest) {
-      return (
-        <FriendActionButton onClick={() => handleAcceptFriendRequest(user.uid)}>
-          Aceitar
-        </FriendActionButton>
-      );
-    }
-    return (
-      <FriendActionButton onClick={() => handleSendFriendRequest(user.uid)}>
-        <UserPlus size={18} /> Adicionar
-      </FriendActionButton>
-    );
-  };
 
   if (isLoading) {
     return (
@@ -356,7 +199,6 @@ export const RankingPage = ({ onBack }: { onBack: () => void }) => {
       >
         <Crown size={32} weight="fill" /> Ranking Global
       </Title>
-
       {ranking.length === 0 ? (
         <CenteredContainer>
           <p>O ranking ainda está vazio. Seja o primeiro a marcar pontos!</p>
@@ -368,22 +210,21 @@ export const RankingPage = ({ onBack }: { onBack: () => void }) => {
             user.fullTag === devTag
               ? '/Light.jpg'
               : `https://api.dicebear.com/8.x/pixel-art/svg?seed=${user.avatarSeed}`;
-
           return (
             <UserRow
               key={user.uid}
               rank={index + 1}
               isCurrentUser={user.uid === auth.currentUser?.uid}
+              onClick={() => onViewProfile(user)}
             >
               <Rank>#{index + 1}</Rank>
-              <Avatar src={avatarSrc} alt={user.username} />
+              <Avatar src={avatarSrc} alt={user.username || 'Avatar'} />
               <UserInfo>
                 <Username>{user.username}</Username>
                 <UserStats>
                   Nível {user.level} - {user.xp.toLocaleString('pt-BR')} XP
                 </UserStats>
               </UserInfo>
-              {renderFriendButton(user)}
             </UserRow>
           );
         })
