@@ -440,7 +440,7 @@ export const ContinueButton = styled.button<{
   variant?: 'primary' | 'secondary';
 }>`
   margin-top: 2rem;
-  width: 40%;
+  width: 50%;
   background-color: ${({ variant }) =>
     variant === 'primary' ? '#43b581' : '#5c5c5c'};
   color: #ffffff;

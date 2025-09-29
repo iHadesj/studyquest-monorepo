@@ -206,6 +206,9 @@ export default function App() {
   };
 
   const backToHome = () => {
+    if (gameRoomId) {
+      socket.emit('leave_game', { roomId: gameRoomId });
+    }
     setSelectedSubject(null);
     setSelectedLevel(null);
     setScreen('subject');

@@ -87,10 +87,11 @@ interface GameRoom {
 const gameRooms = new Map<string, GameRoom>();
 
 const QUESTION_TIME_LIMIT_S = 15;
-const NEXT_QUESTION_DELAY_MS = 3000;
+const NEXT_QUESTION_DELAY_MS = 1500;
 const BASE_SCORE = 50;
 const TIME_BONUS_MULTIPLIER = 10;
 const MODE_DURATION_S = 60;
+const CONSOLATION_XP = 50;
 
 const normalizeAnswer = (s: string) =>
   s
@@ -159,6 +160,52 @@ const sendNextQuestion = (roomId: string) => {
       }
     }
   }, 1000);
+};
+
+const endGameByDisconnection = async (
+  roomId: string,
+  disconnectedSocketId: string
+) => {
+  const room = gameRooms.get(roomId);
+  if (!room) return;
+
+  const remainingPlayer = room.players.find(
+    (p) => p.socketId !== disconnectedSocketId
+  );
+  const disconnectedPlayer = room.players.find(
+    (p) => p.socketId === disconnectedSocketId
+  );
+
+  if (remainingPlayer) {
+    // Avisa o jogador que ficou
+    io.to(remainingPlayer.socketId).emit("opponent_left", {
+      message: `Seu oponente (${
+        disconnectedPlayer?.tag || "Anônimo"
+      }) desconectou.`,
+      consolationXp: CONSOLATION_XP,
+    });
+
+    // Adiciona o XP de consolação no Firestore
+    const winnerUid = userTagsToUids.get(remainingPlayer.tag);
+    if (winnerUid) {
+      try {
+        const userDocRef = db.collection("users").doc(winnerUid);
+        await userDocRef.update({
+          xp: admin.firestore.FieldValue.increment(CONSOLATION_XP),
+        });
+        console.log(
+          `+${CONSOLATION_XP} XP adicionado para ${remainingPlayer.tag} por W.O.`
+        );
+      } catch (error) {
+        console.error("Erro ao adicionar XP de consolação:", error);
+      }
+    }
+  }
+
+  // Limpa tudo
+  safeClearAllTimers(room);
+  gameRooms.delete(roomId);
+  console.log(`Sala ${roomId} encerrada devido à desconexão.`);
 };
 
 io.on("connection", (socket) => {
@@ -462,6 +509,10 @@ io.on("connection", (socket) => {
     }
   );
 
+  socket.on("leave_game", ({ roomId }: { roomId: string }) => {
+    endGameByDisconnection(roomId, socket.id);
+  });
+
   socket.on("disconnect", () => {
     console.log("❌ Jogador desconectou. ID:", socket.id);
     if (currentUserTag) {
@@ -469,16 +520,11 @@ io.on("connection", (socket) => {
       userTagsToUids.delete(currentUserTag);
       notifySubscribers(currentUserTag, "offline");
     }
-    for (const [roomId, room] of [...gameRooms.entries()]) {
-      const disconnectedPlayer = room.players.find(
-        (p) => p.socketId === socket.id
-      );
-      if (disconnectedPlayer) {
-        io.to(roomId).emit("player_disconnected", {
-          tag: disconnectedPlayer.tag,
-        });
-        safeClearAllTimers(room);
-        gameRooms.delete(roomId);
+
+    for (const [roomId, room] of gameRooms.entries()) {
+      if (room.players.some((p) => p.socketId === socket.id)) {
+        endGameByDisconnection(roomId, socket.id);
+        break;
       }
     }
   });

@@ -1,21 +1,16 @@
 import { useState, useEffect, useMemo } from 'react';
 import { AnimatePresence } from 'framer-motion';
-
 import {
   Title,
   SubmitButton,
   BackButton,
-  TextInput,
   QuestionText,
+  Subtitle,
 } from '../../style/globalStyle';
-
 import * as S from './style';
-
 import { socket } from '../../services/socket';
 import { useProgressStore } from '../../hooks/useProgressStore';
-
-// Ícones e Tipos
-import { Timer, Trophy } from 'phosphor-react';
+import { Timer, Trophy, UserMinus } from 'phosphor-react';
 import type { Exercicio } from '../../interfaces';
 import { Radio } from '@mui/material';
 import { verificarEdesbloquearConquistas } from '../../services/achievements';
@@ -44,8 +39,11 @@ export function MultiplayerLobbyPage({
   const { fullTag: myTag } = useProgressStore();
 
   const [modeTimeLeft, setModeTimeLeft] = useState<number | null>(null);
-
   const [roundResult, setRoundResult] = useState<RoundResult | null>(null);
+  const [opponentLeft, setOpponentLeft] = useState<{
+    message: string;
+    xp: number;
+  } | null>(null);
 
   const me = useMemo(
     () => players.find((p) => p.tag === myTag),
@@ -57,7 +55,6 @@ export function MultiplayerLobbyPage({
   );
 
   useEffect(() => {
-    // handlers
     const onTimerTick = ({ timeLeft: newTime }: { timeLeft: number }) =>
       setTimeLeft(newTime);
 
@@ -94,10 +91,12 @@ export function MultiplayerLobbyPage({
     };
 
     const onGameOver = ({ finalScores }: { finalScores: Player[] }) => {
-      const vencedor = finalScores[0];
-      const oponente = finalScores[1];
-      if (vencedor.tag === myTag && oponente.score === 0) {
-        verificarEdesbloquearConquistas('VENCEU_DUELO', { pontosOponente: 0 });
+      const vencedor = finalScores.sort((a, b) => b.score - a.score)[0];
+      const oponente = finalScores.find((p) => p.tag !== myTag);
+      if (vencedor.tag === myTag) {
+        verificarEdesbloquearConquistas('VENCEU_DUELO', {
+          pontosOponente: oponente?.score || 0,
+        });
       }
       setPlayers(finalScores);
       setIsGameOver(true);
@@ -105,13 +104,10 @@ export function MultiplayerLobbyPage({
       setModeTimeLeft(0);
     };
 
-    const onPlayerDisconnected = ({ tag }: { tag?: string }) => {
-      console.warn('player disconnected:', tag);
-    };
-
     const onModeStarted = ({ duration }: { duration: number }) => {
       setModeTimeLeft(duration);
       setIsGameOver(false);
+      verificarEdesbloquearConquistas('JOGOU_DUELO');
     };
 
     const onModeTick = ({ timeLeft: newTime }: { timeLeft: number }) => {
@@ -130,16 +126,25 @@ export function MultiplayerLobbyPage({
       }
     };
 
+    const onOpponentLeft = ({
+      message,
+      consolationXp,
+    }: {
+      message: string;
+      consolationXp: number;
+    }) => {
+      setOpponentLeft({ message, xp: consolationXp });
+    };
+
     socket.on('timer_tick', onTimerTick);
     socket.on('new_question', onNewQuestion);
     socket.on('update_score', onUpdateScore);
     socket.on('answer_result', onAnswerResult);
     socket.on('game_over', onGameOver);
-    socket.on('player_disconnected', onPlayerDisconnected);
-
     socket.on('mode_started', onModeStarted);
     socket.on('mode_tick', onModeTick);
     socket.on('game_started', onGameStarted);
+    socket.on('opponent_left', onOpponentLeft);
 
     socket.emit('player_ready', { roomId });
 
@@ -149,11 +154,10 @@ export function MultiplayerLobbyPage({
       socket.off('update_score', onUpdateScore);
       socket.off('answer_result', onAnswerResult);
       socket.off('game_over', onGameOver);
-      socket.off('player_disconnected', onPlayerDisconnected);
-
       socket.off('mode_started', onModeStarted);
       socket.off('mode_tick', onModeTick);
       socket.off('game_started', onGameStarted);
+      socket.off('opponent_left', onOpponentLeft);
     };
   }, [roomId, myTag]);
 
@@ -178,30 +182,22 @@ export function MultiplayerLobbyPage({
 
   const parseText = (text: string): React.ReactNode | null => {
     if (!text) return null;
-
-    // --- 1) Mapeie aqui as substituições que quiser --- //
-    // Note: cada chave é a sequência com a barra (ex: \div), que no regex vira \\div
     const replacements: { [seq: string]: string } = {
-      '\\div': '÷',
-      '\\times': '×',
-      '\\sqrt': '√',
-      '\\pm': '±',
-      // adiciona mais conforme precisar...
+      '\\\\div': '÷',
+      '\\\\times': '×',
+      '\\\\sqrt': '√',
+      '\\\\pm': '±',
     };
 
-    // --- 2) Aplique as substituições no texto --- //
     let processed = text;
     for (const seq in replacements) {
-      // seq já vem como '\\div', então aqui usamos um RegExp que casa o backslash corretamente
       const re = new RegExp(seq, 'g');
       processed = processed.replace(re, replacements[seq]);
     }
 
-    // --- 3) Markdown-like splitter existente --- //
     const regex = /(\*[^*]+\*)|(_[^_]+_)|(~[^~]+~)|(`[^`]+`)|(\$[^$]+\$)/g;
     const parts = processed.split(regex).filter(Boolean);
 
-    // --- 4) Renderiza os pedaços como antes --- //
     return parts.map((part, idx) => {
       if (part.startsWith('*') && part.endsWith('*')) {
         return <strong key={idx}>{part.slice(1, -1)}</strong>;
@@ -218,10 +214,8 @@ export function MultiplayerLobbyPage({
             key={idx}
             style={{
               backgroundColor: '#2f3136',
-              color: '#f8f8f2',
               padding: '0 4px',
               borderRadius: '4px',
-              fontFamily: 'monospace',
             }}
           >
             {part.slice(1, -1)}
@@ -247,6 +241,33 @@ export function MultiplayerLobbyPage({
       return <span key={idx}>{part}</span>;
     });
   };
+
+  if (opponentLeft) {
+    return (
+      <S.LobbyWrapper>
+        <S.GameOverScreen>
+          <UserMinus size={64} color="#faa61a" weight="fill" />
+          <Title>Vitória por W.O.!</Title>
+          <Subtitle>{opponentLeft.message}</Subtitle>
+          <p
+            style={{
+              fontSize: '1.5rem',
+              color: '#43b581',
+              fontWeight: 'bold',
+            }}
+          >
+            +{opponentLeft.xp} XP
+          </p>
+          <BackButton
+            onClick={onGoHome}
+            style={{ position: 'static', margin: '1rem 0 0 0' }}
+          >
+            Voltar ao Menu Principal
+          </BackButton>
+        </S.GameOverScreen>
+      </S.LobbyWrapper>
+    );
+  }
 
   if (isGameOver) {
     return (
@@ -395,18 +416,6 @@ export function MultiplayerLobbyPage({
                   ))}
                 </S.OptionsContainer>
               )}
-
-              {currentQuestion.tipo === 'preenchimento' && (
-                <TextInput
-                  type="text"
-                  value={selectedAnswer}
-                  onChange={(e) => setSelectedAnswer(e.target.value)}
-                  placeholder="Digite sua resposta aqui"
-                  disabled={hasAnswered}
-                  autoFocus
-                />
-              )}
-
               <SubmitButton
                 onClick={handleAnswerSubmit}
                 disabled={!selectedAnswer || hasAnswered}

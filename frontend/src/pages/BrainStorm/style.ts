@@ -1,5 +1,11 @@
 // src/pages/BrainStorm/style.ts
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+
+// --- Animação de brilho para a barra de tempo ---
+const glow = (color: string) => keyframes`
+  0%, 100% { box-shadow: 0 0 3px ${color}, 0 0 6px ${color}; }
+  50% { box-shadow: 0 0 8px ${color}, 0 0 16px ${color}; }
+`;
 
 export const StormWrapper = styled.div`
   text-align: center;
@@ -11,7 +17,6 @@ export const StormWrapper = styled.div`
   gap: 1.5rem;
 `;
 
-// --- Container Padrão para Telas de Idle e Resultado ---
 export const CardContainer = styled.div`
   background-color: #2f3136;
   border: 1px solid #40444b;
@@ -23,9 +28,12 @@ export const CardContainer = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  @media (max-width: 480px) {
+    padding: 1.3rem;
+  }
 `;
 
-// --- Tela de Idle ---
 export const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -55,51 +63,85 @@ export const IconCircle = styled.div<{ bg?: string }>`
   flex-shrink: 0;
 `;
 
-// --- Tela de Jogo (Playing) ---
+// --- NOVO HEADER DE JOGO (HUD) ---
 export const GameHeader = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   width: 100%;
   max-width: 600px;
   background-color: #2f3136;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  border-radius: 12px;
   border: 1px solid #40444b;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 `;
 
-export const StatItem = styled.span`
-  color: #b9bbbe;
+export const MainTimer = styled.div`
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  svg {
+    color: #5865f2;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.5rem;
+  }
+`;
+
+export const StatsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+`;
+
+export const StatItem = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: bold;
-
-  strong {
-    color: #ffffff;
-  }
+  color: #ffffff;
 `;
 
 export const TimerBarContainer = styled.div`
   width: 100%;
   max-width: 600px;
-  height: 10px;
-  background-color: #40444b;
-  border-radius: 5px;
+  height: 12px;
+  background-color: #202225;
+  border-radius: 6px;
   overflow: hidden;
 `;
 
 export const TimerBarProgress = styled.div<{ percentage: number }>`
   width: ${(props) => props.percentage}%;
   height: 100%;
+  border-radius: 6px;
+
   background-color: ${(props) =>
     props.percentage > 50
       ? '#43b581'
       : props.percentage > 25
       ? '#faa61a'
       : '#ed4245'};
-  transition: width 0.2s linear;
+
+  // Efeito de brilho (glow)
+  animation: ${(props) =>
+      glow(
+        props.percentage > 50
+          ? '#43b581'
+          : props.percentage > 25
+          ? '#faa61a'
+          : '#ed4245'
+      )}
+    2s ease-in-out infinite;
+
+  transition: width 0.2s linear, background-color 0.3s ease;
 `;
 
 export const FeedbackText = styled.p<{ $isCorrect: boolean }>`

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { doc, updateDoc, increment } from 'firebase/firestore';
 import { auth, db } from '../../config/firebase';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { Exercicio } from '../../interfaces';
 import { Heart, Timer, XCircle, Question, Trophy } from 'phosphor-react';
 import {
@@ -320,23 +321,22 @@ export function BrainStorm({ onBack }: BrainStormProps) {
   return (
     <S.StormWrapper>
       <S.GameHeader>
-        <S.StatItem>
-          <Timer size={24} />
-          <strong>{mainTimeLeft}s</strong>
-        </S.StatItem>
-        <S.StatItem>
-          {Array(Math.max(0, lives))
-            .fill(0)
-            .map((_, i) => (
-              <Heart key={i} weight="fill" color="#ed4245" size={24} />
-            ))}
-        </S.StatItem>
-        <S.StatItem>
-          🔥<strong>{streak}x</strong>
-        </S.StatItem>
-        <S.StatItem>
-          XP: <strong>{totalXp}</strong>
-        </S.StatItem>
+        <S.MainTimer>
+          <Timer size={32} />
+          {mainTimeLeft}s
+        </S.MainTimer>
+
+        <S.StatsContainer>
+          <S.StatItem>
+            {Array(Math.max(0, lives))
+              .fill(0)
+              .map((_, i) => (
+                <Heart key={i} weight="fill" color="#ed4245" size={28} />
+              ))}
+          </S.StatItem>
+          <S.StatItem>🔥 {streak}x</S.StatItem>
+          <S.StatItem>XP: {totalXp}</S.StatItem>
+        </S.StatsContainer>
       </S.GameHeader>
 
       <S.TimerBarContainer>
@@ -353,44 +353,56 @@ export function BrainStorm({ onBack }: BrainStormProps) {
         <div style={{ height: '30px' }} />
       )}
 
-      {currentQuestion && (
-        <ExerciseBox
-          style={{
-            opacity: isAnswered ? 0.6 : 1,
-            minHeight: '270px',
-            width: '100%',
-            maxWidth: '568px',
-          }}
-        >
-          <QuestionText>{currentQuestion.pergunta}</QuestionText>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.75rem',
-            }}
+      <AnimatePresence mode="wait">
+        {currentQuestion && (
+          <motion.div
+            key={currentQuestion.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            style={{ width: '100%', maxWidth: '600px' }}
           >
-            {currentQuestion.opcoes?.map((option) => (
-              <OptionLabel key={option}>
-                <RadioInput
-                  type="radio"
-                  name={`ex-${currentQuestion.id}`}
-                  value={option}
-                  checked={userAnswer === option}
-                  onChange={(e) => setUserAnswer(e.target.value)}
-                  disabled={isAnswered}
-                />
-                <span>{option}</span>
-              </OptionLabel>
-            ))}
-          </div>
-        </ExerciseBox>
-      )}
+            <ExerciseBox
+              style={{
+                opacity: isAnswered ? 0.6 : 1,
+                minHeight: '270px',
+              }}
+            >
+              <QuestionText>{currentQuestion.pergunta}</QuestionText>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.75rem',
+                }}
+              >
+                {currentQuestion.opcoes?.map((option) => (
+                  <OptionLabel key={option}>
+                    <RadioInput
+                      type="radio"
+                      name={`ex-${currentQuestion.id}`}
+                      value={option}
+                      checked={userAnswer === option}
+                      onChange={(e) => setUserAnswer(e.target.value)}
+                      disabled={isAnswered}
+                    />
+                    <span>{option}</span>
+                  </OptionLabel>
+                ))}
+              </div>
+            </ExerciseBox>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <ContinueButton
         variant="primary"
         onClick={handleAnswerSubmit}
         disabled={!userAnswer || isAnswered}
+        style={{
+          backgroundColor: '#43b581', // Mudei a cor pra combinar com a UI
+        }}
       >
         Responder
       </ContinueButton>

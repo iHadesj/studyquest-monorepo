@@ -1,5 +1,15 @@
+// src/components/TopBar/style.ts
 import { Gear } from 'phosphor-react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+
+const shineAnimation = keyframes`
+  0% {
+    transform: translateX(-100%) skewX(-30deg);
+  }
+  100% {
+    transform: translateX(250%) skewX(-30deg);
+  }
+`;
 
 export const TopBarContainer = styled.div`
   display: flex;
@@ -49,6 +59,9 @@ export const LevelBarContainer = styled.div`
   gap: 1rem;
   width: 100%;
   max-width: 400px;
+  @media (max-width: 480px) {
+    gap: 0.6rem;
+  }
 `;
 
 export const LevelDisplay = styled.div`
@@ -57,24 +70,26 @@ export const LevelDisplay = styled.div`
   font-weight: bold;
   padding: 0.5rem;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1rem;
   flex-shrink: 0;
   border: 2px solid #2f3136;
+  box-shadow: 0 0 10px rgba(88, 101, 242, 0.7);
 `;
 
 export const ProgressBarContainer = styled.div`
   width: 100%;
   background-color: #202225;
-  border-radius: 8px;
-  height: 20px;
+  border-radius: 99px;
+  border: 2px solid #ffffff85;
+  height: 22px;
   overflow: hidden;
   position: relative;
-  border: 1px solid #40444b;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
 `;
 
 export const AvatarContainer = styled.div`
@@ -87,6 +102,25 @@ export const ProgressBarFill = styled.div<{ $progress: number }>`
   height: 100%;
   background: linear-gradient(90deg, #43b581, #5865f2);
   transition: width 0.5s ease-in-out;
+  border-radius: 99px;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: ${shineAnimation} 3s infinite linear;
+  }
 `;
 
 export const XPText = styled.span`
@@ -97,7 +131,8 @@ export const XPText = styled.span`
   color: white;
   font-size: 0.75rem;
   font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
 
   @media (max-width: 480px) {
     display: none;
