@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { motion } from 'framer-motion'; // Importa o motion
-import { Avatar as BaseAvatar } from '../TopBar/index';
+import { Avatar as BaseAvatar } from '../../style/globalStyle';
 
 export const FriendsListWrapper = styled.div`
   display: flex;

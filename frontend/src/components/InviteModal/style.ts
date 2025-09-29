@@ -1,11 +1,11 @@
 // src/components/InviteModal/style.ts
 import styled from 'styled-components';
-import { Avatar as BaseAvatar } from '../TopBar';
+import { Avatar as BaseAvatar } from '../../style/globalStyle';
 
 export const InviteBox = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   text-align: center;
 `;
 

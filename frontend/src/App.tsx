@@ -287,7 +287,7 @@ export default function App() {
           <SubjectSelector {...subjectSelectorProps} />
         );
       case 'brainstorm':
-        return <BrainStorm subjects={allSubjectsData} onBack={backToHome} />;
+        return <BrainStorm onBack={backToHome} />;
       case 'exercise':
         return selectedSubject && selectedLevel ? (
           <ExercisePage

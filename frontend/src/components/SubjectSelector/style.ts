@@ -112,7 +112,10 @@ export const ProgressBarContainer = styled.div`
   border: 1px solid rgba(0, 0, 0, 0.15);
 `;
 
-export const ProgressBarFill = styled.div<{ $percent: number }>`
+export const ProgressBarFill = styled.div<{
+  $percent: number;
+  $delay?: number;
+}>`
   width: ${(p) => Math.max(0, Math.min(100, p.$percent))}%;
   height: 100%;
   background: linear-gradient(
@@ -124,7 +127,8 @@ export const ProgressBarFill = styled.div<{ $percent: number }>`
   transition: width 420ms cubic-bezier(0.2, 0.9, 0.2, 1);
   position: relative;
   background-size: 220% 100%;
-  animation: ${shine} 2.6s linear infinite;
+  animation: ${shine} 4.6s linear infinite;
+  animation-delay: ${(p) => p.$delay || 0}ms;
 `;
 
 export const ProgressLabel = styled.div`

@@ -165,7 +165,7 @@ export const SubjectSelector: React.FC<{
                     aria-label={`${subject.nome} progresso`}
                   >
                     <ProgressBarContainer>
-                      <ProgressBarFill $percent={percent} />
+                      <ProgressBarFill $percent={percent} $delay={idx * 100} />
                     </ProgressBarContainer>
                     <ProgressLabel>
                       <span style={{ opacity: 0.9 }}>{percent}%</span>

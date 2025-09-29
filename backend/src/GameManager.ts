@@ -40,7 +40,8 @@ export const subjectDataMap: { [key: string]: Materia } = {
   quimica: quimicaData,
 };
 
-let allExercises: Exercicio[] = [];
+// --- A CORREÇÃO ESTÁ AQUI, MEU BOM! ---
+export let allExercises: Exercicio[] = [];
 
 try {
   console.log("Carregando perguntas a partir dos módulos JSON importados...");
@@ -51,7 +52,12 @@ try {
     if (subjectData && subjectData.niveis) {
       subjectData.niveis.forEach((level) => {
         if (level.exercicios) {
-          allExercises.push(...level.exercicios);
+          // Adicionamos o subjectId a cada exercício para referência futura
+          const exercisesWithSubject = level.exercicios.map((ex) => ({
+            ...ex,
+            subjectId: subjectInfo.id,
+          }));
+          allExercises.push(...exercisesWithSubject);
         }
       });
     }
@@ -76,4 +82,13 @@ export const getRandomQuestion = (): Exercicio | null => {
   }
   const randomIndex = Math.floor(Math.random() * allExercises.length);
   return allExercises[randomIndex] ?? null;
+};
+
+export const getRandomQuestions = (count: number): Exercicio[] => {
+  if (allExercises.length === 0) {
+    return [];
+  }
+
+  const shuffled = [...allExercises].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
 };

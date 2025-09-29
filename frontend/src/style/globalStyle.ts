@@ -150,6 +150,15 @@ export const MainContent = styled.div`
   animation: ${fadeIn} 0.4s ease-in-out;
 `;
 
+export const Avatar = styled.img`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #2f3136;
+  border: 2px solid #40444b;
+  object-fit: cover;
+`;
+
 export const BackButton = styled.button`
   position: relative;
   background: none;
@@ -431,7 +440,7 @@ export const ContinueButton = styled.button<{
   variant?: 'primary' | 'secondary';
 }>`
   margin-top: 2rem;
-  width: 100%;
+  width: 40%;
   background-color: ${({ variant }) =>
     variant === 'primary' ? '#43b581' : '#5c5c5c'};
   color: #ffffff;

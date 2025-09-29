@@ -1,140 +1,10 @@
-import styled from 'styled-components';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import { useProgressStore } from '../../hooks/useProgressStore';
-import { SignOut, Gear } from 'phosphor-react';
+import { SignOut } from 'phosphor-react';
 import { calculateLevelInfo } from '../../style/level';
-
-export const TopBarContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 1280px;
-  gap: 2rem;
-  margin: 0 auto;
-`;
-
-export const ProfileInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-`;
-
-export const Avatar = styled.img`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #2f3136;
-  border: 2px solid #40444b;
-  object-fit: cover;
-`;
-
-export const UserDetails = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #ffffff;
-  font-weight: bold;
-  font-size: 1rem;
-
-  &:hover .settings-icon {
-    opacity: 1;
-  }
-
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
-export const Username = styled.span``;
-
-export const SettingsIcon = styled(Gear)`
-  color: #b9bbbe;
-  opacity: 0;
-  transition: opacity 0.2s;
-`;
-
-export const LevelBarContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  width: 100%;
-  max-width: 400px;
-`;
-
-export const LevelDisplay = styled.div`
-  background-color: #5865f2;
-  color: white;
-  font-weight: bold;
-  padding: 0.5rem;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  flex-shrink: 0;
-  border: 2px solid #2f3136;
-`;
-
-export const ProgressBarContainer = styled.div`
-  width: 100%;
-  background-color: #202225;
-  border-radius: 8px;
-  height: 20px;
-  overflow: hidden;
-  position: relative;
-  border: 1px solid #40444b;
-`;
-
-export const AvatarContainer = styled.div`
-  position: relative;
-  cursor: pointer;
-`;
-
-export const ProgressBarFill = styled.div<{ $progress: number }>`
-  width: ${(props) => props.$progress}%;
-  height: 100%;
-  background: linear-gradient(90deg, #43b581, #5865f2);
-  transition: width 0.5s ease-in-out;
-`;
-
-export const XPText = styled.span`
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-size: 0.75rem;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-
-  @media (max-width: 480px) {
-    display: none;
-  }
-`;
-
-export const LogoutButton = styled.button`
-  background: none;
-  border: none;
-  color: #b9bbbe;
-  cursor: pointer;
-  margin-left: 1rem;
-  padding: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s;
-
-  &:hover {
-    color: #ffffff;
-    background-color: #40444b;
-  }
-`;
+import * as S from './style';
+import { Avatar } from '../../style/globalStyle';
 
 type TopBarProps = {
   onClick?: () => void;
@@ -160,26 +30,26 @@ export const TopBar = ({ onClick }: TopBarProps) => {
       : `https://api.dicebear.com/8.x/pixel-art/svg?seed=${avatarSeed}`;
 
   return (
-    <TopBarContainer>
-      <ProfileInfo onClick={onClick}>
+    <S.TopBarContainer>
+      <S.ProfileInfo onClick={onClick}>
         <Avatar src={avatarSrc} alt="User Avatar" />
-        <UserDetails>
-          <Username>{username}</Username>
-          <SettingsIcon className="settings-icon" weight="fill" size={16} />
-        </UserDetails>
-      </ProfileInfo>
+        <S.UserDetails>
+          <S.Username>{username}</S.Username>
+          <S.SettingsIcon className="settings-icon" weight="fill" size={16} />
+        </S.UserDetails>
+      </S.ProfileInfo>
 
-      <LevelBarContainer>
-        <LevelDisplay title={`Nível ${level}`}>{level}</LevelDisplay>
-        <ProgressBarContainer>
-          <ProgressBarFill $progress={progress} />
-          <XPText>{`${xpInCurrentLevel} / ${xpNeededForLevel} XP`}</XPText>
-        </ProgressBarContainer>
-      </LevelBarContainer>
+      <S.LevelBarContainer>
+        <S.LevelDisplay title={`Nível ${level}`}>{level}</S.LevelDisplay>
+        <S.ProgressBarContainer>
+          <S.ProgressBarFill $progress={progress} />
+          <S.XPText>{`${xpInCurrentLevel} / ${xpNeededForLevel} XP`}</S.XPText>
+        </S.ProgressBarContainer>
+      </S.LevelBarContainer>
 
-      <LogoutButton onClick={handleLogout} title="Sair">
+      <S.LogoutButton onClick={handleLogout} title="Sair">
         <SignOut size={24} />
-      </LogoutButton>
-    </TopBarContainer>
+      </S.LogoutButton>
+    </S.TopBarContainer>
   );
 };

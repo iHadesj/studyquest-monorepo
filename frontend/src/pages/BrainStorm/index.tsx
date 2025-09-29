@@ -1,45 +1,41 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+// src/pages/BrainStorm/index.tsx
+
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { doc, updateDoc, increment } from 'firebase/firestore';
 import { auth, db } from '../../config/firebase';
-import type { Exercicio, Materia } from '../../interfaces';
-import { Heart, Timer, XCircle } from 'phosphor-react';
-
+import type { Exercicio } from '../../interfaces';
+import { Heart, Timer, XCircle, Question, Trophy } from 'phosphor-react';
 import {
   ExerciseBox,
   QuestionText,
   RadioInput,
   OptionLabel,
-  TextInput,
   ContinueButton,
   Title,
   Subtitle,
+  LoadingSpinner,
 } from '../../style/globalStyle';
+import * as S from './style';
+import { api } from '../../services/api';
+import { verificarEdesbloquearConquistas } from '../../services/achievements';
 
-import {
-  StormWrapper,
-  StatsBar,
-  StatItem,
-  TimerBarContainer,
-  TimerBarProgress,
-  FeedbackText,
-  StartScreen,
-} from './style';
-
-const GAME_DURATION = 60; // 1 minuto
-const QUESTION_TIME_LIMIT = 15; // 15 segundos
+const GAME_DURATION = 60;
+const QUESTION_TIME_LIMIT = 15;
 const INITIAL_LIVES = 3;
 const BASE_XP_PER_CORRECT_ANSWER = 20;
 const STREAK_MULTIPLIER_BONUS = 0.5;
 
 interface BrainStormProps {
-  subjects: Materia[];
   onBack: () => void;
 }
 
-export function BrainStorm({ subjects, onBack }: BrainStormProps) {
+export function BrainStorm({ onBack }: BrainStormProps) {
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'finished'>(
     'idle'
   );
+  const [allExercises, setAllExercises] = useState<Exercicio[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [mainTimeLeft, setMainTimeLeft] = useState(GAME_DURATION);
   const [questionTimeLeft, setQuestionTimeLeft] = useState(QUESTION_TIME_LIMIT);
   const [lives, setLives] = useState(INITIAL_LIVES);
@@ -48,47 +44,65 @@ export function BrainStorm({ subjects, onBack }: BrainStormProps) {
     null
   );
   const [streak, setStreak] = useState(0);
-
-  console.log(mainTimeLeft);
-
-  // Estados da pergunta atual
   const [currentQuestion, setCurrentQuestion] = useState<Exercicio | null>(
     null
   );
   const [userAnswer, setUserAnswer] = useState('');
+  const [isAnswered, setIsAnswered] = useState(false);
   const [feedback, setFeedback] = useState<{
     message: string;
     correct: boolean;
   } | null>(null);
 
-  const allExercises = useMemo(() => {
-    return subjects.flatMap((subject) =>
-      subject.niveis.flatMap((level) => level.exercicios)
-    );
-  }, [subjects]);
+  const mainTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const questionTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const feedbackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const fetchBrainstormExercises = async () => {
+      setIsLoading(true);
+      try {
+        const response = await api.get('/api/exercises/brainstorm/questions');
+        const multipleChoice = response.data.filter(
+          (ex: any) => ex.tipo === 'multipla_escolha'
+        );
+        setAllExercises(multipleChoice);
+      } catch (error) {
+        console.error('Falha ao carregar exercícios para o Brainstorm:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchBrainstormExercises();
+  }, []);
 
   const pickNextQuestion = useCallback(() => {
     setUserAnswer('');
     setFeedback(null);
+    setIsAnswered(false);
     setQuestionTimeLeft(QUESTION_TIME_LIMIT);
     if (allExercises.length > 0) {
       const randomIndex = Math.floor(Math.random() * allExercises.length);
       setCurrentQuestion(allExercises[randomIndex]);
+    } else {
+      setGameState('idle');
     }
   }, [allExercises]);
 
   const endGame = useCallback(
     async (reason: 'time' | 'lives') => {
-      setGameOverReason(reason);
       setGameState('finished');
+      setGameOverReason(reason);
+      if (mainTimerRef.current) clearInterval(mainTimerRef.current);
+      if (questionTimerRef.current) clearInterval(questionTimerRef.current);
+      if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
+
+      verificarEdesbloquearConquistas('JOGOU_BRAINSTORM');
+
       const user = auth.currentUser;
       if (user && totalXp > 0) {
         const userDocRef = doc(db, 'users', user.uid);
-        try {
-          await updateDoc(userDocRef, { xp: increment(totalXp) });
-        } catch (error) {
-          console.error('Erro ao salvar XP bônus:', error);
-        }
+        await updateDoc(userDocRef, { xp: increment(totalXp) });
       }
     },
     [totalXp]
@@ -97,10 +111,9 @@ export function BrainStorm({ subjects, onBack }: BrainStormProps) {
   useEffect(() => {
     if (gameState !== 'playing') return;
 
-    const mainTimer = setInterval(() => {
+    mainTimerRef.current = setInterval(() => {
       setMainTimeLeft((prev) => {
         if (prev <= 1) {
-          clearInterval(mainTimer);
           endGame('time');
           return 0;
         }
@@ -108,24 +121,30 @@ export function BrainStorm({ subjects, onBack }: BrainStormProps) {
       });
     }, 1000);
 
-    const questionTimer = setInterval(() => {
-      setQuestionTimeLeft((prev) => {
-        if (prev <= 1) {
-          setStreak(0);
-          setLives((l) => l - 1);
-          setFeedback({ message: 'Tempo esgotado!', correct: false });
-          setTimeout(pickNextQuestion, 1500);
-          return QUESTION_TIME_LIMIT;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    if (!isAnswered) {
+      questionTimerRef.current = setInterval(() => {
+        setQuestionTimeLeft((prev) => {
+          if (prev <= 1) {
+            setStreak(0);
+            setLives((l) => l - 1);
+            setFeedback({ message: 'Tempo esgotado!', correct: false });
+            setIsAnswered(true);
+            feedbackTimeoutRef.current = setTimeout(pickNextQuestion, 1500);
+            return QUESTION_TIME_LIMIT;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      if (questionTimerRef.current) clearInterval(questionTimerRef.current);
+    }
 
     return () => {
-      clearInterval(mainTimer);
-      clearInterval(questionTimer);
+      if (mainTimerRef.current) clearInterval(mainTimerRef.current);
+      if (questionTimerRef.current) clearInterval(questionTimerRef.current);
+      if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
     };
-  }, [gameState, pickNextQuestion, endGame]);
+  }, [gameState, pickNextQuestion, endGame, isAnswered]);
 
   useEffect(() => {
     if (lives <= 0 && gameState === 'playing') {
@@ -134,6 +153,7 @@ export function BrainStorm({ subjects, onBack }: BrainStormProps) {
   }, [lives, gameState, endGame]);
 
   const startGame = () => {
+    if (allExercises.length === 0) return;
     setLives(INITIAL_LIVES);
     setTotalXp(0);
     setGameOverReason(null);
@@ -143,203 +163,237 @@ export function BrainStorm({ subjects, onBack }: BrainStormProps) {
     pickNextQuestion();
   };
 
-  const handleAnswerSubmit = () => {
-    if (!currentQuestion || feedback) return;
-    const isCorrect =
-      userAnswer.trim().toLowerCase() ===
-      currentQuestion.respostaCorreta.trim().toLowerCase();
+  const handleAnswerSubmit = async () => {
+    if (!currentQuestion || isAnswered) return;
 
-    if (isCorrect) {
-      const timeBonus = questionTimeLeft;
-      const currentMultiplier = 1 + streak * STREAK_MULTIPLIER_BONUS;
-      const xpGained = Math.round(
-        (BASE_XP_PER_CORRECT_ANSWER + timeBonus) * currentMultiplier
-      );
+    setIsAnswered(true);
+    if (questionTimerRef.current) clearInterval(questionTimerRef.current);
 
-      setTotalXp((prev) => prev + xpGained);
-      setStreak((prev) => prev + 1);
-      setFeedback({
-        message: `+${xpGained} XP! Combo x${streak + 1}`,
-        correct: true,
+    try {
+      const response = await api.post('/api/exercises/brainstorm/submit', {
+        exerciseId: currentQuestion.id,
+        userAnswer: userAnswer,
       });
-    } else {
-      setStreak(0);
-      setLives((prev) => prev - 1);
-      setFeedback({ message: 'Incorreto!', correct: false });
+
+      const { isCorrect } = response.data;
+      if (isCorrect) {
+        const timeBonus = Math.floor(questionTimeLeft / 2);
+        const currentMultiplier = 1 + streak * STREAK_MULTIPLIER_BONUS;
+        const xpGained = Math.round(
+          (BASE_XP_PER_CORRECT_ANSWER + timeBonus) * currentMultiplier
+        );
+        setTotalXp((prev) => prev + xpGained);
+        setStreak((prev) => prev + 1);
+        setFeedback({
+          message: `+${xpGained} XP! Combo x${streak + 1}`,
+          correct: true,
+        });
+      } else {
+        setStreak(0);
+        setLives((prev) => prev - 1);
+        setFeedback({ message: 'Incorreto!', correct: false });
+      }
+    } catch (error) {
+      console.error('Erro ao submeter resposta do Brainstorm:', error);
+      setFeedback({
+        message: 'Erro ao enviar. Tente de novo.',
+        correct: false,
+      });
+    } finally {
+      feedbackTimeoutRef.current = setTimeout(pickNextQuestion, 1500);
     }
-    setTimeout(pickNextQuestion, 1500);
   };
+
   if (gameState === 'idle') {
     return (
-      <StormWrapper>
-        <StartScreen>
-          <Title>Modo Brainstorm!</Title>
-          <Subtitle as="p">
-            Teste seus conhecimentos contra o relógio. Você tem{' '}
-            <strong>{GAME_DURATION} segundos</strong> e{' '}
-            <strong>{INITIAL_LIVES} vidas</strong>. Responda cada pergunta em
-            até <strong>{QUESTION_TIME_LIMIT} segundos</strong>. Quanto mais
-            rápido, mais XP você ganha!
-          </Subtitle>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              gap: '1rem',
-              justifyContent: 'center',
-              width: '100%',
-            }}
-          >
-            <ContinueButton
-              style={{ marginTop: '0px' }}
-              variant="primary"
-              onClick={startGame}
+      <S.StormWrapper>
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <S.CardContainer>
+            <Title>Brainstorm Solo</Title>
+            <Subtitle>
+              Teste seus conhecimentos contra o relógio. Responda o máximo que
+              puder antes que o tempo ou suas vidas acabem!
+            </Subtitle>
+            <S.StatsGrid>
+              <S.StatCard>
+                <S.IconCircle bg="linear-gradient(180deg,#60a5fa,#3182ce)">
+                  <Timer size={24} color="white" weight="bold" />
+                </S.IconCircle>
+                <div>
+                  <strong style={{ fontSize: '1.05rem' }}>Tempo Total</strong>
+                  <div style={{ fontSize: '0.9rem', color: '#c7d2de' }}>
+                    {GAME_DURATION} segundos
+                  </div>
+                </div>
+              </S.StatCard>
+              <S.StatCard>
+                <S.IconCircle bg="linear-gradient(180deg,#f472b6,#c026d3)">
+                  <Heart size={24} color="white" weight="bold" />
+                </S.IconCircle>
+                <div>
+                  <strong style={{ fontSize: '1.05rem' }}>Vidas</strong>
+                  <div style={{ fontSize: '0.9rem', color: '#c7d2de' }}>
+                    {INITIAL_LIVES} chances
+                  </div>
+                </div>
+              </S.StatCard>
+              <S.StatCard>
+                <S.IconCircle bg="linear-gradient(180deg,#43b581,#2f855a)">
+                  <Question size={24} color="white" weight="bold" />
+                </S.IconCircle>
+                <div>
+                  <strong style={{ fontSize: '1.05rem' }}>Bônus</strong>
+                  <div style={{ fontSize: '0.9rem', color: '#c7d2de' }}>
+                    XP por velocidade e combos
+                  </div>
+                </div>
+              </S.StatCard>
+            </S.StatsGrid>
+            <div
+              style={{
+                display: 'flex',
+                gap: '1rem',
+                width: '100%',
+                maxWidth: '400px',
+                marginTop: '1rem',
+              }}
             >
-              Começar!
-            </ContinueButton>
-            <ContinueButton
-              style={{ marginTop: '0px' }}
-              variant="secondary"
-              onClick={onBack}
-            >
-              Cancelar
-            </ContinueButton>
-          </div>
-        </StartScreen>
-      </StormWrapper>
+              <ContinueButton
+                variant="primary"
+                onClick={startGame}
+                disabled={allExercises.length === 0}
+              >
+                Começar
+              </ContinueButton>
+              <ContinueButton variant="secondary" onClick={onBack}>
+                Voltar
+              </ContinueButton>
+            </div>
+          </S.CardContainer>
+        )}
+      </S.StormWrapper>
     );
   }
 
   if (gameState === 'finished') {
-    const playerWon = totalXp > 0;
     return (
-      <StormWrapper>
-        {playerWon ? (
-          <>
-            <Title>Desafio Concluído!</Title>
-            <Subtitle>Você ganhou um total de</Subtitle>
-            <Title as="h2" style={{ fontSize: '2rem', color: '#43b581' }}>
-              {totalXp} XP Bônus!
-            </Title>
-          </>
-        ) : (
-          <>
-            {gameOverReason === 'time' && <Timer size={64} color="#ed4245" />}
-            {gameOverReason === 'lives' && (
-              <XCircle size={64} color="#ed4245" />
-            )}
-            <Title>Fim de Jogo!</Title>
-            <Subtitle>
-              {gameOverReason === 'time'
-                ? 'O tempo acabou!'
-                : 'Você ficou sem vidas.'}
-            </Subtitle>
-            <p style={{ color: '#b9bbbe', marginTop: '1rem' }}>
-              Não desanime, tente novamente!
-            </p>
-          </>
-        )}
-        <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-          <ContinueButton variant="primary" onClick={startGame}>
-            Jogar Novamente
-          </ContinueButton>
-          <ContinueButton variant="secondary" onClick={onBack}>
-            Voltar ao Menu
-          </ContinueButton>
-        </div>
-      </StormWrapper>
+      <S.StormWrapper>
+        <S.CardContainer>
+          {totalXp > 0 ? (
+            <>
+              <Trophy size={64} color="#f1c40f" weight="fill" />
+              <Title>Desafio Concluído!</Title>
+              <Subtitle>Você ganhou um total de</Subtitle>
+              <strong style={{ fontSize: '2rem', color: '#43b581' }}>
+                {totalXp} XP Bônus!
+              </strong>
+            </>
+          ) : (
+            <>
+              {gameOverReason === 'time' && <Timer size={64} color="#ed4245" />}
+              {gameOverReason === 'lives' && (
+                <XCircle size={64} color="#ed4245" />
+              )}
+              <Title>Fim de Jogo!</Title>
+              <Subtitle>
+                {gameOverReason === 'time'
+                  ? 'O tempo acabou!'
+                  : 'Você ficou sem vidas.'}
+              </Subtitle>
+            </>
+          )}
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+            <ContinueButton variant="primary" onClick={startGame}>
+              Jogar Novamente
+            </ContinueButton>
+            <ContinueButton variant="secondary" onClick={onBack}>
+              Voltar ao Menu
+            </ContinueButton>
+          </div>
+        </S.CardContainer>
+      </S.StormWrapper>
     );
   }
 
   return (
-    <StormWrapper>
-      <StatsBar style={{ justifyContent: 'center' }}>
-        <StatItem>
-          <Timer size={20} />
+    <S.StormWrapper>
+      <S.GameHeader>
+        <S.StatItem>
+          <Timer size={24} />
           <strong>{mainTimeLeft}s</strong>
-        </StatItem>
-      </StatsBar>
-      <StatsBar>
-        <StatItem>
-          <strong>
-            {Array(Math.max(0, lives))
-              .fill(0)
-              .map((_, index) => (
-                <Heart key={index} weight="fill" color="#ed4245" size={24} />
-              ))}
-          </strong>
-        </StatItem>
-        <StatItem>
-          🔥 Combo: <strong>{streak}x</strong>
-        </StatItem>
-        <StatItem>
+        </S.StatItem>
+        <S.StatItem>
+          {Array(Math.max(0, lives))
+            .fill(0)
+            .map((_, i) => (
+              <Heart key={i} weight="fill" color="#ed4245" size={24} />
+            ))}
+        </S.StatItem>
+        <S.StatItem>
+          🔥<strong>{streak}x</strong>
+        </S.StatItem>
+        <S.StatItem>
           XP: <strong>{totalXp}</strong>
-        </StatItem>
-      </StatsBar>
+        </S.StatItem>
+      </S.GameHeader>
 
-      <TimerBarContainer>
-        <TimerBarProgress
+      <S.TimerBarContainer>
+        <S.TimerBarProgress
           percentage={(questionTimeLeft / QUESTION_TIME_LIMIT) * 100}
         />
-      </TimerBarContainer>
+      </S.TimerBarContainer>
 
-      {feedback && (
-        <FeedbackText isCorrect={feedback.correct}>
+      {feedback ? (
+        <S.FeedbackText $isCorrect={feedback.correct}>
           {feedback.message}
-        </FeedbackText>
+        </S.FeedbackText>
+      ) : (
+        <div style={{ height: '30px' }} />
       )}
 
       {currentQuestion && (
         <ExerciseBox
-          style={{ minHeight: '130px', opacity: feedback ? 0.5 : 1 }}
+          style={{
+            opacity: isAnswered ? 0.6 : 1,
+            minHeight: '270px',
+            width: '100%',
+            maxWidth: '568px',
+          }}
         >
           <QuestionText>{currentQuestion.pergunta}</QuestionText>
-          {currentQuestion.tipo === 'multipla_escolha' &&
-            currentQuestion.opcoes && (
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.75rem',
-                }}
-              >
-                {currentQuestion.opcoes.map((option) => (
-                  <OptionLabel key={option}>
-                    <RadioInput
-                      type="radio"
-                      name={`ex-${currentQuestion.id}`}
-                      value={option}
-                      checked={userAnswer === option}
-                      onChange={(e) => setUserAnswer(e.target.value)}
-                    />
-                    <span>{option}</span>
-                  </OptionLabel>
-                ))}
-              </div>
-            )}
-          {currentQuestion.tipo === 'preenchimento' && (
-            <TextInput
-              type="text"
-              value={userAnswer}
-              onChange={(e) => setUserAnswer(e.target.value)}
-              placeholder="Digite sua resposta"
-            />
-          )}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem',
+            }}
+          >
+            {currentQuestion.opcoes?.map((option) => (
+              <OptionLabel key={option}>
+                <RadioInput
+                  type="radio"
+                  name={`ex-${currentQuestion.id}`}
+                  value={option}
+                  checked={userAnswer === option}
+                  onChange={(e) => setUserAnswer(e.target.value)}
+                  disabled={isAnswered}
+                />
+                <span>{option}</span>
+              </OptionLabel>
+            ))}
+          </div>
         </ExerciseBox>
       )}
 
-      <div style={{ display: 'flex', gap: '1rem' }}>
-        <ContinueButton
-          variant="primary"
-          onClick={handleAnswerSubmit}
-          disabled={!userAnswer || !!feedback}
-        >
-          Responder
-        </ContinueButton>
-        <ContinueButton variant="secondary" onClick={onBack}>
-          Cancelar
-        </ContinueButton>
-      </div>
-    </StormWrapper>
+      <ContinueButton
+        variant="primary"
+        onClick={handleAnswerSubmit}
+        disabled={!userAnswer || isAnswered}
+      >
+        Responder
+      </ContinueButton>
+    </S.StormWrapper>
   );
 }

@@ -1,10 +1,22 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { subjectDataMap } from "../GameManager";
+// Usamos a lista completa de exercícios que já é carregada no GameManager
+import {
+  getRandomQuestions,
+  subjectDataMap,
+  allExercises,
+} from "../GameManager";
 
+// Schema para exercícios normais
 const submitAnswerSchema = z.object({
   subjectId: z.string(),
   levelId: z.string(),
+  exerciseId: z.number(),
+  userAnswer: z.string(),
+});
+
+// Schema só para o Brainstorm, mais simples
+const brainstormSubmitSchema = z.object({
   exerciseId: z.number(),
   userAnswer: z.string(),
 });
@@ -58,7 +70,6 @@ export const submitAnswer = async (req: Request, res: Response) => {
     exercise.respostaCorreta.trim().toLowerCase() ===
     userAnswer.trim().toLowerCase();
 
-  // <<< MUDANÇA PRINCIPAL AQUI >>>
   if (isCorrect) {
     return res.json({ isCorrect: true });
   } else {
@@ -68,4 +79,41 @@ export const submitAnswer = async (req: Request, res: Response) => {
       correctAnswer: exercise.respostaCorreta,
     });
   }
+};
+
+export const getBrainstormExercises = async (req: Request, res: Response) => {
+  const exercises = getRandomQuestions(50);
+
+  // Remove o gabarito antes de enviar
+  const exercisesSanitized = exercises.map((ex: any) => {
+    const { respostaCorreta, ...exerciseForStudent } = ex;
+    return exerciseForStudent;
+  });
+
+  return res.json(exercisesSanitized);
+};
+
+// Função controller para a submissão do Brainstorm
+export const submitBrainstormAnswer = async (req: Request, res: Response) => {
+  const validation = brainstormSubmitSchema.safeParse(req.body);
+  if (!validation.success) {
+    return res.status(400).json({ message: "Requisição inválida." });
+  }
+
+  const { exerciseId, userAnswer } = validation.data;
+
+  // Encontra o exercício na lista geral de todos os exercícios
+  const exercise = allExercises.find((ex) => ex.id === exerciseId);
+
+  if (!exercise) {
+    return res
+      .status(404)
+      .json({ message: "Exercício do Brainstorm não encontrado." });
+  }
+
+  const isCorrect =
+    exercise.respostaCorreta.trim().toLowerCase() ===
+    userAnswer.trim().toLowerCase();
+
+  return res.json({ isCorrect });
 };

@@ -11,6 +11,7 @@ import * as admin from "firebase-admin";
 import serviceAccount from "./serviceAccountKey.json";
 import exerciseRoutes from "./routes/exerciseRoutes";
 import subjectRoutes from "./routes/subjectRoutes";
+import { getBrainstormExercises } from "./controllers/ExerciseController";
 
 dotenv.config();
 
@@ -58,6 +59,7 @@ app.use(express.json());
 app.use(routes);
 app.use("/api/exercises", exerciseRoutes);
 app.use("/api/subjects", subjectRoutes);
+exerciseRoutes.get("/brainstorm/questions", getBrainstormExercises);
 
 // O resto do seu código do server.ts continua aqui, sem alterações...
 // (const onlineUsers, gameRooms, funções de jogo, io.on('connection', ...))

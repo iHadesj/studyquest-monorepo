@@ -6,7 +6,7 @@ import { BackButton, Title } from '../../style/globalStyle';
 import { Crown } from 'phosphor-react';
 import type { FirestoreUserData } from '../../hooks/useProgressStore';
 import type { UserProfileData } from '../../interfaces';
-import { Avatar as BaseAvatar } from '../../components/TopBar';
+import { Avatar as BaseAvatar } from '../../style/globalStyle';
 
 const neonGold = keyframes`
   0%, 100% { box-shadow: 0 0 3px #f1c40f, 0 0 6px #f1c40f, 0 0 9px #f1c40f; }

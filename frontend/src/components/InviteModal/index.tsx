@@ -36,7 +36,6 @@ export function InviteModal({ isOpen, onClose }: InviteModalProps) {
     const fetchAndSubscribe = async () => {
       setIsLoading(true);
 
-      // 1. Buscar detalhes dos amigos no Firestore
       let fetchedFriends: UserProfileData[] = [];
       if (friendUIDs && friendUIDs.length > 0) {
         const usersRef = collection(db, 'users');
@@ -49,7 +48,6 @@ export function InviteModal({ isOpen, onClose }: InviteModalProps) {
       }
       setFriendsDetails(fetchedFriends);
 
-      // 2. Com os detalhes em mãos, se inscrever no status online via Socket
       const friendTags = fetchedFriends
         .map((f) => f.fullTag)
         .filter(Boolean) as string[];
@@ -127,7 +125,9 @@ export function InviteModal({ isOpen, onClose }: InviteModalProps) {
       <Modal.Overlay />
       <Modal.Content>
         <Modal.Header>
-          <Modal.Title>Convidar para Duelo</Modal.Title>
+          <Modal.Title style={{ fontSize: '1.5rem' }}>
+            Convidar para Duelo
+          </Modal.Title>
           <Modal.Close />
         </Modal.Header>
         <Modal.Body>

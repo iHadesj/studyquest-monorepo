@@ -295,14 +295,12 @@ export const ExercisePage = ({
     const user = auth.currentUser;
     if (!user) return;
 
-    // <<< MUDANÇA PRINCIPAL AQUI >>>
     const levelProgress = progress[subject.id]?.[level.id];
     const tentativasFeitas = levelProgress?.tentativas || 0;
     const ehUltimaTentativa = tentativasFeitas + 1 >= 3;
 
     const correctCount = allUserAnswers.filter((a) => a.isCorrect).length;
 
-    // O gabarito só é montado se for a última tentativa!
     const wrongAnswersList = ehUltimaTentativa
       ? allUserAnswers
           .filter((a) => !a.isCorrect)
