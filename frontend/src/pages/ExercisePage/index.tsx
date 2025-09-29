@@ -254,7 +254,6 @@ export const ExercisePage = ({
 
   const handleCheckAnswer = async () => {
     if (!selectedAnswer) return;
-    setIsAnswered(true);
 
     try {
       const response = await api.post('/api/exercises/submit', {
@@ -277,6 +276,8 @@ export const ExercisePage = ({
       ]);
     } catch (error) {
       console.error('Erro ao submeter resposta:', error);
+    } finally {
+      setIsAnswered(true);
     }
   };
 
