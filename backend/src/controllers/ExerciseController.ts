@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-// Usamos a lista completa de exercícios que já é carregada no GameManager
 import {
   getRandomQuestions,
   subjectDataMap,
-  allExercises,
+  loadAllExercises, // Importa a nova função dinâmica
 } from "../GameManager";
 
 // Schema para exercícios normais
@@ -15,7 +14,7 @@ const submitAnswerSchema = z.object({
   userAnswer: z.string(),
 });
 
-// Schema só para o Brainstorm, mais simples
+// Schema só para o Brainstorm
 const brainstormSubmitSchema = z.object({
   exerciseId: z.number(),
   userAnswer: z.string(),
@@ -73,7 +72,6 @@ export const submitAnswer = async (req: Request, res: Response) => {
   if (isCorrect) {
     return res.json({ isCorrect: true });
   } else {
-    // Se errou, a gente devolve o gabarito junto!
     return res.json({
       isCorrect: false,
       correctAnswer: exercise.respostaCorreta,
@@ -83,17 +81,13 @@ export const submitAnswer = async (req: Request, res: Response) => {
 
 export const getBrainstormExercises = async (req: Request, res: Response) => {
   const exercises = getRandomQuestions(50);
-
-  // Remove o gabarito antes de enviar
   const exercisesSanitized = exercises.map((ex: any) => {
     const { respostaCorreta, ...exerciseForStudent } = ex;
     return exerciseForStudent;
   });
-
   return res.json(exercisesSanitized);
 };
 
-// Função controller para a submissão do Brainstorm
 export const submitBrainstormAnswer = async (req: Request, res: Response) => {
   const validation = brainstormSubmitSchema.safeParse(req.body);
   if (!validation.success) {
@@ -102,7 +96,7 @@ export const submitBrainstormAnswer = async (req: Request, res: Response) => {
 
   const { exerciseId, userAnswer } = validation.data;
 
-  // Encontra o exercício na lista geral de todos os exercícios
+  const allExercises = loadAllExercises(); // Usa a função pra pegar os dados atualizados
   const exercise = allExercises.find((ex) => ex.id === exerciseId);
 
   if (!exercise) {

@@ -40,43 +40,37 @@ export const subjectDataMap: { [key: string]: Materia } = {
   quimica: quimicaData,
 };
 
-// --- A CORREÇÃO ESTÁ AQUI, MEU BOM! ---
-export let allExercises: Exercicio[] = [];
-
-try {
-  console.log("Carregando perguntas a partir dos módulos JSON importados...");
-
-  for (const subjectInfo of materiasIndex) {
-    const subjectData = subjectDataMap[subjectInfo.id];
-
-    if (subjectData && subjectData.niveis) {
-      subjectData.niveis.forEach((level) => {
-        if (level.exercicios) {
-          // Adicionamos o subjectId a cada exercício para referência futura
-          const exercisesWithSubject = level.exercicios.map((ex) => ({
-            ...ex,
-            subjectId: subjectInfo.id,
-          }));
-          allExercises.push(...exercisesWithSubject);
-        }
-      });
+// Função que LÊ os arquivos e MONTA a lista de exercícios sob demanda
+const loadAllExercises = (): Exercicio[] => {
+  const exercises: Exercicio[] = [];
+  try {
+    for (const subjectInfo of materiasIndex) {
+      const subjectData = subjectDataMap[subjectInfo.id];
+      if (subjectData && subjectData.niveis) {
+        subjectData.niveis.forEach((level) => {
+          if (level.exercicios) {
+            const exercisesWithSubject = level.exercicios.map((ex) => ({
+              ...ex,
+              subjectId: subjectInfo.id,
+            }));
+            exercises.push(...exercisesWithSubject);
+          }
+        });
+      }
     }
-  }
-
-  if (allExercises.length > 0) {
-    console.log(
-      `✅ Carregadas ${allExercises.length} perguntas para o GameManager.`
-    );
-  } else {
+  } catch (error) {
     console.error(
-      "❌ NENHUMA PERGUNTA FOI CARREGADA. Verifique os imports e os arquivos JSON."
+      "❌ Erro crítico ao processar os dados das perguntas:",
+      error
     );
+    return [];
   }
-} catch (error) {
-  console.error("❌ Erro crítico ao processar os dados das perguntas:", error);
-}
+  return exercises;
+};
 
+// Agora, as funções que pegam questões aleatórias CHAMAM a função de carregar
 export const getRandomQuestion = (): Exercicio | null => {
+  const allExercises = loadAllExercises(); // Sempre pega os dados mais recentes
   if (allExercises.length === 0) {
     return null;
   }
@@ -85,10 +79,13 @@ export const getRandomQuestion = (): Exercicio | null => {
 };
 
 export const getRandomQuestions = (count: number): Exercicio[] => {
+  const allExercises = loadAllExercises(); // Sempre pega os dados mais recentes
   if (allExercises.length === 0) {
     return [];
   }
-
   const shuffled = [...allExercises].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 };
+
+// Exportamos a função principal para o controller também usar
+export { loadAllExercises };

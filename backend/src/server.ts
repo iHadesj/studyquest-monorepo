@@ -11,14 +11,12 @@ import * as admin from "firebase-admin";
 import serviceAccount from "./serviceAccountKey.json";
 import exerciseRoutes from "./routes/exerciseRoutes";
 import subjectRoutes from "./routes/subjectRoutes";
-import { getBrainstormExercises } from "./controllers/ExerciseController";
 
 dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
 
-// --- CONFIGURAÇÃO DE CORS REFORÇADA ---
 const allowedOrigins = [
   "http://localhost:5173",
   "https://go-studyquest.vercel.app",
@@ -29,25 +27,21 @@ const corsOptions = {
     origin: string | undefined,
     callback: (err: Error | null, allow?: boolean) => void
   ) => {
-    // Permite requisições sem 'origin' (ex: Postman, apps mobile) ou que estejam na nossa lista
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.error(`CORS NEGADO: Origem "${origin}" não permitida.`);
       callback(new Error("Não permitido pelo CORS"));
     }
   },
   methods: ["GET", "POST"],
-  credentials: true, // Importante para o Socket.IO
+  credentials: true,
 };
 
-// --- APLICANDO O CORS ---
-app.use(cors(corsOptions)); // Aplica as opções de CORS para todas as rotas Express
+app.use(cors(corsOptions));
 
 const io = new Server(httpServer, {
-  cors: corsOptions, // Aplica as mesmas opções de CORS para o Socket.IO
+  cors: corsOptions,
 });
-// --- FIM DA CONFIGURAÇÃO DE CORS ---
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as any),
@@ -59,10 +53,6 @@ app.use(express.json());
 app.use(routes);
 app.use("/api/exercises", exerciseRoutes);
 app.use("/api/subjects", subjectRoutes);
-exerciseRoutes.get("/brainstorm/questions", getBrainstormExercises);
-
-// O resto do seu código do server.ts continua aqui, sem alterações...
-// (const onlineUsers, gameRooms, funções de jogo, io.on('connection', ...))
 
 const onlineUsers = new Map<string, string>();
 const userTagsToUids = new Map<string, string>();
@@ -99,67 +89,14 @@ const normalizeAnswer = (s: string) =>
     .toLowerCase()
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "");
-const safeClearAllTimers = (room: GameRoom) => {
-  if (room.questionTimer) {
-    clearInterval(room.questionTimer);
-    room.questionTimer = null;
-  }
-  if (room.modeTimer) {
-    clearInterval(room.modeTimer);
-    room.modeTimer = null;
-  }
-  if (room.nextQuestionTimeout) {
-    clearTimeout(room.nextQuestionTimeout);
-    room.nextQuestionTimeout = null;
-  }
-};
 
-const sendNextQuestion = (roomId: string) => {
-  const room = gameRooms.get(roomId);
-  if (!room) return;
-  if (typeof room.modeTimeLeft === "number" && room.modeTimeLeft <= 0) {
-    return;
-  }
-  if (room.questionTimer) {
-    clearInterval(room.questionTimer);
-    room.questionTimer = null;
-  }
-  const nextQuestion = getRandomQuestion();
-  if (!nextQuestion) {
-    safeClearAllTimers(room);
-    io.to(roomId).emit("game_over", { finalScores: room.players });
-    gameRooms.delete(roomId);
-    console.log(`Sala ${roomId} finalizada — sem mais perguntas.`);
-    return;
-  }
-  room.currentQuestion = nextQuestion;
-  room.questionStartTime = Date.now();
-  room.questionAnswered = false;
-  const { respostaCorreta, ...questionForPlayers } = nextQuestion as any;
-  io.to(roomId).emit("new_question", questionForPlayers);
-  let timeLeft = QUESTION_TIME_LIMIT_S;
-  io.to(roomId).emit("timer_tick", { timeLeft });
-  room.questionTimer = setInterval(() => {
-    timeLeft -= 1;
-    io.to(roomId).emit("timer_tick", { timeLeft });
-    if (timeLeft <= 0) {
-      if (room.questionTimer) {
-        clearInterval(room.questionTimer);
-        room.questionTimer = null;
-      }
-      if (!room.questionAnswered) {
-        room.questionAnswered = true;
-        io.to(roomId).emit("answer_result", {
-          playerTag: "O TEMPO",
-          isCorrect: false,
-        });
-        room.nextQuestionTimeout = setTimeout(() => {
-          room.nextQuestionTimeout = null;
-          sendNextQuestion(roomId);
-        }, NEXT_QUESTION_DELAY_MS);
-      }
-    }
-  }, 1000);
+const safeClearAllTimers = (room: GameRoom) => {
+  if (room.questionTimer) clearInterval(room.questionTimer);
+  if (room.modeTimer) clearInterval(room.modeTimer);
+  if (room.nextQuestionTimeout) clearTimeout(room.nextQuestionTimeout);
+  room.questionTimer = null;
+  room.modeTimer = null;
+  room.nextQuestionTimeout = null;
 };
 
 const endGameByDisconnection = async (
@@ -177,7 +114,6 @@ const endGameByDisconnection = async (
   );
 
   if (remainingPlayer) {
-    // Avisa o jogador que ficou
     io.to(remainingPlayer.socketId).emit("opponent_left", {
       message: `Seu oponente (${
         disconnectedPlayer?.tag || "Anônimo"
@@ -185,7 +121,6 @@ const endGameByDisconnection = async (
       consolationXp: CONSOLATION_XP,
     });
 
-    // Adiciona o XP de consolação no Firestore
     const winnerUid = userTagsToUids.get(remainingPlayer.tag);
     if (winnerUid) {
       try {
@@ -202,10 +137,52 @@ const endGameByDisconnection = async (
     }
   }
 
-  // Limpa tudo
   safeClearAllTimers(room);
   gameRooms.delete(roomId);
-  console.log(`Sala ${roomId} encerrada devido à desconexão.`);
+  console.log(`Sala ${roomId} encerrada devido à desconexão/abandono.`);
+};
+
+const sendNextQuestion = (roomId: string) => {
+  const room = gameRooms.get(roomId);
+  if (!room) return;
+  if (typeof room.modeTimeLeft === "number" && room.modeTimeLeft <= 0) {
+    return;
+  }
+  if (room.questionTimer) clearInterval(room.questionTimer);
+
+  const nextQuestion = getRandomQuestion();
+  if (!nextQuestion) {
+    safeClearAllTimers(room);
+    io.to(roomId).emit("game_over", { finalScores: room.players });
+    gameRooms.delete(roomId);
+    return;
+  }
+
+  room.currentQuestion = nextQuestion;
+  room.questionStartTime = Date.now();
+  room.questionAnswered = false;
+  const { respostaCorreta, ...questionForPlayers } = nextQuestion as any;
+  io.to(roomId).emit("new_question", questionForPlayers);
+
+  let timeLeft = QUESTION_TIME_LIMIT_S;
+  io.to(roomId).emit("timer_tick", { timeLeft });
+  room.questionTimer = setInterval(() => {
+    timeLeft -= 1;
+    io.to(roomId).emit("timer_tick", { timeLeft });
+    if (timeLeft <= 0) {
+      if (room.questionTimer) clearInterval(room.questionTimer);
+      if (!room.questionAnswered) {
+        room.questionAnswered = true;
+        io.to(roomId).emit("answer_result", {
+          playerTag: "O TEMPO",
+          isCorrect: false,
+        });
+        room.nextQuestionTimeout = setTimeout(() => {
+          sendNextQuestion(roomId);
+        }, NEXT_QUESTION_DELAY_MS);
+      }
+    }
+  }, 1000);
 };
 
 io.on("connection", (socket) => {
@@ -236,9 +213,6 @@ io.on("connection", (socket) => {
       userTagsToUids.set(fullTag, uid);
       currentUserTag = fullTag;
       currentUserId = uid;
-      console.log(
-        `Jogador ${fullTag} (UID: ${uid}) registrado com o socket ID ${socket.id}`
-      );
       notifySubscribers(fullTag, "online");
     }
   );
@@ -246,52 +220,17 @@ io.on("connection", (socket) => {
   socket.on(
     "subscribe_to_friends_status",
     ({ friendTags }: { friendTags: string[] }) => {
-      if (!currentUserTag || !Array.isArray(friendTags)) {
-        console.error(
-          `[SUBSCRIBE-ERROR] Tentativa de subscribe sem estar registrado. Socket: ${socket.id}`
-        );
-        return;
-      }
-
-      console.log(
-        `[SUBSCRIBE-INFO] ${currentUserTag} está pedindo o status de:`,
-        friendTags
-      );
-
-      console.log(
-        "[SUBSCRIBE-INFO] Mapa de usuários online no momento:",
-        Array.from(onlineUsers.keys())
-      );
-
+      if (!currentUserTag || !Array.isArray(friendTags)) return;
       friendTags.forEach((friendTag) => {
         if (!friendSubscriptions.has(friendTag)) {
           friendSubscriptions.set(friendTag, new Set());
         }
         friendSubscriptions.get(friendTag)?.add(currentUserTag!);
       });
-
-      const initialOnlineFriends = friendTags.filter((tag) => {
-        const isOnline = onlineUsers.has(tag);
-        console.log(
-          `[SUBSCRIBE-CHECK] Verificando se "${tag}" está online... Resultado: ${isOnline}`
-        );
-        return isOnline;
-      });
-
-      console.log(
-        `[SUBSCRIBE-RESULT] Enviando para ${currentUserTag} a lista de amigos online:`,
-        initialOnlineFriends
+      const initialOnlineFriends = friendTags.filter((tag) =>
+        onlineUsers.has(tag)
       );
       socket.emit("initial_friends_status", initialOnlineFriends);
-    }
-  );
-  socket.on(
-    "unsubscribe_from_friends_status",
-    ({ friendTags }: { friendTags: string[] }) => {
-      if (!currentUserTag || !Array.isArray(friendTags)) return;
-      friendTags.forEach((friendTag) => {
-        friendSubscriptions.get(friendTag)?.delete(currentUserTag!);
-      });
     }
   );
 
@@ -305,94 +244,18 @@ io.on("connection", (socket) => {
       messageText: string;
     }) => {
       if (!currentUserTag || !currentUserId) return;
-
-      let recipientUid: string | undefined = userTagsToUids.get(recipientTag);
-
-      // A lógica para encontrar o UID continua a mesma...
-      if (!recipientUid) {
-        try {
-          const usersRef = db.collection("users");
-          const q = await usersRef
-            .where("fullTag", "==", recipientTag)
-            .limit(1)
-            .get();
-          if (!q.empty) {
-            recipientUid = q?.docs[0]?.id;
-          }
-        } catch (e) {
-          console.error("Erro ao buscar UID do destinatário offline:", e);
-          return;
-        }
-      }
-      if (!recipientUid) {
-        console.log(
-          `Erro: não foi possível encontrar o UID de ${recipientTag}.`
-        );
-        return;
-      }
+      const recipientUid = userTagsToUids.get(recipientTag);
+      if (!recipientUid) return;
 
       const participants = [currentUserId, recipientUid].sort();
       const chatId = participants.join("_");
-
       const messageData = {
         senderId: currentUserId,
         text: messageText,
         timestamp: admin.firestore.FieldValue.serverTimestamp(),
       };
-
-      try {
-        const chatRef = db.collection("chats").doc(chatId);
-        await chatRef.collection("messages").add(messageData);
-        await chatRef.set(
-          {
-            participants,
-            lastMessage: {
-              text: messageText,
-              timestamp: messageData.timestamp,
-            },
-          },
-          { merge: true }
-        );
-
-        // <<< MUDANÇA PRINCIPAL: ESTA PARTE FOI REMOVIDA >>>
-        /* const recipientSocketId = onlineUsers.get(recipientTag);
-        if (recipientSocketId) {
-          // NÃO PRECISAMOS MAIS AVISAR VIA SOCKET. O FIRESTORE JÁ FAZ ISSO.
-          io.to(recipientSocketId).emit("new_message", {
-            ...messageData,
-            id: "temp-id-" + Date.now(),
-            chatId: chatId,
-          });
-        }
-        */
-      } catch (error) {
-        console.error("Erro ao salvar mensagem no Firestore:", error);
-      }
-    }
-  );
-
-  socket.on(
-    "fetch_chat_history",
-    async ({ friendUid }: { friendUid: string }) => {
-      if (!currentUserId) return;
-      const participants = [currentUserId, friendUid].sort();
-      const chatId = participants.join("_");
-      try {
-        const messagesRef = db
-          .collection("chats")
-          .doc(chatId)
-          .collection("messages");
-        const q = await messagesRef
-          .orderBy("timestamp", "desc")
-          .limit(50)
-          .get();
-        const history = q.docs
-          .map((doc) => ({ id: doc.id, ...doc.data() }))
-          .reverse();
-        socket.emit("chat_history", { chatId, messages: history });
-      } catch (error) {
-        console.error(`Erro ao buscar histórico do chat ${chatId}:`, error);
-      }
+      const chatRef = db.collection("chats").doc(chatId);
+      await chatRef.collection("messages").add(messageData);
     }
   );
 
@@ -402,10 +265,6 @@ io.on("connection", (socket) => {
     const inviteeSocketId = onlineUsers.get(inviteeTag);
     if (inviteeSocketId) {
       io.to(inviteeSocketId).emit("incoming_invite", { from: inviterTag });
-    } else {
-      socket.emit("invite_error", {
-        message: `Jogador ${inviteeTag} não encontrado ou está offline.`,
-      });
     }
   });
 
@@ -433,21 +292,10 @@ io.on("connection", (socket) => {
           questionTimer: null,
           questionStartTime: null,
           questionAnswered: true,
-          modeTimer: null,
-          modeTimeLeft: null,
-          nextQuestionTimeout: null,
         });
         socket.join(roomId);
         io.sockets.sockets.get(inviterSocketId)?.join(roomId);
-        io.to(roomId).emit("game_started", {
-          roomId,
-          players: gameRooms.get(roomId)?.players,
-        });
-        console.log(
-          `Sala criada ${roomId} entre ${inviterTag} e ${inviteeTag}`
-        );
-      } else {
-        io.to(inviterSocketId).emit("invite_declined", { from: inviteeTag });
+        io.to(roomId).emit("game_started", { roomId, players });
       }
     }
   );
@@ -456,14 +304,13 @@ io.on("connection", (socket) => {
     const room = gameRooms.get(roomId);
     if (!room) return;
     const player = room.players.find((p) => p.socketId === socket.id);
-    if (player) {
-      player.ready = true;
-    }
+    if (player) player.ready = true;
+
     if (room.players.every((p) => p.ready)) {
       room.modeTimeLeft = MODE_DURATION_S;
       io.to(roomId).emit("mode_started", { duration: MODE_DURATION_S });
       room.modeTimer = setInterval(() => {
-        if (typeof room.modeTimeLeft !== "number") return;
+        if (room.modeTimeLeft === undefined) return;
         room.modeTimeLeft!--;
         io.to(roomId).emit("mode_tick", { timeLeft: room.modeTimeLeft });
         if (room.modeTimeLeft! <= 0) {
@@ -482,30 +329,33 @@ io.on("connection", (socket) => {
       const room = gameRooms.get(roomId);
       if (!room || room.questionAnswered) return;
       room.questionAnswered = true;
-      if (room.questionTimer) {
-        clearInterval(room.questionTimer);
-        room.questionTimer = null;
-      }
-      if (!room.currentQuestion || !room.questionStartTime) return;
-      const timeTakenMs = Date.now() - room.questionStartTime;
+      if (room.questionTimer) clearInterval(room.questionTimer);
+
+      const { currentQuestion, questionStartTime } = room;
+      if (!currentQuestion || !questionStartTime) return;
+
+      const timeTakenMs = Date.now() - questionStartTime;
       const timeTakenS = Math.floor(timeTakenMs / 1000);
       const player = room.players.find((p) => p.socketId === socket.id);
       if (!player) return;
+
       const isCorrect =
-        normalizeAnswer(room.currentQuestion.respostaCorreta) ===
+        normalizeAnswer(currentQuestion.respostaCorreta) ===
         normalizeAnswer(answer || "");
       if (isCorrect) {
         const timeLeft = Math.max(0, QUESTION_TIME_LIMIT_S - timeTakenS);
         const timeBonus = timeLeft * TIME_BONUS_MULTIPLIER;
         player.score += BASE_SCORE + timeBonus;
       }
+
       io.to(roomId).emit("answer_result", { playerTag: player.tag, isCorrect });
       io.to(roomId).emit("update_score", room.players);
+
       if (room.nextQuestionTimeout) clearTimeout(room.nextQuestionTimeout);
-      room.nextQuestionTimeout = setTimeout(() => {
-        room.nextQuestionTimeout = null;
-        sendNextQuestion(roomId);
-      }, NEXT_QUESTION_DELAY_MS);
+      room.nextQuestionTimeout = setTimeout(
+        () => sendNextQuestion(roomId),
+        NEXT_QUESTION_DELAY_MS
+      );
     }
   );
 
@@ -520,7 +370,6 @@ io.on("connection", (socket) => {
       userTagsToUids.delete(currentUserTag);
       notifySubscribers(currentUserTag, "offline");
     }
-
     for (const [roomId, room] of gameRooms.entries()) {
       if (room.players.some((p) => p.socketId === socket.id)) {
         endGameByDisconnection(roomId, socket.id);
