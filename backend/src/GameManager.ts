@@ -40,7 +40,6 @@ export const subjectDataMap: { [key: string]: Materia } = {
   quimica: quimicaData,
 };
 
-// Função que LÊ os arquivos e MONTA a lista de exercícios sob demanda
 const loadAllExercises = (): Exercicio[] => {
   const exercises: Exercicio[] = [];
   try {
@@ -68,24 +67,33 @@ const loadAllExercises = (): Exercicio[] => {
   return exercises;
 };
 
-// Agora, as funções que pegam questões aleatórias CHAMAM a função de carregar
 export const getRandomQuestion = (): Exercicio | null => {
-  const allExercises = loadAllExercises(); // Sempre pega os dados mais recentes
-  if (allExercises.length === 0) {
+  const allExercises = loadAllExercises();
+  const multipleChoiceExercises = allExercises.filter(
+    (ex) => ex.tipo === "multipla_escolha"
+  );
+
+  if (multipleChoiceExercises.length === 0) {
     return null;
   }
-  const randomIndex = Math.floor(Math.random() * allExercises.length);
-  return allExercises[randomIndex] ?? null;
+  const randomIndex = Math.floor(
+    Math.random() * multipleChoiceExercises.length
+  );
+  return multipleChoiceExercises[randomIndex] ?? null;
 };
 
 export const getRandomQuestions = (count: number): Exercicio[] => {
-  const allExercises = loadAllExercises(); // Sempre pega os dados mais recentes
-  if (allExercises.length === 0) {
+  const allExercises = loadAllExercises();
+  const multipleChoiceExercises = allExercises.filter(
+    (ex) => ex.tipo === "multipla_escolha"
+  );
+
+  if (multipleChoiceExercises.length === 0) {
     return [];
   }
-  const shuffled = [...allExercises].sort(() => 0.5 - Math.random());
+
+  const shuffled = [...multipleChoiceExercises].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 };
 
-// Exportamos a função principal para o controller também usar
 export { loadAllExercises };
