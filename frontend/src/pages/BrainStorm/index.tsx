@@ -143,7 +143,6 @@ export function BrainStorm({ onBack }: BrainStormProps) {
     return () => {
       if (mainTimerRef.current) clearInterval(mainTimerRef.current);
       if (questionTimerRef.current) clearInterval(questionTimerRef.current);
-      if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
     };
   }, [gameState, pickNextQuestion, endGame, isAnswered]);
 
