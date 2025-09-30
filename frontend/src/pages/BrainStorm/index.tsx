@@ -130,6 +130,7 @@ export function BrainStorm({ onBack }: BrainStormProps) {
             setLives((l) => l - 1);
             setFeedback({ message: 'Tempo esgotado!', correct: false });
             setIsAnswered(true);
+            // Agenda a próxima questão no timeout do jogo
             feedbackTimeoutRef.current = setTimeout(pickNextQuestion, 1500);
             return QUESTION_TIME_LIMIT;
           }

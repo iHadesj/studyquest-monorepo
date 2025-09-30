@@ -7,15 +7,15 @@ import {
   loadAllExercises, // Importa a nova função dinâmica
 } from "../GameManager";
 
-// Função de normalização robusta e definitiva (Resolve acentos e pontuação)
-// Remove acentos, pontuação e todos os espaços.
+// Função de normalização robusta e definitiva:
+// Remove acentos, pontuação e todos os espaços para comparação agnóstica.
 const normalizeAnswer = (s: string) =>
   s
     .trim()
     .toLowerCase()
     .normalize("NFD") // Normaliza para decompor acentos
-    .replace(/\p{Diacritic}/gu, "") // Remove os acentos decompostos (ex: 'a' + '~' -> 'a')
-    .replace(/[.,'":;?!-]/g, "") // Remove pontuação comum (vírgulas, pontos, etc.)
+    .replace(/\p{Diacritic}/gu, "") // Remove os acentos decompostos
+    .replace(/[.,'":;?!-]/g, "") // Remove pontuação comum
     .replace(/\s/g, ""); // Remove TODOS os espaços (internos e externos)
 
 // Schema para exercícios normais
@@ -77,6 +77,7 @@ export const submitAnswer = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "Exercício não encontrado." });
   }
 
+  // Compara apenas com trim e lowercase para o modo normal (exercícios fixos)
   const isCorrect =
     exercise.respostaCorreta.trim().toLowerCase() ===
     userAnswer.trim().toLowerCase();
@@ -117,7 +118,7 @@ export const submitBrainstormAnswer = async (req: Request, res: Response) => {
       .json({ message: "Exercício do Brainstorm não encontrado." });
   }
 
-  // APLICAÇÃO DA CORREÇÃO: Usa a função de normalização robusta
+  // APLICAÇÃO DA CORREÇÃO DEFINITIVA: Usa a função de normalização robusta
   const isCorrect =
     normalizeAnswer(exercise.respostaCorreta) ===
     normalizeAnswer(userAnswer || "");
