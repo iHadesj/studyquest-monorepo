@@ -14,8 +14,8 @@ const normalizeAnswer = (s: string) =>
     .trim()
     .toLowerCase()
     .normalize("NFD") // Normaliza para decompor acentos
-    .replace(/\p{Diacritic}/gu, "") // Remove os acentos decompostos
-    .replace(/[.,'":;?!-]/g, "") // Remove pontuação comum
+    .replace(/\p{Diacritic}/gu, "") // Remove os acentos decompostos (ex: 'a' + '~' -> 'a')
+    .replace(/[.,'":;?!-()\[\]{}/*+|=`]/g, "") // CORREÇÃO: Remove PONTUAÇÃO EXPANDIDA, incluindo parênteses e backticks
     .replace(/\s/g, ""); // Remove TODOS os espaços (internos e externos)
 
 // Schema para exercícios normais
@@ -118,7 +118,6 @@ export const submitBrainstormAnswer = async (req: Request, res: Response) => {
       .json({ message: "Exercício do Brainstorm não encontrado." });
   }
 
-  // APLICAÇÃO DA CORREÇÃO DEFINITIVA: Usa a função de normalização robusta
   const isCorrect =
     normalizeAnswer(exercise.respostaCorreta) ===
     normalizeAnswer(userAnswer || "");
