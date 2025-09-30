@@ -56,7 +56,7 @@ export const SettingsIcon = styled(Gear)`
 export const LevelBarContainer = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
   width: 100%;
   max-width: 400px;
   @media (max-width: 480px) {
@@ -68,14 +68,14 @@ export const LevelDisplay = styled.div`
   background-color: #5865f2;
   color: white;
   font-weight: bold;
-  padding: 0.5rem;
+  padding: 0.4rem;
   border-radius: 50%;
   width: 20px;
   height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 0.8rem;
   flex-shrink: 0;
   border: 2px solid #2f3136;
   box-shadow: 0 0 10px rgba(88, 101, 242, 0.7);
@@ -83,9 +83,9 @@ export const LevelDisplay = styled.div`
 
 export const ProgressBarContainer = styled.div`
   width: 100%;
-  background-color: #202225;
+  background-color: #282a2fff;
   border-radius: 99px;
-  border: 2px solid #ffffff85;
+  border: 2px solid #ffffff00;
   height: 22px;
   overflow: hidden;
   position: relative;
@@ -130,7 +130,7 @@ export const XPText = styled.span`
   transform: translate(-50%, -50%);
   color: white;
   font-size: 0.75rem;
-  font-weight: bold;
+  font-weight: 100;
   text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.8);
   white-space: nowrap;
 
