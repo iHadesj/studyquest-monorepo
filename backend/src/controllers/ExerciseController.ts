@@ -6,6 +6,15 @@ import {
   loadAllExercises, // Importa a nova função dinâmica
 } from "../GameManager";
 
+const normalizeAnswer = (s: string) =>
+  s
+    .trim()
+    .toLowerCase()
+    .normalize("NFD") // Normaliza para decompor acentos
+    .replace(/\p{Diacritic}/gu, "") // Remove os acentos
+    .replace(/[.,'":;?!-]/g, "") // Remove pontuação comum
+    .replace(/\s/g, ""); // Remove TODOS os espaços (internos e externos)
+
 // Schema para exercícios normais
 const submitAnswerSchema = z.object({
   subjectId: z.string(),
@@ -106,8 +115,8 @@ export const submitBrainstormAnswer = async (req: Request, res: Response) => {
   }
 
   const isCorrect =
-    exercise.respostaCorreta.trim().toLowerCase() ===
-    userAnswer.trim().toLowerCase();
+    normalizeAnswer(exercise.respostaCorreta) ===
+    normalizeAnswer(userAnswer || "");
 
   return res.json({ isCorrect });
 };
