@@ -1,3 +1,4 @@
+// src/controllers/ExerciseController.ts
 import { Request, Response } from "express";
 import { z } from "zod";
 import {
@@ -6,13 +7,15 @@ import {
   loadAllExercises, // Importa a nova função dinâmica
 } from "../GameManager";
 
+// Função de normalização robusta e definitiva (Resolve acentos e pontuação)
+// Remove acentos, pontuação e todos os espaços.
 const normalizeAnswer = (s: string) =>
   s
     .trim()
     .toLowerCase()
     .normalize("NFD") // Normaliza para decompor acentos
-    .replace(/\p{Diacritic}/gu, "") // Remove os acentos
-    .replace(/[.,'":;?!-]/g, "") // Remove pontuação comum
+    .replace(/\p{Diacritic}/gu, "") // Remove os acentos decompostos (ex: 'a' + '~' -> 'a')
+    .replace(/[.,'":;?!-]/g, "") // Remove pontuação comum (vírgulas, pontos, etc.)
     .replace(/\s/g, ""); // Remove TODOS os espaços (internos e externos)
 
 // Schema para exercícios normais
@@ -105,7 +108,7 @@ export const submitBrainstormAnswer = async (req: Request, res: Response) => {
 
   const { exerciseId, userAnswer } = validation.data;
 
-  const allExercises = loadAllExercises(); // Usa a função pra pegar os dados atualizados
+  const allExercises = loadAllExercises();
   const exercise = allExercises.find((ex) => ex.id === exerciseId);
 
   if (!exercise) {
@@ -114,6 +117,7 @@ export const submitBrainstormAnswer = async (req: Request, res: Response) => {
       .json({ message: "Exercício do Brainstorm não encontrado." });
   }
 
+  // APLICAÇÃO DA CORREÇÃO: Usa a função de normalização robusta
   const isCorrect =
     normalizeAnswer(exercise.respostaCorreta) ===
     normalizeAnswer(userAnswer || "");
