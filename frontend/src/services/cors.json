@@ -1,0 +1,15 @@
+[
+  {
+    "origin": [
+      "http://localhost:5173",
+      "https://go-studyquest.vercel.app" 
+    ],
+    "method": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "responseHeader": [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]
