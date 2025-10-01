@@ -1,5 +1,3 @@
-// src/pages/BrainStorm/index.tsx
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { doc, updateDoc, increment } from 'firebase/firestore';
 import { auth, db } from '../../config/firebase';
@@ -130,7 +128,6 @@ export function BrainStorm({ onBack }: BrainStormProps) {
             setLives((l) => l - 1);
             setFeedback({ message: 'Tempo esgotado!', correct: false });
             setIsAnswered(true);
-            // Agenda a próxima questão no timeout do jogo
             feedbackTimeoutRef.current = setTimeout(pickNextQuestion, 1500);
             return QUESTION_TIME_LIMIT;
           }
@@ -171,8 +168,12 @@ export function BrainStorm({ onBack }: BrainStormProps) {
     if (questionTimerRef.current) clearInterval(questionTimerRef.current);
 
     try {
-      const response = await api.post('/api/exercises/brainstorm/submit', {
-        exerciseId: currentQuestion.id,
+      // <<< CORREÇÃO PRINCIPAL AQUI >>>
+      // Chamando a rota correta (/api/exercises/submit) com o payload que o backend espera.
+      const response = await api.post('/api/exercises/submit', {
+        subjectId: 'brainstorm', // Placeholder, não é usado mas a validação espera
+        levelId: 'brainstorm', // Sinaliza para o backend como encontrar a questão
+        exerciseId: currentQuestion.id, // O ID único (ex: "fisica-iniciante-1")
         userAnswer: userAnswer,
       });
 
@@ -400,9 +401,6 @@ export function BrainStorm({ onBack }: BrainStormProps) {
         variant="primary"
         onClick={handleAnswerSubmit}
         disabled={!userAnswer || isAnswered}
-        style={{
-          backgroundColor: '#43b581', // Mudei a cor pra combinar com a UI
-        }}
       >
         Responder
       </ContinueButton>

@@ -31,7 +31,7 @@ export type FirestoreUserData = {
 
 // O resto das suas interfaces que já estavam aqui, sem mudança.
 export interface Exercicio {
-  id: number;
+  id: number | string; // Pode ser número ou string
   tipo: "multipla_escolha" | "preenchimento";
   pergunta: string;
   opcoes?: readonly string[];

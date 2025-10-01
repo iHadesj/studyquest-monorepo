@@ -1,7 +1,5 @@
 import { Exercicio, Materia } from "./interfaces";
-
 import materiasIndex from "./data/materias.json";
-
 import biologiaDataRaw from "./data/biologia.json";
 import cienciasDataRaw from "./data/ciencias.json";
 import filosofiaDataRaw from "./data/filosofia.json";
@@ -40,60 +38,59 @@ export const subjectDataMap: { [key: string]: Materia } = {
   quimica: quimicaData,
 };
 
-const loadAllExercises = (): Exercicio[] => {
-  const exercises: Exercicio[] = [];
-  try {
-    for (const subjectInfo of materiasIndex) {
-      const subjectData = subjectDataMap[subjectInfo.id];
-      if (subjectData && subjectData.niveis) {
-        subjectData.niveis.forEach((level) => {
-          if (level.exercicios) {
-            const exercisesWithSubject = level.exercicios.map((ex) => ({
-              ...ex,
-              subjectId: subjectInfo.id,
-            }));
-            exercises.push(...exercisesWithSubject);
-          }
-        });
-      }
+let allExercises: Exercicio[] = [];
+
+try {
+  console.log("Carregando e unificando perguntas...");
+
+  for (const subjectInfo of materiasIndex) {
+    const subjectData = subjectDataMap[subjectInfo.id];
+
+    if (subjectData && subjectData.niveis) {
+      subjectData.niveis.forEach((level) => {
+        if (level.exercicios) {
+          const exercisesWithUniqueIds = level.exercicios.map((ex) => ({
+            ...ex,
+            id: `${subjectData.id}-${level.id}-${ex.id}`,
+          }));
+          allExercises.push(...exercisesWithUniqueIds);
+        }
+      });
     }
-  } catch (error) {
-    console.error(
-      "❌ Erro crítico ao processar os dados das perguntas:",
-      error
-    );
-    return [];
   }
-  return exercises;
-};
+
+  if (allExercises.length > 0) {
+    console.log(
+      `✅ Carregadas ${allExercises.length} perguntas para o GameManager.`
+    );
+  } else {
+    console.error(
+      "❌ NENHUMA PERGUNTA FOI CARREGADA. Verifique os imports e os arquivos JSON."
+    );
+  }
+} catch (error) {
+  console.error("❌ Erro crítico ao processar os dados das perguntas:", error);
+}
 
 export const getRandomQuestion = (): Exercicio | null => {
-  const allExercises = loadAllExercises();
-  const multipleChoiceExercises = allExercises.filter(
-    (ex) => ex.tipo === "multipla_escolha"
-  );
-
-  if (multipleChoiceExercises.length === 0) {
+  if (allExercises.length === 0) {
     return null;
   }
-  const randomIndex = Math.floor(
-    Math.random() * multipleChoiceExercises.length
-  );
-  return multipleChoiceExercises[randomIndex] ?? null;
+  const randomIndex = Math.floor(Math.random() * allExercises.length);
+  return allExercises[randomIndex] ?? null;
 };
 
 export const getRandomQuestions = (count: number): Exercicio[] => {
-  const allExercises = loadAllExercises();
-  const multipleChoiceExercises = allExercises.filter(
-    (ex) => ex.tipo === "multipla_escolha"
-  );
-
-  if (multipleChoiceExercises.length === 0) {
+  if (allExercises.length === 0) {
     return [];
   }
-
-  const shuffled = [...multipleChoiceExercises].sort(() => 0.5 - Math.random());
+  const shuffled = [...allExercises].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 };
 
-export { loadAllExercises };
+export const findExerciseById = (
+  id: string | number
+): Exercicio | undefined => {
+  // A conversão para string aqui garante que a comparação funcione tanto para números quanto para strings
+  return allExercises.find((ex) => String(ex.id) === String(id));
+};
