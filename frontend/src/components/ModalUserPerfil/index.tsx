@@ -118,6 +118,12 @@ export function ModalUserPerfil({
   };
 
   useEffect(() => {
+    if (!isEditing) {
+      resetFormState();
+    }
+  }, [isEditing, resetFormState]);
+
+  useEffect(() => {
     resetFormState();
     if (!isOpen) {
       setIsEditing(false);
@@ -148,9 +154,12 @@ export function ModalUserPerfil({
       ? '/Light.jpg'
       : `https://api.dicebear.com/8.x/pixel-art/svg?seed=${user.avatarSeed}`;
 
-  const selectedAvatarSrc = `https://api.dicebear.com/8.x/pixel-art/svg?seed=${encodeURIComponent(
-    selectedAvatar
-  )}`;
+  const selectedAvatarSrc =
+    user.fullTag === devTag
+      ? '/Light.jpg'
+      : `https://api.dicebear.com/8.x/pixel-art/svg?seed=${encodeURIComponent(
+          selectedAvatar
+        )}`;
 
   const handleAchievementsClick = () => {
     onNavigateToAchievements();
