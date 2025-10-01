@@ -167,6 +167,12 @@ export default function App() {
     fetchSubjectsList();
   }, []);
 
+  useEffect(() => {
+    if (isUserModalOpen && viewedUser?.uid === currentUserProfile.uid) {
+      setViewedUser(currentUserProfile);
+    }
+  }, [currentUserProfile, isUserModalOpen, viewedUser?.uid]);
+
   const handleSelectSubject = async (subjectInfo: SubjectInfo) => {
     try {
       const response = await api.get(`/api/subjects/${subjectInfo.id}`);
