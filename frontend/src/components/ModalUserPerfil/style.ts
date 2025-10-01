@@ -95,7 +95,6 @@ export const UserInfo = styled(motion.div)`
   margin-top: 80px; /* Mantém o espaçamento do avatar */
   text-align: center;
   width: 90%; /* Para que os inputs ocupem a largura correta */
-  padding: 0 1.5rem; /* Adiciona padding para alinhamento */
   box-sizing: border-box; /* Garante que o padding não aumente a largura */
 `;
 
