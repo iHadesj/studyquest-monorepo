@@ -9,7 +9,7 @@ import {
 const submitAnswerSchema = z.object({
   subjectId: z.string(),
   levelId: z.string(),
-  exerciseId: z.union([z.string(), z.number()]), // ID pode ser string ou número
+  exerciseId: z.union([z.string(), z.number()]),
   userAnswer: z.string(),
 });
 
@@ -46,7 +46,6 @@ export const submitAnswer = async (req: Request, res: Response) => {
 
   const { levelId, exerciseId, userAnswer } = validation.data;
 
-  // A lógica agora é simples: só precisamos do ID único.
   const exercise = findExerciseById(exerciseId);
 
   if (!exercise) {

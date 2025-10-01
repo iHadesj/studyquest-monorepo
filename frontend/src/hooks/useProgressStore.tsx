@@ -3,6 +3,8 @@ import { create } from 'zustand';
 export type FirestoreUserData = {
   uid: string | null;
   username: string | null;
+  bio?: string;
+  customAvatarUrl?: string;
   avatarSeed: string | null;
   xp: number;
   progress: UserProgress;
