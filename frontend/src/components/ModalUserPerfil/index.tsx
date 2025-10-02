@@ -271,7 +271,6 @@ export function ModalUserPerfil({
 
           <S.ContentWrapper>
             {' '}
-            {/* Novo container para alinhar o conteúdo */}
             <S.UserInfo variants={itemVariants}>
               {isEditing ? (
                 <S.StyledInput
@@ -289,7 +288,7 @@ export function ModalUserPerfil({
                 <S.StyledTextArea
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  maxLength={100}
+                  maxLength={57}
                   placeholder="Conte um pouco sobre você..."
                 />
               ) : (
@@ -322,7 +321,7 @@ export function ModalUserPerfil({
                 </S.AvatarGrid>
               )}
             </AnimatePresence>
-            {!isEditing && ( // Stats só aparecem no modo de visualização
+            {!isEditing && (
               <S.StatsContainer variants={itemVariants}>
                 <S.StatBox>
                   <S.StatIcon>

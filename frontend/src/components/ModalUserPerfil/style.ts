@@ -130,9 +130,14 @@ export const StatsContainer = styled(motion.div)`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
-  width: 100%;
   margin-top: 1rem;
   box-sizing: border-box;
+
+  /* --- A MÁGICA É ESSA LINHA AQUI, MEU NOBRE --- */
+  /* Seleciona o terceiro item (StatBox) APENAS se ele for o último */
+  > div:nth-child(3):last-child {
+    grid-column: span 2;
+  }
 `;
 
 export const StatBox = styled.div`
@@ -200,7 +205,7 @@ export const StyledInput = styled.input`
 
 export const StyledTextArea = styled.textarea`
   width: 100%;
-  min-height: 80px;
+  min-height: 95px;
   padding: 0.75rem;
   background-color: #202225;
   border: 1px solid #40444b;

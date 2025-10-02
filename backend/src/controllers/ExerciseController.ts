@@ -44,12 +44,24 @@ export const submitAnswer = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "Requisição inválida." });
   }
 
-  const { levelId, exerciseId, userAnswer } = validation.data;
+  const { subjectId, levelId, exerciseId, userAnswer } = validation.data;
 
-  const exercise = findExerciseById(exerciseId);
+  let exercise;
+
+  // --- AQUI ESTÁ A CORREÇÃO, MEU CONSAGRADO! ---
+  // Se a requisição vier do Brainstorm, o ID do exercício já está completo.
+  if (subjectId === "brainstorm" && levelId === "brainstorm") {
+    exercise = findExerciseById(exerciseId);
+  } else {
+    // Para os exercícios normais, a gente monta o ID completo.
+    const fullExerciseId = `${subjectId}-${levelId}-${exerciseId}`;
+    exercise = findExerciseById(fullExerciseId);
+  }
 
   if (!exercise) {
-    console.error(`Exercício não encontrado com ID: ${exerciseId}`);
+    console.error(
+      `Exercício não encontrado com ID: ${exerciseId} no contexto de ${subjectId}`
+    );
     return res.status(404).json({ message: "Exercício não encontrado." });
   }
 

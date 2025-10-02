@@ -62,5 +62,3 @@ export const parseText = (text: string): React.ReactNode => {
     return <span key={idx}>{part}</span>;
   });
 };
-
-export default parseText;

@@ -300,14 +300,24 @@ export const ContentBox = styled.div`
   margin-bottom: 2rem;
 `;
 
-export const ExerciseBox = styled.div`
+export const ExerciseBox = styled.div<{
+  $hasMarginTop?: boolean;
+}>`
   background-color: #2f3136;
   border: 1px solid #40444b;
   padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+
   border-radius: 4px;
   transition: box-shadow 0.2s ease-in-out;
   &:hover {
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: 480px) {
+    margin-top: ${(props) => (props.$hasMarginTop ? '7rem' : '0')};
   }
 `;
 

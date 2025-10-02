@@ -8,7 +8,6 @@ import {
   ExerciseBox,
   QuestionText,
   RadioInput,
-  OptionLabel,
   ContinueButton,
   Title,
   Subtitle,
@@ -17,9 +16,10 @@ import {
 import * as S from './style';
 import { api } from '../../services/api';
 import { verificarEdesbloquearConquistas } from '../../services/achievements';
+import { parseText } from '../../utils/utils';
 
 const GAME_DURATION = 60;
-const QUESTION_TIME_LIMIT = 15;
+const QUESTION_TIME_LIMIT = 60;
 const INITIAL_LIVES = 3;
 const BASE_XP_PER_CORRECT_ANSWER = 20;
 const STREAK_MULTIPLIER_BONUS = 0.5;
@@ -48,14 +48,16 @@ export function BrainStorm({ onBack }: BrainStormProps) {
   );
   const [userAnswer, setUserAnswer] = useState('');
   const [isAnswered, setIsAnswered] = useState(false);
-  const [feedback, setFeedback] = useState<{
-    message: string;
-    correct: boolean;
+
+  // --- MUDANÇA 1: Adeus 'feedback', olá 'lastAnswerResult' ---
+  const [lastAnswerResult, setLastAnswerResult] = useState<{
+    isCorrect: boolean;
+    correctAnswer: string;
   } | null>(null);
 
   const mainTimerRef = useRef<NodeJS.Timeout | null>(null);
   const questionTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const feedbackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const nextQuestionTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Timeout para a próxima pergunta
 
   useEffect(() => {
     const fetchBrainstormExercises = async () => {
@@ -75,10 +77,11 @@ export function BrainStorm({ onBack }: BrainStormProps) {
     fetchBrainstormExercises();
   }, []);
 
+  // --- MUDANÇA 2: Limpar o resultado da resposta anterior ---
   const pickNextQuestion = useCallback(() => {
     setUserAnswer('');
-    setFeedback(null);
     setIsAnswered(false);
+    setLastAnswerResult(null); // Limpa as cores
     setQuestionTimeLeft(QUESTION_TIME_LIMIT);
     if (allExercises.length > 0) {
       const randomIndex = Math.floor(Math.random() * allExercises.length);
@@ -94,7 +97,8 @@ export function BrainStorm({ onBack }: BrainStormProps) {
       setGameOverReason(reason);
       if (mainTimerRef.current) clearInterval(mainTimerRef.current);
       if (questionTimerRef.current) clearInterval(questionTimerRef.current);
-      if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
+      if (nextQuestionTimeoutRef.current)
+        clearTimeout(nextQuestionTimeoutRef.current);
 
       verificarEdesbloquearConquistas('JOGOU_BRAINSTORM');
 
@@ -126,9 +130,12 @@ export function BrainStorm({ onBack }: BrainStormProps) {
           if (prev <= 1) {
             setStreak(0);
             setLives((l) => l - 1);
-            setFeedback({ message: 'Tempo esgotado!', correct: false });
-            setIsAnswered(true);
-            feedbackTimeoutRef.current = setTimeout(pickNextQuestion, 1500);
+            setIsAnswered(true); // Trava a resposta
+            setLastAnswerResult({
+              isCorrect: false,
+              correctAnswer: currentQuestion?.respostaCorreta || '',
+            }); // Mostra feedback de erro
+            nextQuestionTimeoutRef.current = setTimeout(pickNextQuestion, 1500);
             return QUESTION_TIME_LIMIT;
           }
           return prev - 1;
@@ -142,7 +149,7 @@ export function BrainStorm({ onBack }: BrainStormProps) {
       if (mainTimerRef.current) clearInterval(mainTimerRef.current);
       if (questionTimerRef.current) clearInterval(questionTimerRef.current);
     };
-  }, [gameState, pickNextQuestion, endGame, isAnswered]);
+  }, [gameState, pickNextQuestion, endGame, isAnswered, currentQuestion]);
 
   useEffect(() => {
     if (lives <= 0 && gameState === 'playing') {
@@ -161,6 +168,7 @@ export function BrainStorm({ onBack }: BrainStormProps) {
     pickNextQuestion();
   };
 
+  // --- MUDANÇA 3: Submissão agora atualiza o 'lastAnswerResult' ---
   const handleAnswerSubmit = async () => {
     if (!currentQuestion || isAnswered) return;
 
@@ -168,16 +176,16 @@ export function BrainStorm({ onBack }: BrainStormProps) {
     if (questionTimerRef.current) clearInterval(questionTimerRef.current);
 
     try {
-      // <<< CORREÇÃO PRINCIPAL AQUI >>>
-      // Chamando a rota correta (/api/exercises/submit) com o payload que o backend espera.
       const response = await api.post('/api/exercises/submit', {
-        subjectId: 'brainstorm', // Placeholder, não é usado mas a validação espera
-        levelId: 'brainstorm', // Sinaliza para o backend como encontrar a questão
-        exerciseId: currentQuestion.id, // O ID único (ex: "fisica-iniciante-1")
+        subjectId: 'brainstorm',
+        levelId: 'brainstorm',
+        exerciseId: currentQuestion.id,
         userAnswer: userAnswer,
       });
 
-      const { isCorrect } = response.data;
+      const { isCorrect, correctAnswer } = response.data;
+      setLastAnswerResult({ isCorrect, correctAnswer }); // Guarda o resultado completo
+
       if (isCorrect) {
         const timeBonus = Math.floor(questionTimeLeft / 2);
         const currentMultiplier = 1 + streak * STREAK_MULTIPLIER_BONUS;
@@ -186,23 +194,18 @@ export function BrainStorm({ onBack }: BrainStormProps) {
         );
         setTotalXp((prev) => prev + xpGained);
         setStreak((prev) => prev + 1);
-        setFeedback({
-          message: `+${xpGained} XP! Combo x${streak + 1}`,
-          correct: true,
-        });
       } else {
         setStreak(0);
         setLives((prev) => prev - 1);
-        setFeedback({ message: 'Incorreto!', correct: false });
       }
     } catch (error) {
       console.error('Erro ao submeter resposta do Brainstorm:', error);
-      setFeedback({
-        message: 'Erro ao enviar. Tente de novo.',
-        correct: false,
+      setLastAnswerResult({
+        isCorrect: false,
+        correctAnswer: currentQuestion.respostaCorreta,
       });
     } finally {
-      feedbackTimeoutRef.current = setTimeout(pickNextQuestion, 1500);
+      nextQuestionTimeoutRef.current = setTimeout(pickNextQuestion, 1500);
     }
   };
 
@@ -346,13 +349,7 @@ export function BrainStorm({ onBack }: BrainStormProps) {
         />
       </S.TimerBarContainer>
 
-      {feedback ? (
-        <S.FeedbackText $isCorrect={feedback.correct}>
-          {feedback.message}
-        </S.FeedbackText>
-      ) : (
-        <div style={{ height: '30px' }} />
-      )}
+      <div style={{ height: '30px', margin: 0 }} />
 
       <AnimatePresence mode="wait">
         {currentQuestion && (
@@ -366,11 +363,13 @@ export function BrainStorm({ onBack }: BrainStormProps) {
           >
             <ExerciseBox
               style={{
-                opacity: isAnswered ? 0.6 : 1,
                 minHeight: '270px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-around',
               }}
             >
-              <QuestionText>{currentQuestion.pergunta}</QuestionText>
+              <QuestionText>{parseText(currentQuestion.pergunta)}</QuestionText>
               <div
                 style={{
                   display: 'flex',
@@ -378,19 +377,36 @@ export function BrainStorm({ onBack }: BrainStormProps) {
                   gap: '0.75rem',
                 }}
               >
-                {currentQuestion.opcoes?.map((option) => (
-                  <OptionLabel key={option}>
-                    <RadioInput
-                      type="radio"
-                      name={`ex-${currentQuestion.id}`}
-                      value={option}
-                      checked={userAnswer === option}
-                      onChange={(e) => setUserAnswer(e.target.value)}
-                      disabled={isAnswered}
-                    />
-                    <span>{option}</span>
-                  </OptionLabel>
-                ))}
+                {currentQuestion.opcoes?.map((option) => {
+                  let status: 'correct' | 'incorrect' | 'default' = 'default';
+
+                  if (isAnswered && lastAnswerResult) {
+                    if (option === userAnswer) {
+                      status = lastAnswerResult.isCorrect
+                        ? 'correct'
+                        : 'incorrect';
+                    } else if (
+                      option === lastAnswerResult.correctAnswer &&
+                      !lastAnswerResult.isCorrect
+                    ) {
+                      status = 'correct';
+                    }
+                  }
+
+                  return (
+                    <S.OptionLabel key={option} $status={status}>
+                      <RadioInput
+                        type="radio"
+                        name={`ex-${currentQuestion.id}`}
+                        value={option}
+                        checked={userAnswer === option}
+                        onChange={(e) => setUserAnswer(e.target.value)}
+                        disabled={isAnswered}
+                      />
+                      <span>{option}</span>
+                    </S.OptionLabel>
+                  );
+                })}
               </div>
             </ExerciseBox>
           </motion.div>

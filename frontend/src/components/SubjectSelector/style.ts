@@ -159,6 +159,7 @@ export const BrainstormSection = styled(motion.section)`
   @media (max-width: 880px) {
     grid-template-columns: 1fr;
     text-align: center;
+    padding: 2rem 1.5rem;
   }
 `;
 

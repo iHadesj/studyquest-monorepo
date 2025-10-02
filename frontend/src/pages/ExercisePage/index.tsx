@@ -24,71 +24,7 @@ import type { Exercicio, Materia, Nivel } from '../../interfaces';
 import { Star } from 'phosphor-react';
 import { verificarEdesbloquearConquistas } from '../../services/achievements';
 import { api } from '../../services/api';
-
-const parseText = (text: string): React.ReactNode => {
-  if (!text) return null;
-
-  const replacements: { [key: string]: string } = {
-    '\\\\div': '÷',
-    '\\\\times': '×',
-    '\\\\sqrt': '√',
-    '\\\\pm': '±',
-    '\\\\alpha': 'α',
-    '\\\\implies': '⇒',
-  };
-
-  let processedText = text;
-  for (const seq in replacements) {
-    const regex = new RegExp(seq, 'g');
-    processedText = processedText.replace(regex, replacements[seq]);
-  }
-
-  const regex = /(\*[^*]+\*)|(_[^_]+_)|(~[^~]+~)|(`[^`]+`)|(\$[^$]+\$)/g;
-  const parts = processedText.split(regex).filter(Boolean);
-
-  return parts.map((part, idx) => {
-    if (part.startsWith('*') && part.endsWith('*')) {
-      return <strong key={idx}>{part.slice(1, -1)}</strong>;
-    }
-    if (part.startsWith('_') && part.endsWith('_')) {
-      return <em key={idx}>{part.slice(1, -1)}</em>;
-    }
-    if (part.startsWith('~') && part.endsWith('~')) {
-      return <del key={idx}>{part.slice(1, -1)}</del>;
-    }
-    if (part.startsWith('`') && part.endsWith('`')) {
-      return (
-        <code
-          key={idx}
-          style={{
-            backgroundColor: '#202225',
-            padding: '0.2rem 0.4rem',
-            borderRadius: '4px',
-          }}
-        >
-          {part.slice(1, -1)}
-        </code>
-      );
-    }
-    if (part.startsWith('$') && part.endsWith('$')) {
-      return (
-        <span
-          key={idx}
-          style={{
-            fontFamily: 'monospace',
-            color: '#84cc16',
-            backgroundColor: '#202225',
-            padding: '0.2rem 0.4rem',
-            borderRadius: '4px',
-          }}
-        >
-          {part.slice(1, -1)}
-        </span>
-      );
-    }
-    return <span key={idx}>{part}</span>;
-  });
-};
+import { parseText } from '../../utils/utils';
 
 const shake = keyframes`
   10%, 90% { transform: translate3d(-1px, 0, 0); }
@@ -122,6 +58,10 @@ const OptionLabel = styled(motion.label)<{
   cursor: pointer;
   transition: all 0.2s;
 
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+  }
+
   &:hover {
     ${({ $status }) => $status === 'default' && `border-color: #5865f2;`}
   }
@@ -148,29 +88,6 @@ const OptionLabel = styled(motion.label)<{
 const RadioInput = styled.input`
   margin-right: 0.75rem;
   accent-color: #5865f2;
-`;
-
-const ActionButton = styled.button`
-  background-color: #5865f2;
-  color: #ffffff;
-  font-family: 'Fira Code', monospace;
-  font-weight: bold;
-  padding: 0.75rem 3rem;
-  border-radius: 4px;
-  font-size: 1.1rem;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 2rem;
-
-  &:disabled {
-    background-color: #40444b;
-    cursor: not-allowed;
-  }
-
-  &:hover:not(:disabled) {
-    background-color: #4f5bd5;
-  }
 `;
 
 const StarsContainer = styled.div`
@@ -292,6 +209,12 @@ export const ExercisePage = ({
   >([]);
   const [finalResults, setFinalResults] = useState<any>(null);
 
+  // --- MUDANÇA 1: Novo estado para o feedback da rodada ---
+  const [lastAnswerResult, setLastAnswerResult] = useState<{
+    isCorrect: boolean;
+    correctAnswer?: string;
+  } | null>(null);
+
   const progress = useProgressStore((state) => state.progress);
 
   useEffect(() => {
@@ -317,8 +240,11 @@ export const ExercisePage = ({
 
   const currentQuestion = exercises[currentQuestionIndex];
 
+  // --- MUDANÇA 2: Lógica de verificação atualizada ---
   const handleCheckAnswer = async () => {
     if (!selectedAnswer) return;
+
+    setIsAnswered(true);
 
     try {
       const response = await api.post('/api/exercises/submit', {
@@ -329,6 +255,9 @@ export const ExercisePage = ({
       });
 
       const { isCorrect, correctAnswer } = response.data;
+
+      // Guarda o resultado da API no novo estado
+      setLastAnswerResult({ isCorrect, correctAnswer });
 
       setAllUserAnswers((prev) => [
         ...prev,
@@ -341,12 +270,15 @@ export const ExercisePage = ({
       ]);
     } catch (error) {
       console.error('Erro ao submeter resposta:', error);
-    } finally {
-      setIsAnswered(true);
+      setLastAnswerResult({ isCorrect: false }); // Garante que a UI reaja mesmo com erro
     }
   };
 
+  // --- MUDANÇA 3: Limpando o estado de feedback ---
   const handleNextQuestion = () => {
+    // Limpa o resultado da resposta anterior
+    setLastAnswerResult(null);
+
     if (currentQuestionIndex < exercises.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
       setSelectedAnswer(null);
@@ -494,26 +426,25 @@ export const ExercisePage = ({
         Questão {currentQuestionIndex + 1} de {exercises.length}
       </QuestionCounter>
 
-      <ExerciseBox>
+      <ExerciseBox $hasMarginTop={true}>
         <QuestionText>{parseText(currentQuestion.pergunta)}</QuestionText>
         <div
           style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
         >
           {currentQuestion.opcoes?.map((option) => {
             let status: 'correct' | 'incorrect' | 'default' = 'default';
-            const lastAnswer = allUserAnswers[allUserAnswers.length - 1];
-            if (isAnswered && lastAnswer) {
-              if (lastAnswer.isCorrect && option === selectedAnswer) {
-                status = 'correct';
-              } else if (!lastAnswer.isCorrect && option === selectedAnswer) {
-                status = 'incorrect';
+
+            if (isAnswered && lastAnswerResult) {
+              if (option === selectedAnswer) {
+                status = lastAnswerResult.isCorrect ? 'correct' : 'incorrect';
               } else if (
-                !lastAnswer.isCorrect &&
-                option === lastAnswer.correctAnswer
+                option === lastAnswerResult.correctAnswer &&
+                !lastAnswerResult.isCorrect
               ) {
                 status = 'correct';
               }
             }
+
             return (
               <OptionLabel key={option} $status={status}>
                 <RadioInput
@@ -533,15 +464,19 @@ export const ExercisePage = ({
 
       <div style={{ textAlign: 'center' }}>
         {isAnswered ? (
-          <ActionButton onClick={handleNextQuestion}>
+          <ContinueButton variant="primary" onClick={handleNextQuestion}>
             {currentQuestionIndex < exercises.length - 1
               ? 'Próxima Questão'
               : 'Ver Resultado'}
-          </ActionButton>
+          </ContinueButton>
         ) : (
-          <ActionButton onClick={handleCheckAnswer} disabled={!selectedAnswer}>
+          <ContinueButton
+            variant="primary"
+            onClick={handleCheckAnswer}
+            disabled={!selectedAnswer}
+          >
             Verificar Resposta
-          </ActionButton>
+          </ContinueButton>
         )}
       </div>
     </ExerciseContainer>

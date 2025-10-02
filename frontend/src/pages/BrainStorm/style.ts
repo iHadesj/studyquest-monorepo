@@ -1,10 +1,19 @@
 // src/pages/BrainStorm/style.ts
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
+import { motion } from 'framer-motion';
 
 // --- Animação de brilho para a barra de tempo ---
 const glow = (color: string) => keyframes`
   0%, 100% { box-shadow: 0 0 3px ${color}, 0 0 6px ${color}; }
   50% { box-shadow: 0 0 8px ${color}, 0 0 16px ${color}; }
+`;
+
+// --- NOVA ANIMAÇÃO DE TREMER (COPIADA DA EXERCISEPAGE) ---
+const shake = keyframes`
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
 `;
 
 export const StormWrapper = styled.div`
@@ -69,6 +78,7 @@ export const GameHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  gap: 1.5rem;
   max-width: 600px;
   background-color: #2f3136;
   padding: 0.5rem 1.5rem;
@@ -130,7 +140,6 @@ export const TimerBarProgress = styled.div<{ percentage: number }>`
       ? '#faa61a'
       : '#ed4245'};
 
-  // Efeito de brilho (glow)
   animation: ${(props) =>
       glow(
         props.percentage > 50
@@ -144,10 +153,45 @@ export const TimerBarProgress = styled.div<{ percentage: number }>`
   transition: width 0.2s linear, background-color 0.3s ease;
 `;
 
-export const FeedbackText = styled.p<{ $isCorrect: boolean }>`
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: ${(props) => (props.$isCorrect ? '#43b581' : '#ed4245')};
-  height: 30px;
-  margin: 0;
+// --- COMPONENTE REMOVIDO (NÃO PRECISAMOS MAIS DELE) ---
+// export const FeedbackText ...
+
+// --- NOVO OPTIONLABEL ESTILIZADO (COPIADO DA EXERCISEPAGE) ---
+export const OptionLabel = styled(motion.label)<{
+  $status: 'correct' | 'incorrect' | 'default';
+}>`
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: #36393f;
+  border-radius: 4px;
+  border: 2px solid #40444b;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+  }
+
+  &:hover {
+    ${({ $status }) => $status === 'default' && `border-color: #5865f2;`}
+  }
+
+  ${({ $status }) =>
+    $status === 'correct' &&
+    css`
+      background-color: #43b581;
+      border-color: #3aa570;
+      color: white;
+      transform: scale(1.02);
+    `}
+
+  ${({ $status }) =>
+    $status === 'incorrect' &&
+    css`
+      background-color: #ed4245;
+      border-color: #d83c3e;
+      color: white;
+      animation: ${shake} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    `}
 `;
