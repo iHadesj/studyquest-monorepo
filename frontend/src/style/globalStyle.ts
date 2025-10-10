@@ -1,7 +1,5 @@
 import styled, { keyframes } from 'styled-components';
 
-// --- DEFINIÇÃO DAS ANIMAÇÕES (KEYFRAMES) ---
-
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -24,7 +22,6 @@ const scaleIn = keyframes`
   }
 `;
 
-// --- ESTILOS GLOBAIS COM ANIMAÇÕES ---
 export const AppContainer = styled.div`
   background-color: #36393f;
   color: #dcddde;
@@ -100,7 +97,6 @@ export const HomeButton = styled.button`
   }
 `;
 
-// Botão base para Ranking e Amigos
 const FooterButton = styled.button`
   background: none;
   border: none;
