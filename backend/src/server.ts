@@ -40,7 +40,10 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 const io = new Server(httpServer, {
-  cors: corsOptions,
+  cors: {
+    origin: "*", // LIBERA TUDO
+    methods: ["GET", "POST"],
+  },
 });
 
 admin.initializeApp({
