@@ -32,6 +32,8 @@ import {
   CategoryTitle,
   Container,
   LargeButton,
+  Loader,
+  LoaderWrapper,
   ProgressBarContainer,
   ProgressBarFill,
   ProgressLabel,
@@ -122,63 +124,86 @@ export const SubjectSelector: React.FC<{
       <Subtitle style={{ marginBottom: '2.2rem', color: '#c9d1d9' }}>
         Escolha uma matéria e bora detonar a curva de aprendizado.
       </Subtitle>
-      {Object.entries(groupedSubjects).map(([category, subjectsInCategory]) => (
-        <section key={category}>
-          <CategoryTitle>{category}</CategoryTitle>
-          <SubjectGrid>
-            {subjectsInCategory.map((subject, idx) => {
-              const totalLevels = 3;
-              const correctAnswers = computeCorrectAnswers(subject.id);
-              const completed = computeCompletedLevels(subject.id);
-              const percent = computeSubjectPercent(subject.id, totalLevels);
-              const textColor = getContrastText(subject.cor.bg || '#111827');
-              return (
-                <SubjectCard
-                  key={subject.id}
-                  onClick={() => onSelect(subject)}
-                  bg={subject.cor.bg}
-                  text={textColor}
-                  aria-label={`${subject.nome} - ${percent}% completo`}
-                  style={{ animationDelay: `${(idx % 6) * 35}ms` }}
-                >
-                  <div className="top">
-                    <div className="icon-wrap" aria-hidden>
-                      {getIcon(subject.iconName)}
-                    </div>
 
-                    <div style={{ flex: 1 }}>
-                      <h3>{subject.nome}</h3>
-                      <div className="meta">
-                        {completed}/{totalLevels} níveis • {correctAnswers}{' '}
-                        acertos
-                      </div>
-                    </div>
-                    <div style={{ marginLeft: 8, textAlign: 'right' }} />
-                  </div>
+      {subjects.length === 0 ? (
+        <LoaderWrapper>
+          <Loader />
+          <p style={{ color: '#b9bbbe', marginTop: '1rem' }}>
+            Carregando matérias...
+          </p>
+        </LoaderWrapper>
+      ) : (
+        <>
+          {Object.entries(groupedSubjects).map(
+            ([category, subjectsInCategory]) => (
+              <section key={category}>
+                <CategoryTitle>{category}</CategoryTitle>
+                <SubjectGrid>
+                  {subjectsInCategory.map((subject, idx) => {
+                    const totalLevels = 3;
+                    const correctAnswers = computeCorrectAnswers(subject.id);
+                    const completed = computeCompletedLevels(subject.id);
+                    const percent = computeSubjectPercent(
+                      subject.id,
+                      totalLevels
+                    );
+                    const textColor = getContrastText(
+                      subject.cor.bg || '#111827'
+                    );
+                    return (
+                      <SubjectCard
+                        key={subject.id}
+                        onClick={() => onSelect(subject)}
+                        bg={subject.cor.bg}
+                        text={textColor}
+                        aria-label={`${subject.nome} - ${percent}% completo`}
+                        style={{ animationDelay: `${(idx % 6) * 35}ms` }}
+                      >
+                        <div className="top">
+                          <div className="icon-wrap" aria-hidden>
+                            {getIcon(subject.iconName)}
+                          </div>
 
-                  <div
-                    className="progress-wrap"
-                    role="progressbar"
-                    aria-valuenow={percent}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-label={`${subject.nome} progresso`}
-                  >
-                    <ProgressBarContainer>
-                      <ProgressBarFill $percent={percent} $delay={idx * 100} />
-                    </ProgressBarContainer>
-                    <ProgressLabel>
-                      <span style={{ opacity: 0.9 }}>{percent}%</span>
-                    </ProgressLabel>
-                  </div>
-                </SubjectCard>
-              );
-            })}
-          </SubjectGrid>
-        </section>
-      ))}
-      <Separator />
+                          <div style={{ flex: 1 }}>
+                            <h3>{subject.nome}</h3>
+                            <div className="meta">
+                              {completed}/{totalLevels} níveis •{' '}
+                              {correctAnswers} acertos
+                            </div>
+                          </div>
+                          <div style={{ marginLeft: 8, textAlign: 'right' }} />
+                        </div>
 
+                        <div
+                          className="progress-wrap"
+                          role="progressbar"
+                          aria-valuenow={percent}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-label={`${subject.nome} progresso`}
+                        >
+                          <ProgressBarContainer>
+                            <ProgressBarFill
+                              $percent={percent}
+                              $delay={idx * 100}
+                            />
+                          </ProgressBarContainer>
+                          <ProgressLabel>
+                            <span style={{ opacity: 0.9 }}>{percent}%</span>
+                          </ProgressLabel>
+                        </div>
+                      </SubjectCard>
+                    );
+                  })}
+                </SubjectGrid>
+              </section>
+            )
+          )}
+          <Separator />
+        </>
+      )}
+
+      {/* A seção Brainstorm fica fora da checagem para ser um CTA de destaque */}
       <BrainstormSection
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
