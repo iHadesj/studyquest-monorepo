@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { theme } from '../../style/theme';
 
 export const ContentWrapper = styled.div`
   max-width: 48rem;
@@ -36,7 +37,7 @@ export const ContentCard = styled(motion.div)`
 export const StartExercisesButton = styled.button`
   background-color: #43b581;
   color: #ffffff;
-  font-family: 'Fira Code', monospace;
+  font-family: ${theme.font.sans};
   font-weight: bold;
   padding: 0.75rem 2rem;
   border-radius: 4px;

@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { theme } from '../../style/theme';
 
 export const CloseButton = styled.button`
   position: absolute;
@@ -190,7 +191,7 @@ export const StyledInput = styled.input`
   border: 1px solid #40444b;
   border-radius: 4px;
   color: #ffffff; /* Cor do texto similar ao Username */
-  font-family: 'Fira Code', monospace;
+  font-family: ${theme.font.sans};
   font-size: 1.75rem; /* Tamanho da fonte similar ao Username */
   font-weight: 700;
   text-align: center;
@@ -211,7 +212,7 @@ export const StyledTextArea = styled.textarea`
   border: 1px solid #40444b;
   border-radius: 4px;
   color: #dcddde;
-  font-family: 'Fira Code', monospace;
+  font-family: ${theme.font.sans};
   font-size: 0.95rem; /* Tamanho da fonte similar ao UserBio */
   line-height: 1.5;
   resize: vertical;

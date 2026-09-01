@@ -80,7 +80,7 @@ export const OptionButton = styled.button`
 
   h2 {
     position: relative;
-    font-family: ${theme.font.mono};
+    font-family: ${theme.font.sans};
     font-size: 1.25rem;
     font-weight: 700;
     margin: 0;

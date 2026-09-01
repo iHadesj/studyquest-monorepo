@@ -1,6 +1,7 @@
 // src/components/InviteModal/style.ts
 import styled from 'styled-components';
 import { Avatar as BaseAvatar } from '../../style/globalStyle';
+import { theme } from '../../style/theme';
 
 export const InviteBox = styled.div`
   display: flex;
@@ -16,7 +17,7 @@ export const TagInput = styled.input`
   border: 1px solid #40444b;
   border-radius: 4px;
   color: #dcddde;
-  font-family: 'Fira Code', monospace;
+  font-family: ${theme.font.sans};
   font-size: 1.2rem;
   text-align: center;
   &:focus {

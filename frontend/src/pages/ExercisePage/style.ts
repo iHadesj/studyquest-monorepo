@@ -1,5 +1,6 @@
 import styled, { css, keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
+import { theme } from '../../style/theme';
 
 const shake = keyframes`
   10%, 90% { transform: translate3d(-1px, 0, 0); }
@@ -64,7 +65,7 @@ export const RadioInput = styled.input`
 export const ActionButton = styled.button`
   background-color: #5865f2;
   color: #ffffff;
-  font-family: 'Fira Code', monospace;
+  font-family: ${theme.font.sans};
   font-weight: bold;
   padding: 0.75rem 3rem;
   border-radius: 4px;

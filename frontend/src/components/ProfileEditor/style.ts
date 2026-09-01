@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { Title } from '../../style/globalStyle';
+import { theme } from '../../style/theme';
 
 export const EditorBox = styled.div`
   background-color: #2f3136;
@@ -32,7 +33,7 @@ export const UsernameInput = styled.input`
   border: 1px solid #40444b;
   border-radius: 4px;
   color: #dcddde;
-  font-family: 'Fira Code', monospace;
+  font-family: ${theme.font.sans};
   font-size: 1.2rem;
   text-align: center;
   margin-bottom: 1rem;
@@ -76,7 +77,7 @@ export const AvatarOption = styled.button<{ $isSelected: boolean }>`
 export const SaveButton = styled.button`
   background-color: #43b581;
   color: #ffffff;
-  font-family: 'Fira Code', monospace;
+  font-family: ${theme.font.sans};
   font-weight: bold;
   padding: 0.75rem 2rem;
   border-radius: 4px;

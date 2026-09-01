@@ -70,6 +70,10 @@ export const theme = {
   },
 
   font: {
+    // Inter para toda a interface: o monoespaçado em tudo dava ar de terminal,
+    // não de plataforma de estudo.
+    sans: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+    // Reservado para código, fórmulas e números que precisam alinhar.
     mono: "'Fira Code', ui-monospace, SFMono-Regular, Menlo, monospace",
   },
 

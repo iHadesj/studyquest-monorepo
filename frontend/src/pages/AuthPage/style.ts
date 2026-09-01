@@ -124,7 +124,7 @@ export const Input = styled.input`
   border: 1px solid ${theme.color.stroke};
   border-radius: ${theme.radius.md};
   color: ${theme.color.text};
-  font-family: ${theme.font.mono};
+  font-family: ${theme.font.sans};
   font-size: 0.92rem;
   transition: border-color 220ms ease, box-shadow 220ms ease,
     background 220ms ease;
@@ -167,7 +167,7 @@ export const Button = styled.button`
   overflow: hidden;
   background: ${theme.gradient.primary};
   color: #ffffff;
-  font-family: ${theme.font.mono};
+  font-family: ${theme.font.sans};
   font-weight: 800;
   padding: 0.95rem;
   border-radius: ${theme.radius.pill};

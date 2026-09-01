@@ -58,7 +58,7 @@ const GlobalStyle = createGlobalStyle`
 
   body {
     margin: 0;
-    font-family: ${theme.font.mono};
+    font-family: ${theme.font.sans};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-user-select: none;
@@ -426,7 +426,7 @@ export default function App() {
             border: `1px solid ${theme.color.strokeStrong}`,
             borderRadius: theme.radius.md,
             backdropFilter: 'blur(14px)',
-            fontFamily: theme.font.mono,
+            fontFamily: theme.font.sans,
             fontSize: '0.88rem',
           },
         }}

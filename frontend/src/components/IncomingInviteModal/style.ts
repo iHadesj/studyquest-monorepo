@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { theme } from '../../style/theme';
 
 export const InviteBox = styled.div`
   text-align: center;
@@ -13,7 +14,7 @@ export const InviterTag = styled.strong`
   background-color: #292b2f;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
-  font-family: 'Fira Code', monospace;
+  font-family: ${theme.font.sans};
 `;
 
 export const ButtonGroup = styled.div`
@@ -24,7 +25,7 @@ export const ButtonGroup = styled.div`
 `;
 
 export const ActionButton = styled.button<{ accept?: boolean }>`
-  font-family: 'Fira Code', monospace;
+  font-family: ${theme.font.sans};
   font-weight: bold;
   font-size: 1rem;
   padding: 0.75rem 2rem;

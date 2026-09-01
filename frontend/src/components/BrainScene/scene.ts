@@ -61,67 +61,105 @@ function makeDotTexture() {
 }
 
 /**
- * Deforma um ponto da esfera até uma silhueta de cérebro: elipsoide achatado,
- * sulcos, fissura entre os hemisférios e um bojo de cerebelo atrás e embaixo.
+ * Anatomia por metaballs.
+ *
+ * Deformar uma esfera só produz um ovo com sulcos. Aqui a forma nasce da união
+ * suave de volumes posicionados onde os lobos ficam de verdade — é isso que dá
+ * a silhueta: testa projetada, lobo temporal descolado, occipital atrás e o
+ * cerebelo embaixo dele.
+ *
+ * Eixos: +z frente, +y cima, +x direita.
  */
-function toBrain(x: number, y: number, z: number) {
-  // Giros e sulcos: soma de senos em frequências diferentes, para a superfície
-  // não ficar lisa como uma esfera.
-  const fold =
-    1 +
-    0.115 * Math.sin(7.0 * x + 2.5 * y) * Math.cos(6.0 * z) +
-    0.075 * Math.sin(10.0 * z + 2.0 * y) +
-    0.055 * Math.cos(12.0 * y + 4.0 * x);
+type Blob = readonly [x: number, y: number, z: number, r: number];
 
-  // Um cérebro é mais comprido (frente-trás) do que largo, e mais largo do
-  // que alto. A esfera precisa dessa proporção antes de qualquer outra coisa.
-  let px = x * 0.84 * fold;
-  let py = y * 0.8 * fold;
-  let pz = z * 1.06 * fold;
+/** Um hemisfério; o outro é o espelho em x. */
+const HEMISFERIO: Blob[] = [
+  [0.22, 0.05, 0.76, 0.26], // polo frontal
+  [0.32, 0.22, 0.54, 0.4], // lobo frontal superior
+  [0.3, -0.08, 0.57, 0.32], // lobo frontal inferior (orbital)
+  [0.28, 0.06, 0.18, 0.38], // região central / ínsula
+  [0.36, 0.34, 0.1, 0.4], // lobo parietal
+  [0.32, 0.26, -0.32, 0.36], // parietal posterior
+  [0.26, 0.02, -0.72, 0.32], // lobo occipital
+  [0.46, -0.26, 0.3, 0.3], // temporal anterior
+  [0.5, -0.24, -0.02, 0.3], // temporal médio
+  [0.44, -0.16, -0.34, 0.28], // temporal posterior
+  [0.24, -0.46, -0.62, 0.3], // cerebelo
+];
 
-  // Fissura longitudinal separando os hemisférios.
-  const groove = Math.exp(-(px * px) / 0.02);
-  px += (px >= 0 ? 1 : -1) * 0.06 * groove;
-  py -= 0.05 * groove;
+/** Estruturas da linha média, sem espelho. */
+const MEDIANO: Blob[] = [
+  [0, -0.42, -0.24, 0.15], // tronco encefálico
+  [0, -0.7, -0.3, 0.12], // bulbo
+];
 
-  // Lobo temporal: alarga e puxa para baixo a lateral, à frente do centro.
-  const temporal = Math.exp(
-    -((py + 0.3) * (py + 0.3)) / 0.05 - ((pz - 0.18) * (pz - 0.18)) / 0.3
-  );
-  px *= 1 + 0.28 * temporal;
-  py -= 0.09 * temporal;
+const BLOBS: Blob[] = [
+  ...HEMISFERIO,
+  ...HEMISFERIO.map(([x, y, z, r]) => [-x, y, z, r] as Blob),
+  ...MEDIANO,
+];
 
-  // Fissura de Sylvius: o sulco diagonal que descola o lobo temporal do resto.
-  // É esta reentrância — mais do que a silhueta — que faz a forma ler como
-  // cérebro em vez de bolha.
-  const faixa = py + 0.1 - 0.3 * pz;
-  const syl = Math.exp(-(faixa * faixa) / 0.007);
-  const rad = Math.hypot(px, py, pz) || 1;
-  px -= (px / rad) * 0.12 * syl;
-  py -= (py / rad) * 0.12 * syl;
-  pz -= (pz / rad) * 0.12 * syl;
+const LIMIAR = 0.62;
+const ORIGEM_Y = -0.02;
 
-  // Base achatada e testa um pouco mais projetada.
-  if (py < 0) py *= 0.86;
-  pz *= 1 + 0.1 * Math.max(0, py);
-
-  // Cerebelo: bojo denso atrás e embaixo.
-  const cb = Math.exp(
-    -((pz + 0.8) * (pz + 0.8)) / 0.07 - ((py + 0.4) * (py + 0.4)) / 0.045
-  );
-  py -= 0.15 * cb;
-  pz -= 0.1 * cb;
-
-  // Tronco encefálico: puxa o miolo de trás para baixo.
-  const stem = Math.exp(
-    -(px * px) / 0.025 -
-      ((pz + 0.32) * (pz + 0.32)) / 0.06 -
-      ((py + 0.5) * (py + 0.5)) / 0.06
-  );
-  py -= 0.24 * stem;
-
-  return [px, py, pz] as const;
+function campo(px: number, py: number, pz: number) {
+  let s = 0;
+  for (let i = 0; i < BLOBS.length; i++) {
+    const b = BLOBS[i];
+    const dx = px - b[0];
+    const dy = py - b[1];
+    const dz = pz - b[2];
+    s += Math.exp(-(dx * dx + dy * dy + dz * dz) / (b[3] * b[3]));
+  }
+  return s;
 }
+
+/**
+ * Distância do centro até a superfície numa direção: caminha para fora até o
+ * campo cair abaixo do limiar e refina a travessia por bisseção.
+ */
+function raioAte(dx: number, dy: number, dz: number) {
+  const PASSO = 0.02;
+  let dentro = 0.02;
+  let fora = -1;
+
+  for (let t = 0.05; t < 1.7; t += PASSO) {
+    if (campo(dx * t, ORIGEM_Y + dy * t, dz * t) >= LIMIAR) {
+      dentro = t;
+    } else if (dentro > 0.02) {
+      fora = t;
+      break;
+    }
+  }
+  if (fora < 0) fora = dentro + PASSO;
+
+  let lo = dentro;
+  let hi = fora;
+  for (let i = 0; i < 10; i++) {
+    const mid = (lo + hi) / 2;
+    if (campo(dx * mid, ORIGEM_Y + dy * mid, dz * mid) >= LIMIAR) lo = mid;
+    else hi = mid;
+  }
+  return lo;
+}
+
+/** Giros e sulcos: deslocamento radial de alta frequência sobre a superfície. */
+function aplicarGiros(px: number, py: number, pz: number) {
+  const g =
+    Math.sin(11.0 * px + 4.0 * py) * Math.cos(9.5 * pz + 3.0 * py) +
+    0.7 * Math.sin(15.0 * pz - 6.5 * px) +
+    0.55 * Math.cos(13.0 * py + 7.5 * pz) +
+    0.4 * Math.sin(21.0 * px + 17.0 * pz) * Math.cos(19.0 * py);
+
+  const len = Math.hypot(px, py, pz) || 1;
+  const amp = 0.034 * g;
+  return [
+    px + (px / len) * amp,
+    py + (py / len) * amp,
+    pz + (pz / len) * amp,
+  ] as const;
+}
+
 
 export function createBrain(
   canvas: HTMLCanvasElement,
@@ -130,9 +168,9 @@ export function createBrain(
   const parent = canvas.parentElement!;
   const baixa = opts.quality === 'baixa';
 
-  const POINTS = baixa ? 1400 : 2600;
-  const LINK_TRIES = baixa ? 5000 : 9000;
-  const LINK_MAX = baixa ? 1100 : 2200;
+  const POINTS = baixa ? 1600 : 3200;
+  const LINK_TRIES = baixa ? 6000 : 12000;
+  const LINK_MAX = baixa ? 1200 : 2600;
   const LINK_DIST = 0.19;
   const SIGNALS = baixa ? 18 : 36;
 
@@ -160,16 +198,38 @@ export function createBrain(
   const cC = new Color(opts.colorC);
   const tmp = new Color();
 
+  // Direções distribuídas por espiral de Fibonacci; para cada uma, acha onde a
+  // superfície do campo está. É o que amarra os pontos à anatomia em vez de a
+  // uma esfera.
   const golden = Math.PI * (3 - Math.sqrt(5));
+  let maiorRaio = 0;
+
   for (let i = 0; i < POINTS; i++) {
     const sy = 1 - (i / (POINTS - 1)) * 2;
     const sr = Math.sqrt(Math.max(0, 1 - sy * sy));
     const th = golden * i;
-    const [px, py, pz] = toBrain(Math.cos(th) * sr, sy, Math.sin(th) * sr);
+    const dx = Math.cos(th) * sr;
+    const dy = sy;
+    const dz = Math.sin(th) * sr;
+
+    const r = raioAte(dx, dy, dz);
+    let px = dx * r;
+    let py = ORIGEM_Y + dy * r;
+    let pz = dz * r;
+
+    // Fissura longitudinal: afasta os hemisférios e aprofunda a ranhura, mas
+    // só acima do tronco — embaixo o cérebro é contínuo.
+    const portao = Math.min(1, Math.max(0, (py + 0.12) / 0.25));
+    const sulco = Math.exp(-(px * px) / 0.01) * portao;
+    px += (px >= 0 ? 1 : -1) * 0.035 * sulco;
+    py -= 0.075 * sulco;
+
+    [px, py, pz] = aplicarGiros(px, py, pz);
 
     positions[i * 3] = px;
     positions[i * 3 + 1] = py;
     positions[i * 3 + 2] = pz;
+    maiorRaio = Math.max(maiorRaio, Math.hypot(px, py, pz));
 
     // Gradiente por altura, com um toque da terceira cor na frente.
     const t = (py + 0.85) / 1.7;
@@ -180,13 +240,18 @@ export function createBrain(
     colors[i * 3 + 2] = tmp.b;
   }
 
+  // Normaliza para o volume ocupar sempre o mesmo espaço na câmera,
+  // independente de ajustes nos blobs.
+  const escala = 1.12 / (maiorRaio || 1);
+  for (let i = 0; i < positions.length; i++) positions[i] *= escala;
+
   const pointsGeo = new BufferGeometry();
   pointsGeo.setAttribute('position', new BufferAttribute(positions, 3));
   pointsGeo.setAttribute('color', new BufferAttribute(colors, 3));
 
   const dotTexture = makeDotTexture();
   const pointsMat = new PointsMaterial({
-    size: baixa ? 0.036 : 0.03,
+    size: baixa ? 0.038 : 0.033,
     map: dotTexture,
     vertexColors: true,
     transparent: true,
@@ -235,7 +300,7 @@ export function createBrain(
   const linesMat = new LineBasicMaterial({
     vertexColors: true,
     transparent: true,
-    opacity: 0.24,
+    opacity: 0.3,
     depthWrite: false,
     blending: AdditiveBlending,
   });
@@ -268,7 +333,7 @@ export function createBrain(
   // Vista inicial em 3/4, ligeiramente de cima: é o ângulo em que a silhueta
   // do cérebro se lê (lobo frontal, temporal e cerebelo). De frente, qualquer
   // volume desses vira um ovo.
-  const VISTA_INICIAL = -0.62;
+  const VISTA_INICIAL = -1.15;
   let spin = VISTA_INICIAL;
   let yaw = VISTA_INICIAL;
   let pitch = 0.14;

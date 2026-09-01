@@ -72,49 +72,38 @@ export const HeroText = styled.div`
   }
 `;
 
+/** Rótulo de seção: discreto, sem selo colorido nem emoji. */
 export const HeroBadge = styled(motion.div)`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.35rem 0.9rem;
-  border-radius: ${theme.radius.pill};
-  background: ${theme.color.glass};
-  border: 1px solid ${theme.color.stroke};
-  color: ${theme.color.textMuted};
-  font-size: 0.78rem;
+  color: ${theme.color.textFaint};
+  font-size: 0.72rem;
   font-weight: 600;
-  margin-bottom: 1.1rem;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  margin-bottom: 0.9rem;
 
   svg {
-    color: ${theme.color.warn};
+    color: ${theme.color.textMuted};
   }
 `;
 
-/** Título editorial em duas linhas, com pesos e cores contrastantes. */
+/**
+ * Título sóbrio: peso e hierarquia fazem o trabalho, sem gradiente arco-íris
+ * animado. Só o nome do estudante recebe cor.
+ */
 export const DisplayTitle = styled(motion.h1)`
   margin: 0;
-  font-size: clamp(2.2rem, 6.2vw, 4rem);
-  line-height: 0.98;
-  letter-spacing: -2.5px;
-  font-weight: 800;
+  font-size: clamp(2.1rem, 5.4vw, 3.4rem);
+  line-height: 1.05;
+  letter-spacing: -1.8px;
+  font-weight: 300;
+  color: ${theme.color.textMuted};
 
-  .leve {
-    display: block;
-    font-weight: 300;
-    color: ${theme.color.textMuted};
-  }
-
-  .forte {
-    display: block;
-    background: linear-gradient(
-      100deg,
-      ${theme.color.primarySoft} 0%,
-      ${theme.color.cyan} 55%,
-      ${theme.color.pink} 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  .nome {
+    font-weight: 700;
+    color: ${theme.color.text};
   }
 `;
 
@@ -141,7 +130,7 @@ export const ContinueButton = styled(motion.button)`
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: ${theme.color.text};
-  font-family: ${theme.font.mono};
+  font-family: ${theme.font.sans};
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
@@ -436,7 +425,7 @@ export const LargeButton = styled(motion.button)<{
   gap: 0.6rem;
   align-items: center;
   justify-content: center;
-  font-family: ${theme.font.mono};
+  font-family: ${theme.font.sans};
   font-weight: 800;
   font-size: 0.95rem;
   color: #fff;

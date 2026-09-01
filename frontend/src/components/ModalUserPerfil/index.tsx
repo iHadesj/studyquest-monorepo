@@ -19,6 +19,7 @@ import type { UserProfileData } from '../../interfaces';
 import { useProgressStore } from '../../hooks/useProgressStore';
 import { verificarEdesbloquearConquistas } from '../../services/achievements';
 import * as S from './style';
+import { theme } from '../../style/theme';
 
 function generateAvatarSeeds(count = 120) {
   const seeds: string[] = [];
@@ -50,7 +51,7 @@ const ActionButton = styled.button<{
   border-radius: 4px;
   padding: 0.5rem 1rem;
   cursor: pointer;
-  font-family: 'Fira Code', monospace;
+  font-family: ${theme.font.sans};
   display: flex;
   align-items: center;
   gap: 0.5rem;

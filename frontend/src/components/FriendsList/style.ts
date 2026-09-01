@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { motion } from 'framer-motion'; // Importa o motion
 import { Avatar as BaseAvatar } from '../../style/globalStyle';
+import { theme } from '../../style/theme';
 
 export const FriendsListWrapper = styled.div`
   display: flex;
@@ -32,7 +33,7 @@ export const TabButton = styled.button<{ $isActive: boolean }>`
   background-color: transparent;
   border: none;
   color: ${({ $isActive }) => ($isActive ? '#ffffff' : '#b9bbbe')};
-  font-family: 'Fira Code', monospace;
+  font-family: ${theme.font.sans};
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
@@ -101,7 +102,7 @@ export const FriendActionButton = styled.button`
   border: none;
   border-radius: 4px;
   padding: 0.5rem 1rem;
-  font-family: 'Fira Code', monospace;
+  font-family: ${theme.font.sans};
   cursor: pointer;
   transition: background-color 0.2s;
   display: flex;
@@ -204,7 +205,7 @@ export const CancelButton = styled.button<{
   border-radius: 4px;
   padding: 0.5rem;
   cursor: pointer;
-  font-family: 'Fira Code', monospace;
+  font-family: ${theme.font.sans};
   display: flex;
   align-items: center;
   gap: 0.5rem;

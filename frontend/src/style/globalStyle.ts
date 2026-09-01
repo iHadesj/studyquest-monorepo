@@ -41,7 +41,7 @@ export const AppContainer = styled.div`
   padding: 2rem;
   padding-top: 6rem;
   min-height: 100vh;
-  font-family: ${theme.font.mono};
+  font-family: ${theme.font.sans};
   padding-bottom: 6rem;
 
   @media (max-width: 480px) {
@@ -127,7 +127,7 @@ const FooterButton = styled.button`
   gap: 0.5rem;
   padding: 0.5rem 1.1rem;
   border-radius: ${theme.radius.pill};
-  font-family: ${theme.font.mono};
+  font-family: ${theme.font.sans};
   font-size: 0.9rem;
   font-weight: 600;
   overflow: hidden;
@@ -229,7 +229,7 @@ export const BackButton = styled.button`
   padding: 0.5rem 1.1rem;
   border-radius: ${theme.radius.pill};
   cursor: pointer;
-  font-family: ${theme.font.mono};
+  font-family: ${theme.font.sans};
   font-size: 0.9rem;
   font-weight: 600;
   transition: color 200ms ease, transform 220ms ${theme.ease.bounce},
@@ -380,14 +380,14 @@ export const LevelButton = styled.button`
   }
 
   h2 {
-    font-family: ${theme.font.mono};
+    font-family: ${theme.font.sans};
     font-size: 1.4rem;
     font-weight: 700;
     margin: 0;
     letter-spacing: -0.5px;
   }
   p {
-    font-family: ${theme.font.mono};
+    font-family: ${theme.font.sans};
     font-size: 0.85rem;
     color: ${theme.color.success};
     margin: 0.35rem 0 0 0;
@@ -484,7 +484,7 @@ export const TextInput = styled.input`
   border: 1px solid ${theme.color.stroke};
   border-radius: ${theme.radius.md};
   color: ${theme.color.text};
-  font-family: ${theme.font.mono};
+  font-family: ${theme.font.sans};
   font-size: 1rem;
   transition: border-color 200ms ease, box-shadow 200ms ease;
 
@@ -505,7 +505,7 @@ export const SubmitButton = styled.button`
     props.disabled ? 'rgba(255,255,255,0.06)' : theme.gradient.success};
   cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
   color: ${(props) => (props.disabled ? theme.color.textFaint : '#04231A')};
-  font-family: ${theme.font.mono};
+  font-family: ${theme.font.sans};
   font-weight: 800;
   padding: 0.85rem 2.75rem;
   border-radius: ${theme.radius.pill};
@@ -605,7 +605,7 @@ export const ContinueButton = styled.button<{
   border: 1px solid
     ${({ variant }) =>
       variant === 'primary' ? 'transparent' : theme.color.stroke};
-  font-family: ${theme.font.mono};
+  font-family: ${theme.font.sans};
   font-weight: 800;
   padding: 0.85rem 1.5rem;
   border-radius: ${theme.radius.pill};

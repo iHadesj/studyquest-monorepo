@@ -18,7 +18,7 @@ import {
   Question,
   Heart,
   Lightning,
-  Sparkle,
+  GraduationCap,
   Target,
   Trophy,
   Fire,
@@ -135,6 +135,7 @@ export const SubjectSelector: React.FC<{
     [groups]
   );
 
+  const totalNiveis = subjects.length * TOTAL_LEVELS;
   const isLoading = subjects.length === 0;
 
   return (
@@ -146,18 +147,18 @@ export const SubjectSelector: React.FC<{
       >
         <S.HeroText>
           <S.HeroBadge variants={fadeUp}>
-            <Sparkle size={14} weight="fill" />
-            {username ? `Bom te ver, ${username}` : 'Bem-vindo de volta'}
+            <GraduationCap size={15} weight="fill" />
+            Painel de estudos
           </S.HeroBadge>
 
           <S.DisplayTitle variants={fadeUp}>
-            <span className="leve">Bora treinar</span>
-            <span className="forte">esse cérebro.</span>
+            Olá, <span className="nome">{username || 'estudante'}</span>
           </S.DisplayTitle>
 
           <S.HeroLead variants={fadeUp}>
-            Cada parada da trilha é uma matéria. Siga o caminho, acenda os nós
-            que faltam e chegue ao Brainstorm.
+            Você concluiu {overview.niveisConcluidos} de {totalNiveis} níveis em{' '}
+            {subjects.length} matérias. Retome pela trilha abaixo ou vá direto
+            ao próximo exercício.
           </S.HeroLead>
 
           <S.StatStrip variants={popIn}>
