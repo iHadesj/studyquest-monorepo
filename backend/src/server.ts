@@ -76,6 +76,10 @@ interface GameRoom {
   modeTimer?: NodeJS.Timeout | null;
   modeTimeLeft?: number | null;
   nextQuestionTimeout?: NodeJS.Timeout | null;
+  // Impede que um segundo "player_ready" crie um modeTimer paralelo, e que a
+  // mesma partida seja encerrada duas vezes.
+  started: boolean;
+  finished: boolean;
 }
 const gameRooms = new Map<string, GameRoom>();
 
@@ -102,12 +106,66 @@ const safeClearAllTimers = (room: GameRoom) => {
   room.nextQuestionTimeout = null;
 };
 
+// Resolve o uid a partir da tag: primeiro no cache em memória, depois no
+// Firestore. Antes o cache só era preenchido no "register" e apagado no
+// disconnect, então qualquer ação envolvendo alguém offline falhava calada.
+const resolveUidByTag = async (tag: string): Promise<string | null> => {
+  const cached = userTagsToUids.get(tag);
+  if (cached) return cached;
+  try {
+    const snap = await db
+      .collection("users")
+      .where("fullTag", "==", tag)
+      .limit(1)
+      .get();
+    const first = snap.docs[0];
+    if (!first) return null;
+    const uid = first.id;
+    userTagsToUids.set(tag, uid);
+    return uid;
+  } catch (error) {
+    console.error(`Erro ao resolver uid da tag ${tag}:`, error);
+    return null;
+  }
+};
+
+const grantXp = async (tag: string, amount: number) => {
+  if (amount <= 0) return;
+  const uid = await resolveUidByTag(tag);
+  if (!uid) return;
+  try {
+    await db
+      .collection("users")
+      .doc(uid)
+      .update({ xp: admin.firestore.FieldValue.increment(amount) });
+    console.log(`+${amount} XP adicionado para ${tag}.`);
+  } catch (error) {
+    console.error(`Erro ao adicionar XP para ${tag}:`, error);
+  }
+};
+
+// Encerra a sala e distribui o XP do duelo. Cada jogador leva o próprio placar
+// como XP — antes o placar de uma partida normal era simplesmente descartado.
+const finishGame = async (roomId: string) => {
+  const room = gameRooms.get(roomId);
+  if (!room || room.finished) return;
+  room.finished = true;
+
+  safeClearAllTimers(room);
+  const finalScores = room.players.map((p) => ({ ...p }));
+  io.to(roomId).emit("game_over", { finalScores });
+  gameRooms.delete(roomId);
+
+  await Promise.all(finalScores.map((p) => grantXp(p.tag, p.score)));
+};
+
 const endGameByDisconnection = async (
   roomId: string,
   disconnectedSocketId: string
 ) => {
   const room = gameRooms.get(roomId);
-  if (!room) return;
+  if (!room || room.finished) return;
+  room.finished = true;
 
   const remainingPlayer = room.players.find(
     (p) => p.socketId !== disconnectedSocketId
@@ -116,6 +174,10 @@ const endGameByDisconnection = async (
     (p) => p.socketId === disconnectedSocketId
   );
 
+  safeClearAllTimers(room);
+  gameRooms.delete(roomId);
+  console.log(`Sala ${roomId} encerrada devido à desconexão/abandono.`);
+
   if (remainingPlayer) {
     io.to(remainingPlayer.socketId).emit("opponent_left", {
       message: `Seu oponente (${
@@ -123,31 +185,13 @@ const endGameByDisconnection = async (
       }) desconectou.`,
       consolationXp: CONSOLATION_XP,
     });
-
-    const winnerUid = userTagsToUids.get(remainingPlayer.tag);
-    if (winnerUid) {
-      try {
-        const userDocRef = db.collection("users").doc(winnerUid);
-        await userDocRef.update({
-          xp: admin.firestore.FieldValue.increment(CONSOLATION_XP),
-        });
-        console.log(
-          `+${CONSOLATION_XP} XP adicionado para ${remainingPlayer.tag} por W.O.`
-        );
-      } catch (error) {
-        console.error("Erro ao adicionar XP de consolação:", error);
-      }
-    }
+    await grantXp(remainingPlayer.tag, CONSOLATION_XP + remainingPlayer.score);
   }
-
-  safeClearAllTimers(room);
-  gameRooms.delete(roomId);
-  console.log(`Sala ${roomId} encerrada devido à desconexão/abandono.`);
 };
 
 const sendNextQuestion = (roomId: string) => {
   const room = gameRooms.get(roomId);
-  if (!room) return;
+  if (!room || room.finished) return;
   if (typeof room.modeTimeLeft === "number" && room.modeTimeLeft <= 0) {
     return;
   }
@@ -155,9 +199,7 @@ const sendNextQuestion = (roomId: string) => {
 
   const nextQuestion = getRandomQuestion();
   if (!nextQuestion) {
-    safeClearAllTimers(room);
-    io.to(roomId).emit("game_over", { finalScores: room.players });
-    gameRooms.delete(roomId);
+    void finishGame(roomId);
     return;
   }
 
@@ -174,6 +216,7 @@ const sendNextQuestion = (roomId: string) => {
     io.to(roomId).emit("timer_tick", { timeLeft });
     if (timeLeft <= 0) {
       if (room.questionTimer) clearInterval(room.questionTimer);
+      room.questionTimer = null;
       if (!room.questionAnswered) {
         room.questionAnswered = true;
         io.to(roomId).emit("answer_result", {
@@ -212,6 +255,7 @@ io.on("connection", (socket) => {
   socket.on(
     "register",
     ({ fullTag, uid }: { fullTag: string; uid: string }) => {
+      if (!fullTag || !uid) return;
       onlineUsers.set(fullTag, socket.id);
       userTagsToUids.set(fullTag, uid);
       currentUserTag = fullTag;
@@ -237,6 +281,21 @@ io.on("connection", (socket) => {
     }
   );
 
+  // O front já emitia este evento ao fechar a lista de amigos, mas não havia
+  // handler nenhum: as inscrições só cresciam, para sempre.
+  socket.on(
+    "unsubscribe_from_friends_status",
+    ({ friendTags }: { friendTags: string[] }) => {
+      if (!currentUserTag || !Array.isArray(friendTags)) return;
+      friendTags.forEach((friendTag) => {
+        const subscribers = friendSubscriptions.get(friendTag);
+        if (!subscribers) return;
+        subscribers.delete(currentUserTag!);
+        if (subscribers.size === 0) friendSubscriptions.delete(friendTag);
+      });
+    }
+  );
+
   socket.on(
     "private_message",
     async ({
@@ -247,24 +306,31 @@ io.on("connection", (socket) => {
       messageText: string;
     }) => {
       if (!currentUserTag || !currentUserId) return;
-      const recipientUid = userTagsToUids.get(recipientTag);
+      const text = typeof messageText === "string" ? messageText.trim() : "";
+      if (!text) return;
+
+      const recipientUid = await resolveUidByTag(recipientTag);
       if (!recipientUid) return;
 
       const participants = [currentUserId, recipientUid].sort();
       const chatId = participants.join("_");
       const messageData = {
         senderId: currentUserId,
-        text: messageText,
+        text,
         timestamp: admin.firestore.FieldValue.serverTimestamp(),
       };
-      const chatRef = db.collection("chats").doc(chatId);
-      await chatRef.collection("messages").add(messageData);
+      try {
+        const chatRef = db.collection("chats").doc(chatId);
+        await chatRef.collection("messages").add(messageData);
+      } catch (error) {
+        console.error("Erro ao salvar mensagem privada:", error);
+      }
     }
   );
 
   socket.on("invite_player", ({ inviteeTag }: { inviteeTag: string }) => {
     const inviterTag = currentUserTag;
-    if (!inviterTag) return;
+    if (!inviterTag || inviterTag === inviteeTag) return;
     const inviteeSocketId = onlineUsers.get(inviteeTag);
     if (inviteeSocketId) {
       io.to(inviteeSocketId).emit("incoming_invite", { from: inviterTag });
@@ -274,73 +340,95 @@ io.on("connection", (socket) => {
   socket.on(
     "invite_response",
     ({ inviterTag, accepted }: { inviterTag: string; accepted: boolean }) => {
-      const inviterSocketId = onlineUsers.get(inviterTag);
-      if (!inviterSocketId) return;
       const inviteeTag = currentUserTag;
-      if (!inviteeTag) return;
-      if (accepted) {
-        const roomId = `game-${uuidv4()}`;
-        const players: Player[] = [
-          {
-            tag: inviterTag,
-            score: 0,
-            ready: false,
-            socketId: inviterSocketId,
-          },
-          { tag: inviteeTag, score: 0, ready: false, socketId: socket.id },
-        ];
-        gameRooms.set(roomId, {
-          players,
-          currentQuestion: null,
-          questionTimer: null,
-          questionStartTime: null,
-          questionAnswered: true,
+      if (!inviteeTag || !accepted) return;
+
+      const inviterSocketId = onlineUsers.get(inviterTag);
+      // O socket do convidante pode ter caído entre o convite e a resposta.
+      // Sem esta checagem a sala nascia com um jogador que nunca entraria
+      // nela, e o duelo travava esperando o "player_ready" dele.
+      const inviterSocket = inviterSocketId
+        ? io.sockets.sockets.get(inviterSocketId)
+        : undefined;
+      if (!inviterSocketId || !inviterSocket) {
+        socket.emit("invite_failed", {
+          message: "O jogador que te convidou não está mais disponível.",
         });
-        socket.join(roomId);
-        io.sockets.sockets.get(inviterSocketId)?.join(roomId);
-        io.to(roomId).emit("game_started", { roomId, players });
+        return;
       }
+
+      const roomId = `game-${uuidv4()}`;
+      const players: Player[] = [
+        { tag: inviterTag, score: 0, ready: false, socketId: inviterSocketId },
+        { tag: inviteeTag, score: 0, ready: false, socketId: socket.id },
+      ];
+      gameRooms.set(roomId, {
+        players,
+        currentQuestion: null,
+        questionTimer: null,
+        questionStartTime: null,
+        questionAnswered: true,
+        started: false,
+        finished: false,
+      });
+      socket.join(roomId);
+      inviterSocket.join(roomId);
+      io.to(roomId).emit("game_started", { roomId, players });
     }
   );
 
   socket.on("player_ready", ({ roomId }: { roomId: string }) => {
     const room = gameRooms.get(roomId);
-    if (!room) return;
+    if (!room || room.finished) return;
+
     const player = room.players.find((p) => p.socketId === socket.id);
     if (player) player.ready = true;
 
-    if (room.players.every((p) => p.ready)) {
-      room.modeTimeLeft = MODE_DURATION_S;
-      io.to(roomId).emit("mode_started", { duration: MODE_DURATION_S });
-      room.modeTimer = setInterval(() => {
-        if (room.modeTimeLeft === undefined) return;
-        room.modeTimeLeft!--;
-        io.to(roomId).emit("mode_tick", { timeLeft: room.modeTimeLeft });
-        if (room.modeTimeLeft! <= 0) {
-          safeClearAllTimers(room);
-          io.to(roomId).emit("game_over", { finalScores: room.players });
-          gameRooms.delete(roomId);
-        }
-      }, 1000);
-      sendNextQuestion(roomId);
+    // Um "player_ready" repetido (re-render do lobby, reconexão) criava um
+    // segundo modeTimer sem limpar o primeiro: o relógio da partida corria em
+    // dobro e o game_over disparava duas vezes. Agora só re-sincroniza.
+    if (room.started) {
+      socket.emit("mode_started", {
+        duration: room.modeTimeLeft ?? MODE_DURATION_S,
+      });
+      socket.emit("update_score", room.players);
+      return;
     }
+    if (!room.players.every((p) => p.ready)) return;
+
+    room.started = true;
+    room.modeTimeLeft = MODE_DURATION_S;
+    io.to(roomId).emit("mode_started", { duration: MODE_DURATION_S });
+    room.modeTimer = setInterval(() => {
+      if (typeof room.modeTimeLeft !== "number") return;
+      room.modeTimeLeft -= 1;
+      io.to(roomId).emit("mode_tick", { timeLeft: room.modeTimeLeft });
+      if (room.modeTimeLeft <= 0) {
+        void finishGame(roomId);
+      }
+    }, 1000);
+    sendNextQuestion(roomId);
   });
 
   socket.on(
     "submit_answer",
     ({ roomId, answer }: { roomId: string; answer: string }) => {
       const room = gameRooms.get(roomId);
-      if (!room || room.questionAnswered) return;
-      room.questionAnswered = true;
-      if (room.questionTimer) clearInterval(room.questionTimer);
+      if (!room || room.finished || room.questionAnswered) return;
 
       const { currentQuestion, questionStartTime } = room;
-      if (!currentQuestion || !questionStartTime) return;
+      const player = room.players.find((p) => p.socketId === socket.id);
+      // Estas validações precisam vir ANTES de marcar a rodada como
+      // respondida. Saindo por um return depois disso, a pergunta ficava
+      // travada para sempre e nenhuma próxima era agendada.
+      if (!currentQuestion || !questionStartTime || !player) return;
+
+      room.questionAnswered = true;
+      if (room.questionTimer) clearInterval(room.questionTimer);
+      room.questionTimer = null;
 
       const timeTakenMs = Date.now() - questionStartTime;
       const timeTakenS = Math.floor(timeTakenMs / 1000);
-      const player = room.players.find((p) => p.socketId === socket.id);
-      if (!player) return;
 
       const isCorrect =
         normalizeAnswer(currentQuestion.respostaCorreta) ===
@@ -363,19 +451,29 @@ io.on("connection", (socket) => {
   );
 
   socket.on("leave_game", ({ roomId }: { roomId: string }) => {
-    endGameByDisconnection(roomId, socket.id);
+    void endGameByDisconnection(roomId, socket.id);
   });
 
   socket.on("disconnect", () => {
     console.log("❌ Jogador desconectou. ID:", socket.id);
     if (currentUserTag) {
-      onlineUsers.delete(currentUserTag);
-      userTagsToUids.delete(currentUserTag);
-      notifySubscribers(currentUserTag, "offline");
+      // Só limpa se este socket ainda for o dono da tag. Com duas abas abertas
+      // (ou durante uma reconexão) o socket antigo derrubava o novo, e o
+      // usuário aparecia offline mesmo estando conectado.
+      if (onlineUsers.get(currentUserTag) === socket.id) {
+        onlineUsers.delete(currentUserTag);
+        notifySubscribers(currentUserTag, "offline");
+      }
+      // Remove as inscrições feitas por este usuário, senão o Map cresce
+      // indefinidamente enquanto o servidor estiver de pé.
+      for (const [tag, subscribers] of friendSubscriptions.entries()) {
+        subscribers.delete(currentUserTag);
+        if (subscribers.size === 0) friendSubscriptions.delete(tag);
+      }
     }
     for (const [roomId, room] of gameRooms.entries()) {
       if (room.players.some((p) => p.socketId === socket.id)) {
-        endGameByDisconnection(roomId, socket.id);
+        void endGameByDisconnection(roomId, socket.id);
         break;
       }
     }

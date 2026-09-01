@@ -75,17 +75,34 @@ export function FriendsList({
   useEffect(() => {
     if (!isOpen) return;
 
+    // O operador 'in' do Firestore aceita no máximo 30 valores por consulta.
+    // Sem o fatiamento, quem tivesse 31+ amigos recebia um erro e via a lista
+    // inteira vazia.
+    const FIRESTORE_IN_LIMIT = 30;
+
     const fetchUserDetails = async (
       uids: string[]
     ): Promise<UserProfileData[]> => {
       if (!uids || uids.length === 0) return [];
       const usersRef = collection(db, 'users');
-      const q = query(usersRef, where(documentId(), 'in', uids));
-      const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map((doc) => {
-        const data = doc.data() as FirestoreUserData;
-        return { ...data, uid: doc.id, level: 0, rank: undefined };
-      });
+
+      const chunks: string[][] = [];
+      for (let i = 0; i < uids.length; i += FIRESTORE_IN_LIMIT) {
+        chunks.push(uids.slice(i, i + FIRESTORE_IN_LIMIT));
+      }
+
+      const snapshots = await Promise.all(
+        chunks.map((chunk) =>
+          getDocs(query(usersRef, where(documentId(), 'in', chunk)))
+        )
+      );
+
+      return snapshots.flatMap((snapshot) =>
+        snapshot.docs.map((doc) => {
+          const data = doc.data() as FirestoreUserData;
+          return { ...data, uid: doc.id, level: 0, rank: undefined };
+        })
+      );
     };
 
     const fetchAllDetails = async () => {

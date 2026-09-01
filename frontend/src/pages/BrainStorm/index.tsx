@@ -19,7 +19,9 @@ import { verificarEdesbloquearConquistas } from '../../services/achievements';
 import { parseText } from '../../utils/utils';
 
 const GAME_DURATION = 60;
-const QUESTION_TIME_LIMIT = 60;
+// Era 60, igual à duração da partida inteira: a barra de tempo da pergunta
+// nunca chegava ao fim. A tela inicial sempre prometeu 10s por pergunta.
+const QUESTION_TIME_LIMIT = 10;
 const INITIAL_LIVES = 3;
 const BASE_XP_PER_CORRECT_ANSWER = 20;
 const STREAK_MULTIPLIER_BONUS = 0.5;
@@ -59,6 +61,17 @@ export function BrainStorm({ onBack }: BrainStormProps) {
   const questionTimerRef = useRef<NodeJS.Timeout | null>(null);
   const nextQuestionTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Timeout para a próxima pergunta
 
+  // O XP vive num ref além do state: assim o endGame não precisa depender de
+  // totalXp e para de ser recriado (e de reiniciar o relógio) a cada acerto.
+  const totalXpRef = useRef(0);
+  // Trava contra encerrar a mesma partida duas vezes (tempo + vidas no mesmo
+  // tick), o que gravava o XP em dobro no Firestore.
+  const gameEndedRef = useRef(false);
+
+  useEffect(() => {
+    totalXpRef.current = totalXp;
+  }, [totalXp]);
+
   useEffect(() => {
     const fetchBrainstormExercises = async () => {
       setIsLoading(true);
@@ -91,74 +104,70 @@ export function BrainStorm({ onBack }: BrainStormProps) {
     }
   }, [allExercises]);
 
-  const endGame = useCallback(
-    async (reason: 'time' | 'lives') => {
-      setGameState('finished');
-      setGameOverReason(reason);
-      if (mainTimerRef.current) clearInterval(mainTimerRef.current);
-      if (questionTimerRef.current) clearInterval(questionTimerRef.current);
-      if (nextQuestionTimeoutRef.current)
-        clearTimeout(nextQuestionTimeoutRef.current);
+  const endGame = useCallback(async (reason: 'time' | 'lives') => {
+    if (gameEndedRef.current) return;
+    gameEndedRef.current = true;
 
-      verificarEdesbloquearConquistas('JOGOU_BRAINSTORM');
+    setGameState('finished');
+    setGameOverReason(reason);
+    if (mainTimerRef.current) clearInterval(mainTimerRef.current);
+    if (questionTimerRef.current) clearInterval(questionTimerRef.current);
+    if (nextQuestionTimeoutRef.current)
+      clearTimeout(nextQuestionTimeoutRef.current);
 
-      const user = auth.currentUser;
-      if (user && totalXp > 0) {
-        const userDocRef = doc(db, 'users', user.uid);
-        await updateDoc(userDocRef, { xp: increment(totalXp) });
-      }
-    },
-    [totalXp]
-  );
+    verificarEdesbloquearConquistas('JOGOU_BRAINSTORM');
 
+    const user = auth.currentUser;
+    const xpGanho = totalXpRef.current;
+    if (user && xpGanho > 0) {
+      const userDocRef = doc(db, 'users', user.uid);
+      await updateDoc(userDocRef, { xp: increment(xpGanho) });
+    }
+  }, []);
+
+  // Relógio da partida. Depende só do gameState, então roda de ponta a ponta
+  // sem ser reiniciado a cada resposta — antes ele derrapava e a partida
+  // durava bem mais que os 60s anunciados.
   useEffect(() => {
     if (gameState !== 'playing') return;
 
     mainTimerRef.current = setInterval(() => {
-      setMainTimeLeft((prev) => {
-        if (prev <= 1) {
-          endGame('time');
-          return 0;
-        }
-        return prev - 1;
-      });
+      setMainTimeLeft((prev) => (prev <= 1 ? 0 : prev - 1));
     }, 1000);
-
-    if (!isAnswered) {
-      questionTimerRef.current = setInterval(() => {
-        setQuestionTimeLeft((prev) => {
-          if (prev <= 1) {
-            setStreak(0);
-            setLives((l) => l - 1);
-            setIsAnswered(true); // Trava a resposta
-            setLastAnswerResult({
-              isCorrect: false,
-              correctAnswer: currentQuestion?.respostaCorreta || '',
-            }); // Mostra feedback de erro
-            nextQuestionTimeoutRef.current = setTimeout(pickNextQuestion, 1500);
-            return QUESTION_TIME_LIMIT;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    } else {
-      if (questionTimerRef.current) clearInterval(questionTimerRef.current);
-    }
 
     return () => {
       if (mainTimerRef.current) clearInterval(mainTimerRef.current);
+    };
+  }, [gameState]);
+
+  // Relógio da pergunta.
+  useEffect(() => {
+    if (gameState !== 'playing' || isAnswered || !currentQuestion) return;
+
+    questionTimerRef.current = setInterval(() => {
+      setQuestionTimeLeft((prev) => (prev <= 1 ? 0 : prev - 1));
+    }, 1000);
+
+    return () => {
       if (questionTimerRef.current) clearInterval(questionTimerRef.current);
     };
-  }, [gameState, pickNextQuestion, endGame, isAnswered, currentQuestion]);
+  }, [gameState, isAnswered, currentQuestion]);
+
+  // Os encerramentos ficam em efeitos próprios. Antes eles eram disparados de
+  // dentro de um updater do setState — impuro, e o StrictMode chamava duas
+  // vezes, gravando XP em dobro.
+  useEffect(() => {
+    if (gameState === 'playing' && mainTimeLeft <= 0) endGame('time');
+  }, [gameState, mainTimeLeft, endGame]);
 
   useEffect(() => {
-    if (lives <= 0 && gameState === 'playing') {
-      endGame('lives');
-    }
+    if (gameState === 'playing' && lives <= 0) endGame('lives');
   }, [lives, gameState, endGame]);
 
   const startGame = () => {
     if (allExercises.length === 0) return;
+    gameEndedRef.current = false;
+    totalXpRef.current = 0;
     setLives(INITIAL_LIVES);
     setTotalXp(0);
     setGameOverReason(null);
@@ -169,45 +178,62 @@ export function BrainStorm({ onBack }: BrainStormProps) {
   };
 
   // --- MUDANÇA 3: Submissão agora atualiza o 'lastAnswerResult' ---
-  const handleAnswerSubmit = async () => {
-    if (!currentQuestion || isAnswered) return;
+  const submitAnswer = useCallback(
+    async (answer: string) => {
+      if (!currentQuestion) return;
 
-    setIsAnswered(true);
-    if (questionTimerRef.current) clearInterval(questionTimerRef.current);
+      setIsAnswered(true);
+      if (questionTimerRef.current) clearInterval(questionTimerRef.current);
 
-    try {
-      const response = await api.post('/api/exercises/submit', {
-        subjectId: 'brainstorm',
-        levelId: 'brainstorm',
-        exerciseId: currentQuestion.id,
-        userAnswer: userAnswer,
-      });
+      try {
+        const response = await api.post('/api/exercises/submit', {
+          subjectId: 'brainstorm',
+          levelId: 'brainstorm',
+          exerciseId: currentQuestion.id,
+          userAnswer: answer,
+        });
 
-      const { isCorrect, correctAnswer } = response.data;
-      setLastAnswerResult({ isCorrect, correctAnswer }); // Guarda o resultado completo
+        const { isCorrect, correctAnswer } = response.data;
+        setLastAnswerResult({ isCorrect, correctAnswer: correctAnswer ?? '' });
 
-      if (isCorrect) {
-        const timeBonus = Math.floor(questionTimeLeft / 2);
-        const currentMultiplier = 1 + streak * STREAK_MULTIPLIER_BONUS;
-        const xpGained = Math.round(
-          (BASE_XP_PER_CORRECT_ANSWER + timeBonus) * currentMultiplier
-        );
-        setTotalXp((prev) => prev + xpGained);
-        setStreak((prev) => prev + 1);
-      } else {
-        setStreak(0);
-        setLives((prev) => prev - 1);
+        if (isCorrect) {
+          const timeBonus = Math.floor(questionTimeLeft / 2);
+          const currentMultiplier = 1 + streak * STREAK_MULTIPLIER_BONUS;
+          const xpGained = Math.round(
+            (BASE_XP_PER_CORRECT_ANSWER + timeBonus) * currentMultiplier
+          );
+          setTotalXp((prev) => prev + xpGained);
+          setStreak((prev) => prev + 1);
+        } else {
+          setStreak(0);
+          setLives((prev) => prev - 1);
+        }
+      } catch (error) {
+        console.error('Erro ao submeter resposta do Brainstorm:', error);
+        // A API remove o campo respostaCorreta das perguntas que envia, então
+        // não dá pra usar currentQuestion.respostaCorreta como fallback: era
+        // sempre undefined. Sem resposta da API, só marca como errada e não
+        // penaliza vidas por uma falha de rede.
+        setLastAnswerResult({ isCorrect: false, correctAnswer: '' });
+      } finally {
+        nextQuestionTimeoutRef.current = setTimeout(pickNextQuestion, 1500);
       }
-    } catch (error) {
-      console.error('Erro ao submeter resposta do Brainstorm:', error);
-      setLastAnswerResult({
-        isCorrect: false,
-        correctAnswer: currentQuestion.respostaCorreta,
-      });
-    } finally {
-      nextQuestionTimeoutRef.current = setTimeout(pickNextQuestion, 1500);
-    }
+    },
+    [currentQuestion, questionTimeLeft, streak, pickNextQuestion]
+  );
+
+  const handleAnswerSubmit = () => {
+    if (!currentQuestion || isAnswered) return;
+    void submitAnswer(userAnswer);
   };
+
+  // Tempo da pergunta esgotado: envia resposta vazia. Além de valer como erro,
+  // é assim que a gente descobre qual era a resposta certa para mostrar.
+  useEffect(() => {
+    if (gameState !== 'playing' || isAnswered || !currentQuestion) return;
+    if (questionTimeLeft > 0) return;
+    void submitAnswer('');
+  }, [gameState, isAnswered, currentQuestion, questionTimeLeft, submitAnswer]);
 
   if (gameState === 'idle') {
     return (

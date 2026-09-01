@@ -223,7 +223,8 @@ export const RankingPage = ({ onBack, onViewProfile }: RankingPageProps) => {
               <UserInfo>
                 <Username>{user.username}</Username>
                 <UserStats>
-                  Nível {user.level} - {user.xp.toLocaleString('pt-BR')} XP
+                  Nível {user.level} - {(user.xp ?? 0).toLocaleString('pt-BR')}{' '}
+                  XP
                 </UserStats>
               </UserInfo>
             </UserRow>

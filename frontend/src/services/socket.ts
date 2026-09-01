@@ -1,8 +1,7 @@
 // src/services/socket.ts
 import { io } from 'socket.io-client';
+import { BACKEND_URL } from '../config/backend';
 
-const URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3333';
-
-export const socket = io(URL, {
+export const socket = io(BACKEND_URL, {
   autoConnect: false,
 });

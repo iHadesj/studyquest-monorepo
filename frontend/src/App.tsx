@@ -39,12 +39,13 @@ import {
 import { House, Trophy, Users } from 'phosphor-react';
 import { socket } from './services/socket';
 import { api } from './services/api';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import { calculateLevelInfo } from './style/level';
 import { RankingPage } from './pages/Ranking';
 import { FriendsList } from './components/FriendsList';
 
 type SubjectInfo = Omit<Materia, 'niveis'>;
+export type GamePlayer = { tag: string; score: number };
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -75,6 +76,7 @@ export default function App() {
     useState(false);
   const [inviterTag, setInviterTag] = useState<string | null>(null);
   const [gameRoomId, setGameRoomId] = useState<string | null>(null);
+  const [gamePlayers, setGamePlayers] = useState<GamePlayer[]>([]);
   const [activeChat, setActiveChat] = useState<UserProfileData | null>(null);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [viewedUser, setViewedUser] = useState<UserProfileData | null>(null);
@@ -123,35 +125,63 @@ export default function App() {
   }, [hydrateFromFirestore, resetLocalStore]);
 
   useEffect(() => {
-    if (!currentUserStoreData.fullTag || !currentUserStoreData.uid) {
+    const fullTag = currentUserStoreData.fullTag;
+    const uid = currentUserStoreData.uid;
+
+    if (!fullTag || !uid) {
       if (socket.connected) socket.disconnect();
       return;
     }
-    if (!socket.connected) {
-      socket.connect();
-    }
-    socket.on('connect', () => {
-      socket.emit('register', {
-        fullTag: currentUserStoreData.fullTag,
-        uid: currentUserStoreData.uid,
-      });
-    });
-    socket.on('incoming_invite', ({ from }: { from: string }) => {
+
+    const register = () => socket.emit('register', { fullTag, uid });
+
+    const onIncomingInvite = ({ from }: { from: string }) => {
       setInviterTag(from);
       setIsIncomingInviteModalOpen(true);
-    });
-    socket.on('game_started', ({ roomId }: { roomId: string }) => {
+    };
+
+    const onGameStarted = ({
+      roomId,
+      players,
+    }: {
+      roomId: string;
+      players?: GamePlayer[];
+    }) => {
       setIsInviteModalOpen(false);
       setIsIncomingInviteModalOpen(false);
+      // O lobby só monta depois deste evento, então ele nunca chegava a ouvir
+      // o 'game_started'. Guardamos os jogadores aqui e passamos por prop.
+      setGamePlayers(Array.isArray(players) ? players : []);
       setGameRoomId(roomId);
       setScreen('multiplayer_lobby');
-    });
+    };
 
+    const onInviteFailed = ({ message }: { message: string }) => {
+      setIsIncomingInviteModalOpen(false);
+      toast.error(message);
+    };
+
+    socket.on('connect', register);
+    socket.on('incoming_invite', onIncomingInvite);
+    socket.on('game_started', onGameStarted);
+    socket.on('invite_failed', onInviteFailed);
+
+    if (socket.connected) {
+      // O evento 'connect' não dispara para uma conexão que já está de pé:
+      // nesse caminho o register nunca era enviado e o usuário ficava
+      // invisível para os amigos.
+      register();
+    } else {
+      socket.connect();
+    }
+
+    // Remove só os próprios handlers. O socket.off('connect') sem argumento
+    // derrubava qualquer outro listener de 'connect' registrado no app.
     return () => {
-      socket.off('connect');
-      socket.off('incoming_invite');
-      socket.off('game_started');
-      if (socket.connected) socket.disconnect();
+      socket.off('connect', register);
+      socket.off('incoming_invite', onIncomingInvite);
+      socket.off('game_started', onGameStarted);
+      socket.off('invite_failed', onInviteFailed);
     };
   }, [currentUserStoreData.fullTag, currentUserStoreData.uid]);
 
@@ -269,7 +299,11 @@ export default function App() {
         return <AchievementsPage onBack={backToHome} />;
       case 'multiplayer_lobby':
         return gameRoomId ? (
-          <MultiplayerLobbyPage roomId={gameRoomId} onGoHome={backToHome} />
+          <MultiplayerLobbyPage
+            roomId={gameRoomId}
+            initialPlayers={gamePlayers}
+            onGoHome={backToHome}
+          />
         ) : (
           <SubjectSelector {...subjectSelectorProps} />
         );

@@ -198,6 +198,10 @@ export const ExercisePage = ({
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
+  // Trava o botão "Próxima" enquanto a correção da resposta está no ar. Sem
+  // isso dava pra avançar antes do allUserAnswers receber a resposta atual,
+  // e ela sumia da contagem final.
+  const [isChecking, setIsChecking] = useState(false);
   const [showResultsModal, setShowResultsModal] = useState(false);
   const [allUserAnswers, setAllUserAnswers] = useState<
     {
@@ -214,8 +218,6 @@ export const ExercisePage = ({
     isCorrect: boolean;
     correctAnswer?: string;
   } | null>(null);
-
-  const progress = useProgressStore((state) => state.progress);
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -242,9 +244,10 @@ export const ExercisePage = ({
 
   // --- MUDANÇA 2: Lógica de verificação atualizada ---
   const handleCheckAnswer = async () => {
-    if (!selectedAnswer) return;
+    if (!selectedAnswer || isChecking) return;
 
     setIsAnswered(true);
+    setIsChecking(true);
 
     try {
       const response = await api.post('/api/exercises/submit', {
@@ -271,11 +274,14 @@ export const ExercisePage = ({
     } catch (error) {
       console.error('Erro ao submeter resposta:', error);
       setLastAnswerResult({ isCorrect: false }); // Garante que a UI reaja mesmo com erro
+    } finally {
+      setIsChecking(false);
     }
   };
 
   // --- MUDANÇA 3: Limpando o estado de feedback ---
   const handleNextQuestion = () => {
+    if (isChecking) return;
     // Limpa o resultado da resposta anterior
     setLastAnswerResult(null);
 
@@ -292,21 +298,7 @@ export const ExercisePage = ({
     const user = auth.currentUser;
     if (!user) return;
 
-    const levelProgress = progress[subject.id]?.[level.id];
-    const tentativasFeitas = levelProgress?.tentativas || 0;
-    const ehUltimaTentativa = tentativasFeitas + 1 >= 3;
-
     const correctCount = allUserAnswers.filter((a) => a.isCorrect).length;
-
-    const wrongAnswersList = ehUltimaTentativa
-      ? allUserAnswers
-          .filter((a) => !a.isCorrect)
-          .map((a) => ({
-            ...a.exercise,
-            userAnswer: a.answer,
-            correctAnswer: a.correctAnswer,
-          }))
-      : [];
 
     const totalQuestions = exercises.length;
     const percentage =
@@ -331,6 +323,40 @@ export const ExercisePage = ({
       level.minAcertosParaDesbloquearProximo !== null &&
       correctCount >= level.minAcertosParaDesbloquearProximo;
 
+    const userDocRef = doc(db, 'users', user.uid);
+    const progressPath = `progress.${subject.id}.${level.id}`;
+
+    // Lê o progresso salvo ANTES de decidir qualquer coisa: o número de
+    // tentativas vem do banco, não do store (que pode estar defasado).
+    let currentProgress = {
+      acertos: 0,
+      tentativas: 0,
+      estrelas: 0,
+      concluido: false,
+    };
+    try {
+      const userDoc = await getDoc(userDocRef);
+      currentProgress = {
+        ...currentProgress,
+        ...(userDoc.data()?.progress?.[subject.id]?.[level.id] ?? {}),
+      };
+    } catch (error) {
+      console.error('Erro ao ler o progresso atual:', error);
+    }
+
+    const tentativas = (currentProgress.tentativas || 0) + 1;
+    const ehUltimaTentativa = tentativas >= 3;
+
+    const wrongAnswersList = ehUltimaTentativa
+      ? allUserAnswers
+          .filter((a) => !a.isCorrect)
+          .map((a) => ({
+            ...a.exercise,
+            userAnswer: a.answer,
+            correctAnswer: a.correctAnswer,
+          }))
+      : [];
+
     setFinalResults({
       acertos: correctCount,
       xpGanhos,
@@ -339,9 +365,6 @@ export const ExercisePage = ({
       passou,
       wrongAnswers: wrongAnswersList,
     });
-
-    const userDocRef = doc(db, 'users', user.uid);
-    const progressPath = `progress.${subject.id}.${level.id}`;
 
     verificarEdesbloquearConquistas('GANHOU_XP', {
       novoXpTotal: useProgressStore.getState().xp + totalXp,
@@ -354,18 +377,17 @@ export const ExercisePage = ({
     }
 
     try {
-      const userDoc = await getDoc(userDocRef);
-      const currentProgress = userDoc.data()?.progress?.[subject.id]?.[
-        level.id
-      ] || { acertos: 0, tentativas: 0, estrelas: 0, concluido: false };
-
       await updateDoc(userDocRef, {
         xp: increment(totalXp),
         [progressPath]: {
           acertos: Math.max(currentProgress.acertos, correctCount),
           concluido: currentProgress.concluido || passou,
           estrelas: Math.max(currentProgress.estrelas, estrelas),
-          tentativas: increment(1),
+          // Valor absoluto, não increment(): este update substitui o mapa
+          // inteiro em progressPath, e o transform do increment era aplicado
+          // depois disso, sempre partindo do zero. Resultado: tentativas
+          // ficava travado em 1 para sempre.
+          tentativas,
         },
       });
 
@@ -464,7 +486,11 @@ export const ExercisePage = ({
 
       <div style={{ textAlign: 'center' }}>
         {isAnswered ? (
-          <ContinueButton variant="primary" onClick={handleNextQuestion}>
+          <ContinueButton
+            variant="primary"
+            onClick={handleNextQuestion}
+            disabled={isChecking}
+          >
             {currentQuestionIndex < exercises.length - 1
               ? 'Próxima Questão'
               : 'Ver Resultado'}

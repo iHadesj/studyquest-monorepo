@@ -30,7 +30,9 @@ export const getExercises = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "Nível não encontrado." });
   }
 
-  const exercisesSanitized = level.exercicios.map((ex: any) => {
+  // 'exercicios' é opcional no tipo Nivel: sem esta guarda, um nível sem
+  // exercícios derrubava a rota com um 500.
+  const exercisesSanitized = (level.exercicios ?? []).map((ex: any) => {
     const { respostaCorreta, ...exerciseForStudent } = ex;
     return exerciseForStudent;
   });

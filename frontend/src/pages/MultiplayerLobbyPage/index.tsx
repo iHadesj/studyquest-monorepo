@@ -20,11 +20,16 @@ type RoundResult = { status: 'CERTO!' | 'ERRADO!'; points?: number };
 
 interface MultiplayerLobbyPageProps {
   roomId: string;
+  // O 'game_started' chega no App antes desta tela existir, então os jogadores
+  // iniciais vêm por prop. Sem isso o placar ficava com "Você"/"Oponente" até
+  // a primeira pontuação.
+  initialPlayers?: Player[];
   onGoHome: () => void;
 }
 
 export function MultiplayerLobbyPage({
   roomId,
+  initialPlayers,
   onGoHome,
 }: MultiplayerLobbyPageProps) {
   const [currentQuestion, setCurrentQuestion] = useState<Omit<
@@ -32,7 +37,7 @@ export function MultiplayerLobbyPage({
     'respostaCorreta'
   > | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [players, setPlayers] = useState<Player[]>(initialPlayers ?? []);
   const [hasAnswered, setHasAnswered] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
   const [timeLeft, setTimeLeft] = useState(15);
