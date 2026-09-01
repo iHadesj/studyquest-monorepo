@@ -1,5 +1,6 @@
 // src/pages/AchievementsPage/style.ts
 import styled, { css } from 'styled-components';
+import { theme } from '../../style/theme';
 
 export const AchievementsWrapper = styled.div`
   max-width: 800px;
@@ -17,7 +18,7 @@ export const AchievementCard = styled.div<{
   $unlocked: boolean;
   $rarity: 'bronze' | 'prata' | 'ouro';
 }>`
-  background-color: #2f3136;
+  background-color: ${theme.color.bgRaised};
   border-radius: 8px;
   padding: 1.5rem;
   display: flex;
@@ -35,7 +36,7 @@ export const AchievementCard = styled.div<{
             ? '#cd7f32'
             : $rarity === 'prata'
             ? '#c0c0c0'
-            : '#f1c40f'};
+            : theme.color.gold};
           &:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
@@ -44,7 +45,7 @@ export const AchievementCard = styled.div<{
       : css`
           opacity: 0.5;
           filter: grayscale(80%);
-          border-color: #40444b;
+          border-color: ${theme.color.stroke};
         `}
 `;
 
@@ -63,7 +64,7 @@ export const AchievementName = styled.h3`
 export const AchievementDescription = styled.p`
   margin: 0;
   font-size: 0.875rem;
-  color: #b9bbbe;
+  color: ${theme.color.textMuted};
   flex-grow: 1;
 `;
 
@@ -72,5 +73,5 @@ export const AchievementRarity = styled.span`
   font-size: 0.75rem;
   font-weight: bold;
   text-transform: uppercase;
-  color: #72767d;
+  color: ${theme.color.textFaint};
 `;

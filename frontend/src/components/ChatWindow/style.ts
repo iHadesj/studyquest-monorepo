@@ -1,12 +1,13 @@
 // src/components/ChatWindow/style.ts
 import styled from 'styled-components';
+import { theme } from '../../style/theme';
 
 export const ChatWrapper = styled.div`
   position: fixed;
   bottom: 0;
   right: 2rem;
   width: 320px;
-  background-color: #2f3136;
+  background-color: ${theme.color.bgRaised};
   border-radius: 8px 8px 0 0;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
   display: flex;
@@ -16,12 +17,12 @@ export const ChatWrapper = styled.div`
 `;
 
 export const ChatHeader = styled.div`
-  background-color: #202225;
+  background-color: ${theme.color.bgDeep};
   padding: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #40444b;
+  border-bottom: 1px solid ${theme.color.stroke};
   border-radius: 8px 8px 0 0;
 
   p {
@@ -36,7 +37,7 @@ export const CloseButton = styled.button`
   border: none;
   width: 50px;
   height: 30px;
-  color: #b9bbbe;
+  color: ${theme.color.textMuted};
   cursor: pointer;
   font-size: 1.25rem;
   line-height: 1;
@@ -58,9 +59,9 @@ export const MessagesContainer = styled.div`
 `;
 
 export const MessageBubble = styled.div<{ $isMe: boolean }>`
-  background-color: ${({ $isMe }) => ($isMe ? '#5865f2' : '#36393f')};
+  background-color: ${({ $isMe }) => ($isMe ? theme.color.primary : theme.color.bg)};
   align-self: ${({ $isMe }) => ($isMe ? 'flex-end' : 'flex-start')};
-  color: #dcddde;
+  color: ${theme.color.text};
   padding: 0.5rem 0.75rem;
   user-select: text;
   border-radius: 12px;
@@ -72,24 +73,24 @@ export const MessageBubble = styled.div<{ $isMe: boolean }>`
 export const ChatInputForm = styled.form`
   display: flex;
   padding: 0.75rem;
-  border-top: 1px solid #40444b;
+  border-top: 1px solid ${theme.color.stroke};
   align-items: center;
   gap: 0.5rem;
 `;
 
 export const ChatInput = styled.input`
   flex-grow: 1;
-  background-color: #40444b;
+  background-color: ${theme.color.stroke};
   border: none;
   border-radius: 20px;
   padding: 0.5rem 1rem;
-  color: #dcddde;
+  color: ${theme.color.text};
   outline: none;
 `;
 
 // 3. ESTILO DO NOSSO NOVO BOTÃO DE ENVIO
 export const SendButton = styled.button`
-  background-color: #5865f2;
+  background-color: ${theme.color.primary};
   border: none;
   border-radius: 50%;
   width: 36px;
@@ -103,12 +104,12 @@ export const SendButton = styled.button`
   flex-shrink: 0; /* Impede que o botão encolha */
 
   &:hover {
-    background-color: #4f5bd5;
+    background-color: ${theme.color.primary};
   }
 
   &:disabled {
-    background-color: #40444b;
+    background-color: ${theme.color.stroke};
     cursor: not-allowed;
-    color: #72767d;
+    color: ${theme.color.textFaint};
   }
 `;

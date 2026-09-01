@@ -1,10 +1,16 @@
 import styled, { keyframes } from 'styled-components';
 import { X } from 'phosphor-react';
+import { theme } from '../../style/theme';
 
-const fadeIn = keyframes`
+const overlayIn = keyframes`
+  from { opacity: 0; }
+  to   { opacity: 1; }
+`;
+
+const contentIn = keyframes`
   from {
     opacity: 0;
-    transform: translate(-50%, -48%) scale(0.96);
+    transform: translate(-50%, -46%) scale(0.96);
   }
   to {
     opacity: 1;
@@ -15,8 +21,11 @@ const fadeIn = keyframes`
 export const ModalOverlay = styled.div`
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(4, 4, 10, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   z-index: 1000;
+  animation: ${overlayIn} 220ms ${theme.ease.out};
 `;
 
 export const ModalContent = styled.div`
@@ -25,21 +34,47 @@ export const ModalContent = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
 
-  background-color: #2f3136;
-  border-radius: 8px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-  padding: 1.5rem;
+  background: linear-gradient(
+    160deg,
+    rgba(30, 30, 48, 0.96) 0%,
+    rgba(16, 16, 28, 0.96) 100%
+  );
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid ${theme.color.strokeStrong};
+  border-radius: ${theme.radius.xl};
+  box-shadow: ${theme.shadow.lg};
+  padding: 1.75rem;
   width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
   z-index: 1000;
-  max-width: 500px;
-  animation: ${fadeIn} 0.2s ease-out;
+  animation: ${contentIn} 320ms ${theme.ease.bounce};
 
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
+
+  /* Fio de luz no topo, marcando a borda superior da folha. */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 14%;
+    right: 14%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      ${theme.color.primarySoft},
+      transparent
+    );
+  }
 
   @media (max-width: 768px) {
-    width: 80%;
+    width: calc(100% - 2rem);
+    padding: 1.35rem;
   }
 `;
 
@@ -47,46 +82,53 @@ export const ModalHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   width: 100%;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid ${theme.color.stroke};
 `;
 
 export const ModalTitle = styled.h2`
   margin: 0;
-  font-size: 1.25rem;
-  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: ${theme.color.text};
 `;
 
 export const ModalBody = styled.div`
-  color: #dcddde;
-  font-size: 1rem;
-  line-height: 1.5;
+  color: ${theme.color.textMuted};
+  font-size: 0.95rem;
+  line-height: 1.6;
 `;
 
 export const CloseButton = styled.button`
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: rgba(0, 0, 0, 0.3);
-  border: none;
+  top: 1.1rem;
+  right: 1.1rem;
+  background: ${theme.color.glass};
+  border: 1px solid ${theme.color.stroke};
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #fff;
-  transition: all 0.2s;
+  color: ${theme.color.textMuted};
   z-index: 10;
+  transition: color 200ms ease, background 200ms ease, border-color 200ms ease,
+    transform 240ms ${theme.ease.bounce};
 
   &:hover {
-    background: rgba(0, 0, 0, 0.6);
-    color: #ff0000;
-    transform: scale(1.1);
+    background: rgba(251, 113, 133, 0.12);
+    border-color: rgba(251, 113, 133, 0.4);
+    color: ${theme.color.danger};
+    transform: rotate(90deg);
   }
 `;
 
 export const CloseIcon = styled(X).attrs({
-  size: 24,
+  size: 18,
   weight: 'bold',
 })``;

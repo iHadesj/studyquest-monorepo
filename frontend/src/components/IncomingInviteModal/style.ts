@@ -33,7 +33,7 @@ export const ActionButton = styled.button<{ accept?: boolean }>`
   border: none;
   cursor: pointer;
   transition: all 0.2s;
-  background-color: ${(props) => (props.accept ? '#43b581' : '#f04747')};
+  background-color: ${(props) => (props.accept ? theme.color.success : '#f04747')};
   color: white;
 
   &:hover {

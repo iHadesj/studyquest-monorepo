@@ -1,184 +1,115 @@
 import { useState, useEffect } from 'react';
-import styled, { css, keyframes } from 'styled-components';
-import { motion } from 'framer-motion';
 import { doc, updateDoc, increment, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../config/firebase';
 import {
   BackButton,
   ContinueButton,
-  ExerciseBox,
   ModalContent,
   ModalOverlay,
-  QuestionText,
-  Subtitle,
-  Title,
-  TitleExercise,
-  XPDisplayModal,
 } from '../../style/globalStyle';
 import {
   useProgressStore,
   type FirestoreUserData,
 } from '../../hooks/useProgressStore';
-import { CheckCircleIcon, StarIcon, XCircleIcon } from '../../style/icons';
 import type { Exercicio, Materia, Nivel } from '../../interfaces';
-import { Star } from 'phosphor-react';
+import {
+  Star,
+  CheckCircle,
+  XCircle,
+  Lightning,
+  Sparkle,
+  ArrowClockwise,
+} from 'phosphor-react';
 import { verificarEdesbloquearConquistas } from '../../services/achievements';
 import { api } from '../../services/api';
 import { parseText } from '../../utils/utils';
+import { theme } from '../../style/theme';
+import { spring } from '../../style/motion';
+import * as S from './style';
 
-const shake = keyframes`
-  10%, 90% { transform: translate3d(-1px, 0, 0); }
-  20%, 80% { transform: translate3d(2px, 0, 0); }
-  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-  40%, 60% { transform: translate3d(4px, 0, 0); }
-`;
-
-const ExerciseContainer = styled.div`
-  max-width: 48rem;
-  margin: 0 auto;
-`;
-
-const QuestionCounter = styled.div`
-  text-align: center;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #b9bbbe;
-  margin-bottom: 2rem;
-`;
-
-const OptionLabel = styled(motion.label)<{
-  $status: 'correct' | 'incorrect' | 'default';
-}>`
-  display: flex;
-  align-items: center;
-  padding: 0.75rem;
-  background-color: #36393f;
-  border-radius: 4px;
-  border: 2px solid #40444b;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  @media (max-width: 480px) {
-    font-size: 0.8rem;
-  }
-
-  &:hover {
-    ${({ $status }) => $status === 'default' && `border-color: #5865f2;`}
-  }
-
-  ${({ $status }) =>
-    $status === 'correct' &&
-    css`
-      background-color: #43b581;
-      border-color: #3aa570;
-      color: white;
-      transform: scale(1.02);
-    `}
-
-  ${({ $status }) =>
-    $status === 'incorrect' &&
-    css`
-      background-color: #ed4245;
-      border-color: #d83c3e;
-      color: white;
-      animation: ${shake} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-    `}
-`;
-
-const RadioInput = styled.input`
-  margin-right: 0.75rem;
-  accent-color: #5865f2;
-`;
-
-const StarsContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin: 1rem 0;
-`;
-
-const BonusXPText = styled.p`
-  font-size: 1rem;
-  font-weight: bold;
-  color: #43b581;
-  margin: 0;
-`;
-
-const WrongAnswersContainer = styled.div`
-  margin-top: 1.5rem;
-  text-align: left;
-  max-height: 150px;
-  overflow-y: auto;
-  background-color: #202225;
-  padding: 1rem;
-  border-radius: 4px;
-`;
-
-const WrongAnswerItem = styled.div`
-  & + & {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #40444b;
-  }
-  p {
-    margin: 0.25rem 0;
-  }
-`;
+const LETRAS = ['A', 'B', 'C', 'D', 'E', 'F'];
 
 const ResultsModal = ({ results, totalQuestions, onBack }: any) => {
+  const ok = results.passou;
   return (
     <ModalOverlay>
       <ModalContent>
-        {results.passou ? <CheckCircleIcon /> : <XCircleIcon />}
-        <Title as="h2" style={{ fontSize: '1.875rem', marginTop: '1rem' }}>
-          {results.passou ? 'Nível Concluído!' : 'Tente Novamente!'}
-        </Title>
-        <StarsContainer>
+        <S.ResultIcon $ok={ok}>
+          {ok ? (
+            <CheckCircle size={34} weight="fill" />
+          ) : (
+            <XCircle size={34} weight="fill" />
+          )}
+        </S.ResultIcon>
+
+        <h2
+          style={{
+            margin: 0,
+            fontSize: '1.4rem',
+            fontWeight: 700,
+            letterSpacing: '-0.5px',
+            color: theme.color.text,
+          }}
+        >
+          {ok ? 'Nível concluído' : 'Ainda não foi dessa vez'}
+        </h2>
+
+        <S.StarsContainer>
           {[1, 2, 3].map((i) => (
             <Star
               key={i}
-              size={40}
-              color={i <= results.estrelas ? '#f1c40f' : '#72767d'}
+              size={30}
+              color={i <= results.estrelas ? theme.color.gold : '#3a3a4a'}
               weight="fill"
             />
           ))}
-        </StarsContainer>
-        <Subtitle as="p" style={{ fontSize: '1rem', marginBottom: 0 }}>
-          Você acertou {results.acertos} de {totalQuestions} perguntas.
-        </Subtitle>
+        </S.StarsContainer>
 
-        {results.passou && (
-          <>
-            <XPDisplayModal style={{ marginTop: '1.5rem' }}>
-              <StarIcon />
-              <span>+{results.xpGanhos} XP Ganhos</span>
-            </XPDisplayModal>
+        <S.ScoreLine>
+          Você acertou <strong>{results.acertos}</strong> de{' '}
+          <strong>{totalQuestions}</strong> questões.
+        </S.ScoreLine>
+
+        {ok && (
+          <S.RewardRow>
+            <S.RewardChip $accent={theme.color.primarySoft}>
+              <Sparkle size={14} weight="fill" />+{results.xpGanhos} XP
+            </S.RewardChip>
             {results.bonusXP > 0 && (
-              <BonusXPText>+{results.bonusXP} XP Bônus!</BonusXPText>
+              <S.RewardChip $accent={theme.color.success}>
+                <Lightning size={14} weight="fill" />+{results.bonusXP} bônus
+              </S.RewardChip>
             )}
-          </>
+          </S.RewardRow>
         )}
 
         {results.wrongAnswers.length > 0 && (
-          <WrongAnswersContainer>
-            <h4 style={{ marginTop: 0 }}>Questões para revisar:</h4>
-            {results.wrongAnswers.map((q: any) => (
-              <WrongAnswerItem key={q.id}>
-                <p>
-                  <strong>Pergunta:</strong> {q.pergunta}
-                </p>
-                <p style={{ color: '#ed4245' }}>
-                  <strong>Sua resposta:</strong> {q.userAnswer}
-                </p>
-                <p style={{ color: '#43b581' }}>
-                  <strong>Resposta correta:</strong> {q.correctAnswer}
-                </p>
-              </WrongAnswerItem>
-            ))}
-          </WrongAnswersContainer>
+          <S.ReviewSection>
+            <h4>
+              <ArrowClockwise size={13} weight="bold" />
+              Questões para revisar
+            </h4>
+            <S.ReviewList>
+              {results.wrongAnswers.map((q: any) => (
+                <S.ReviewItem key={q.id}>
+                  <p className="pergunta">{q.pergunta}</p>
+                  <div className="linha">
+                    <span className="rotulo">Você:</span>
+                    <span className="errada">{q.userAnswer}</span>
+                  </div>
+                  <div className="linha">
+                    <span className="rotulo">Correta:</span>
+                    <span className="certa">{q.correctAnswer}</span>
+                  </div>
+                </S.ReviewItem>
+              ))}
+            </S.ReviewList>
+          </S.ReviewSection>
         )}
 
-        <ContinueButton onClick={onBack}>Continuar Jornada</ContinueButton>
+        <ContinueButton variant="primary" onClick={onBack}>
+          Voltar para a trilha
+        </ContinueButton>
       </ModalContent>
     </ModalOverlay>
   );
@@ -406,13 +337,12 @@ export const ExercisePage = ({
 
   if (isLoading) {
     return (
-      <ExerciseContainer>
+      <S.ExerciseContainer>
         <BackButton onClick={onBack}>&larr; Voltar</BackButton>
-        <TitleExercise>Carregando...</TitleExercise>
-        <p style={{ textAlign: 'center' }}>
-          Buscando as questões no servidor... 🥋
-        </p>
-      </ExerciseContainer>
+        <S.QuestionCard>
+          <S.ScoreLine>Buscando as questões no servidor...</S.ScoreLine>
+        </S.QuestionCard>
+      </S.ExerciseContainer>
     );
   }
 
@@ -428,32 +358,51 @@ export const ExercisePage = ({
 
   if (!currentQuestion) {
     return (
-      <ExerciseContainer>
+      <S.ExerciseContainer>
         <BackButton onClick={onBack}>&larr; Voltar</BackButton>
-        <TitleExercise>Opa!</TitleExercise>
-        <p style={{ textAlign: 'center' }}>
-          Nenhum exercício de múltipla escolha encontrado pra esse nível.
-        </p>
-      </ExerciseContainer>
+        <S.QuestionCard>
+          <S.ScoreLine>
+            Nenhum exercício de múltipla escolha encontrado para este nível.
+          </S.ScoreLine>
+        </S.QuestionCard>
+      </S.ExerciseContainer>
     );
   }
 
-  return (
-    <ExerciseContainer>
-      <BackButton onClick={onBack}>&larr; Voltar</BackButton>
-      <TitleExercise as="h2" style={{ border: 'none', padding: 0 }}>
-        Exercícios: {level.nome}
-      </TitleExercise>
-      <QuestionCounter>
-        Questão {currentQuestionIndex + 1} de {exercises.length}
-      </QuestionCounter>
+  const total = exercises.length;
+  const progresso = ((currentQuestionIndex + 1) / total) * 100;
 
-      <ExerciseBox $hasMarginTop={true}>
-        <QuestionText>{parseText(currentQuestion.pergunta)}</QuestionText>
-        <div
-          style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
-        >
-          {currentQuestion.opcoes?.map((option) => {
+  return (
+    <S.ExerciseContainer>
+      <BackButton onClick={onBack}>&larr; Voltar</BackButton>
+
+      <S.ExerciseHeader>
+        <div className="topo">
+          <h2 className="titulo">
+            {subject.nome} · {level.nome}
+          </h2>
+          <span className="contador">
+            {currentQuestionIndex + 1} de {total}
+          </span>
+        </div>
+        <S.ProgressTrack>
+          <S.ProgressFill
+            animate={{ width: `${progresso}%` }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          />
+        </S.ProgressTrack>
+      </S.ExerciseHeader>
+
+      <S.QuestionCard
+        key={currentQuestion.id}
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={spring}
+      >
+        <S.QuestionText>{parseText(currentQuestion.pergunta)}</S.QuestionText>
+
+        <S.OptionsList>
+          {currentQuestion.opcoes?.map((option, i) => {
             let status: 'correct' | 'incorrect' | 'default' = 'default';
 
             if (isAnswered && lastAnswerResult) {
@@ -468,8 +417,12 @@ export const ExercisePage = ({
             }
 
             return (
-              <OptionLabel key={option} $status={status}>
-                <RadioInput
+              <S.OptionRow
+                key={option}
+                $status={status}
+                $selected={selectedAnswer === option}
+              >
+                <input
                   type="radio"
                   name={`ex-${currentQuestion.id}`}
                   value={option}
@@ -477,34 +430,36 @@ export const ExercisePage = ({
                   onChange={(e) => setSelectedAnswer(e.target.value)}
                   disabled={isAnswered}
                 />
+                <span className="letra">{LETRAS[i] ?? i + 1}</span>
                 <span>{option}</span>
-              </OptionLabel>
+                {status !== 'default' && (
+                  <span className="marca">
+                    {status === 'correct' ? (
+                      <CheckCircle size={20} weight="fill" />
+                    ) : (
+                      <XCircle size={20} weight="fill" />
+                    )}
+                  </span>
+                )}
+              </S.OptionRow>
             );
           })}
-        </div>
-      </ExerciseBox>
+        </S.OptionsList>
+      </S.QuestionCard>
 
-      <div style={{ textAlign: 'center' }}>
+      <S.ActionBar>
         {isAnswered ? (
-          <ContinueButton
-            variant="primary"
-            onClick={handleNextQuestion}
-            disabled={isChecking}
-          >
-            {currentQuestionIndex < exercises.length - 1
-              ? 'Próxima Questão'
-              : 'Ver Resultado'}
-          </ContinueButton>
+          <S.ActionButton onClick={handleNextQuestion} disabled={isChecking}>
+            {currentQuestionIndex < total - 1
+              ? 'Próxima questão'
+              : 'Ver resultado'}
+          </S.ActionButton>
         ) : (
-          <ContinueButton
-            variant="primary"
-            onClick={handleCheckAnswer}
-            disabled={!selectedAnswer}
-          >
-            Verificar Resposta
-          </ContinueButton>
+          <S.ActionButton onClick={handleCheckAnswer} disabled={!selectedAnswer}>
+            Verificar resposta
+          </S.ActionButton>
         )}
-      </div>
-    </ExerciseContainer>
+      </S.ActionBar>
+    </S.ExerciseContainer>
   );
 };

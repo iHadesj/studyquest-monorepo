@@ -1,6 +1,7 @@
 // src/pages/BrainStorm/style.ts
 import styled, { keyframes, css } from 'styled-components';
 import { motion } from 'framer-motion';
+import { theme } from '../../style/theme';
 
 // --- Animação de brilho para a barra de tempo ---
 const glow = (color: string) => keyframes`
@@ -27,8 +28,8 @@ export const StormWrapper = styled.div`
 `;
 
 export const CardContainer = styled.div`
-  background-color: #2f3136;
-  border: 1px solid #40444b;
+  background-color: ${theme.color.bgRaised};
+  border: 1px solid ${theme.color.stroke};
   border-radius: 8px;
   padding: 2.5rem;
   width: 100%;
@@ -53,7 +54,7 @@ export const StatsGrid = styled.div`
 
 export const StatCard = styled.div`
   background: rgba(0, 0, 0, 0.2);
-  border: 1px solid #40444b;
+  border: 1px solid ${theme.color.stroke};
   padding: 1rem;
   border-radius: 8px;
   display: flex;
@@ -80,10 +81,10 @@ export const GameHeader = styled.div`
   width: 100%;
   gap: 1.5rem;
   max-width: 600px;
-  background-color: #2f3136;
+  background-color: ${theme.color.bgRaised};
   padding: 0.5rem 1.5rem;
   border-radius: 12px;
-  border: 1px solid #40444b;
+  border: 1px solid ${theme.color.stroke};
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 `;
 
@@ -96,7 +97,7 @@ export const MainTimer = styled.div`
   gap: 0.75rem;
 
   svg {
-    color: #5865f2;
+    color: ${theme.color.primary};
   }
 
   @media (max-width: 480px) {
@@ -123,7 +124,7 @@ export const TimerBarContainer = styled.div`
   width: 100%;
   max-width: 600px;
   height: 12px;
-  background-color: #202225;
+  background-color: ${theme.color.bgDeep};
   border-radius: 6px;
   overflow: hidden;
 `;
@@ -135,18 +136,18 @@ export const TimerBarProgress = styled.div<{ percentage: number }>`
 
   background-color: ${(props) =>
     props.percentage > 50
-      ? '#43b581'
+      ? theme.color.success
       : props.percentage > 25
       ? '#faa61a'
-      : '#ed4245'};
+      : theme.color.danger};
 
   animation: ${(props) =>
       glow(
         props.percentage > 50
-          ? '#43b581'
+          ? theme.color.success
           : props.percentage > 25
           ? '#faa61a'
-          : '#ed4245'
+          : theme.color.danger
       )}
     2s ease-in-out infinite;
 
@@ -163,9 +164,9 @@ export const OptionLabel = styled(motion.label)<{
   display: flex;
   align-items: center;
   padding: 0.75rem;
-  background-color: #36393f;
+  background-color: ${theme.color.bg};
   border-radius: 4px;
-  border: 2px solid #40444b;
+  border: 2px solid ${theme.color.stroke};
   cursor: pointer;
   transition: all 0.2s;
 
@@ -174,14 +175,14 @@ export const OptionLabel = styled(motion.label)<{
   }
 
   &:hover {
-    ${({ $status }) => $status === 'default' && `border-color: #5865f2;`}
+    ${({ $status }) => $status === 'default' && `border-color: ${theme.color.primary};`}
   }
 
   ${({ $status }) =>
     $status === 'correct' &&
     css`
-      background-color: #43b581;
-      border-color: #3aa570;
+      background-color: ${theme.color.success};
+      border-color: ${theme.color.success};
       color: white;
       transform: scale(1.02);
     `}
@@ -189,7 +190,7 @@ export const OptionLabel = styled(motion.label)<{
   ${({ $status }) =>
     $status === 'incorrect' &&
     css`
-      background-color: #ed4245;
+      background-color: ${theme.color.danger};
       border-color: #d83c3e;
       color: white;
       animation: ${shake} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;

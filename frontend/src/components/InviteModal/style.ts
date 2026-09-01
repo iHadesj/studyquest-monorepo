@@ -13,21 +13,21 @@ export const InviteBox = styled.div`
 export const TagInput = styled.input`
   width: 95%;
   padding: 0.75rem;
-  background-color: #202225;
-  border: 1px solid #40444b;
+  background-color: ${theme.color.bgDeep};
+  border: 1px solid ${theme.color.stroke};
   border-radius: 4px;
-  color: #dcddde;
+  color: ${theme.color.text};
   font-family: ${theme.font.sans};
   font-size: 1.2rem;
   text-align: center;
   &:focus {
     outline: none;
-    border-color: #5865f2;
+    border-color: ${theme.color.primary};
   }
 `;
 
 export const InviteButton = styled.button`
-  background-color: #43b581;
+  background-color: ${theme.color.success};
   color: #ffffff;
   font-weight: bold;
   padding: 0.75rem 2rem;
@@ -36,17 +36,17 @@ export const InviteButton = styled.button`
   border: none;
   cursor: pointer;
   &:hover:not(:disabled) {
-    background-color: #3aa570;
+    background-color: ${theme.color.success};
   }
   &:disabled {
-    background-color: #40444b;
+    background-color: ${theme.color.stroke};
     cursor: not-allowed;
   }
 `;
 
 export const Separator = styled.div`
   text-align: center;
-  color: #72767d;
+  color: ${theme.color.textFaint};
   font-weight: bold;
   margin: 0.5rem 0;
 `;
@@ -65,7 +65,7 @@ export const FriendEntry = styled.div`
   align-items: center;
   gap: 1rem;
   padding: 0.5rem;
-  background-color: #36393f;
+  background-color: ${theme.color.bg};
   border-radius: 4px;
 `;
 
@@ -83,6 +83,6 @@ export const UserInfo = styled.div`
 
 export const EmptyState = styled.div`
   text-align: center;
-  color: #72767d;
+  color: ${theme.color.textFaint};
   padding: 2rem 1rem;
 `;

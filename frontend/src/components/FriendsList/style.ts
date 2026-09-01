@@ -14,7 +14,7 @@ export const FriendsListWrapper = styled.div`
 
 export const TabContainer = styled.div`
   display: flex;
-  border-bottom: 1px solid #40444b;
+  border-bottom: 1px solid ${theme.color.stroke};
   position: relative; // Necessário para a barrinha animada
 `;
 
@@ -23,7 +23,7 @@ export const Underline = styled(motion.div)`
   position: absolute;
   bottom: -1px;
   height: 2px;
-  background-color: #5865f2;
+  background-color: ${theme.color.primary};
 `;
 
 export const TabButton = styled.button<{ $isActive: boolean }>`
@@ -32,7 +32,7 @@ export const TabButton = styled.button<{ $isActive: boolean }>`
   padding: 0.75rem;
   background-color: transparent;
   border: none;
-  color: ${({ $isActive }) => ($isActive ? '#ffffff' : '#b9bbbe')};
+  color: ${({ $isActive }) => ($isActive ? '#ffffff' : theme.color.textMuted)};
   font-family: ${theme.font.sans};
   font-size: 1rem;
   font-weight: bold;
@@ -58,7 +58,7 @@ export const ListContainer = styled(motion.div)`
 export const Status = styled.div<{ $isOnline: boolean }>`
   // Usa $
   font-size: 0.85rem;
-  color: ${({ $isOnline }) => ($isOnline ? '#43b581' : '#72767d')};
+  color: ${({ $isOnline }) => ($isOnline ? theme.color.success : theme.color.textFaint)};
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -69,7 +69,7 @@ export const Status = styled.div<{ $isOnline: boolean }>`
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: ${({ $isOnline }) => ($isOnline ? '#43b581' : '#72767d')};
+    background-color: ${({ $isOnline }) => ($isOnline ? theme.color.success : theme.color.textFaint)};
   }
 `;
 
@@ -78,7 +78,7 @@ export const FooterContainer = styled.div`
   display: flex;
   align-items: flex-end;
   padding-top: 1rem;
-  border-top: 1px solid #40444b;
+  border-top: 1px solid ${theme.color.stroke};
 `;
 
 export const AddFriendInput = styled.input`
@@ -97,8 +97,8 @@ export const AddFriendInput = styled.input`
 `;
 
 export const FriendActionButton = styled.button`
-  background-color: #40444b;
-  color: #dcddde;
+  background-color: ${theme.color.stroke};
+  color: ${theme.color.text};
   border: none;
   border-radius: 4px;
   padding: 0.5rem 1rem;
@@ -110,13 +110,13 @@ export const FriendActionButton = styled.button`
   gap: 0.5rem;
 
   &:hover {
-    background-color: #5865f2;
+    background-color: ${theme.color.primary};
     color: white;
   }
 
   &:disabled {
-    background-color: #2f3136;
-    color: #72767d;
+    background-color: ${theme.color.bgRaised};
+    color: ${theme.color.textFaint};
     cursor: not-allowed;
   }
 `;
@@ -125,7 +125,7 @@ export const UserEntry = styled.div`
   display: flex;
   align-items: center;
   padding: 0.5rem;
-  background-color: #36393f;
+  background-color: ${theme.color.bg};
   border-radius: 4px;
   gap: 1rem;
 `;
@@ -133,7 +133,7 @@ export const UserEntry = styled.div`
 export const Avatar = styled(BaseAvatar)`
   width: 50px;
   height: 50px;
-  border: 4px solid #4f545c;
+  border: 4px solid ${theme.color.stroke};
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 `;
 
@@ -167,12 +167,12 @@ export const ActionButton = styled.button<{
 
   background-color: ${({ variant }) =>
     variant === 'accept'
-      ? '#43b581'
+      ? theme.color.success
       : variant === 'decline'
-      ? '#ed4245'
+      ? theme.color.danger
       : variant === 'chat'
       ? '#50525e'
-      : '#5865f2'};
+      : theme.color.primary};
   color: white;
 
   &:hover {
@@ -180,14 +180,14 @@ export const ActionButton = styled.button<{
   }
 
   &:disabled {
-    background-color: #40444b;
+    background-color: ${theme.color.stroke};
     cursor: not-allowed;
   }
 `;
 
 export const EmptyState = styled.div`
   text-align: center;
-  color: #72767d;
+  color: ${theme.color.textFaint};
   padding: 3rem 1rem;
 `;
 
@@ -196,10 +196,10 @@ export const CancelButton = styled.button<{
 }>`
   background-color: ${({ variant }) =>
     variant === 'success'
-      ? '#43b581'
+      ? theme.color.success
       : variant === 'danger'
-      ? '#ed4245'
-      : '#5865f2'};
+      ? theme.color.danger
+      : theme.color.primary};
   color: white;
   border: none;
   border-radius: 4px;
@@ -215,7 +215,7 @@ export const CancelButton = styled.button<{
     filter: brightness(1.1);
   }
   &:disabled {
-    background-color: #40444b;
+    background-color: ${theme.color.stroke};
     cursor: not-allowed;
   }
 `;

@@ -29,7 +29,7 @@ export const CloseButton = styled.button`
 export const ProfileCard = styled(motion.div)`
   background: linear-gradient(135deg, #2e3035, #222428);
   border-radius: 16px;
-  border: 1px solid #4f545c;
+  border: 1px solid ${theme.color.stroke};
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   position: relative;
   overflow: hidden;
@@ -44,7 +44,7 @@ export const ProfileCard = styled(motion.div)`
 export const ProfileHeader = styled(motion.div)`
   width: 100%;
   height: 100px;
-  background: linear-gradient(135deg, #5865f2, #43b581);
+  background: linear-gradient(135deg, ${theme.color.primary}, ${theme.color.success});
   border-radius: 16px 16px 0 0;
   margin-top: -1.5rem;
   position: relative;
@@ -61,17 +61,17 @@ export const ProfileAvatar = styled.img`
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  border: 6px solid #2f3136;
+  border: 6px solid ${theme.color.bgRaised};
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-  background-color: #202225;
+  background-color: ${theme.color.bgDeep};
 `;
 
 export const EditAvatarButton = styled.button`
   position: absolute;
   bottom: 5px;
   right: 5px;
-  background-color: #5865f2;
-  border: 2px solid #2f3136;
+  background-color: ${theme.color.primary};
+  border: 2px solid ${theme.color.bgRaised};
   border-radius: 50%;
   width: 32px;
   height: 32px;
@@ -108,17 +108,17 @@ export const Username = styled.h3`
 `;
 
 export const UserTag = styled.p`
-  color: #b9bbbe;
+  color: ${theme.color.textMuted};
   font-size: 0.9rem;
   margin: -0.5rem 0 0.5rem 0;
-  background-color: #202225;
+  background-color: ${theme.color.bgDeep};
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
 `;
 
 // O texto da bio agora será mais flexível, podendo ser um p ou um textarea
 export const UserBioText = styled.p`
-  color: #dcddde;
+  color: ${theme.color.text};
   font-size: 0.95rem;
   line-height: 1.5;
   max-width: 100%; /* Ajustado para se adequar ao UserInfo */
@@ -148,7 +148,7 @@ export const StatBox = styled.div`
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: #b9bbbe;
+  color: ${theme.color.textMuted};
   transition: background-color 0.2s;
 
   &:hover {
@@ -157,7 +157,7 @@ export const StatBox = styled.div`
 `;
 
 export const StatIcon = styled.div`
-  color: #5865f2;
+  color: ${theme.color.primary};
   flex-shrink: 0;
 `;
 
@@ -180,15 +180,15 @@ export const StatLabel = styled.p`
   margin: 0;
   font-size: 0.75rem;
   text-transform: uppercase;
-  color: #b9bbbe;
+  color: ${theme.color.textMuted};
 `;
 
 // Estilos para os inputs que se misturam ao layout
 export const StyledInput = styled.input`
   width: 100%;
   padding: 0.5rem 0.75rem; /* Ajustado para ser mais compacto */
-  background-color: #202225;
-  border: 1px solid #40444b;
+  background-color: ${theme.color.bgDeep};
+  border: 1px solid ${theme.color.stroke};
   border-radius: 4px;
   color: #ffffff; /* Cor do texto similar ao Username */
   font-family: ${theme.font.sans};
@@ -200,7 +200,7 @@ export const StyledInput = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #5865f2;
+    border-color: ${theme.color.primary};
   }
 `;
 
@@ -208,10 +208,10 @@ export const StyledTextArea = styled.textarea`
   width: 100%;
   min-height: 95px;
   padding: 0.75rem;
-  background-color: #202225;
-  border: 1px solid #40444b;
+  background-color: ${theme.color.bgDeep};
+  border: 1px solid ${theme.color.stroke};
   border-radius: 4px;
-  color: #dcddde;
+  color: ${theme.color.text};
   font-family: ${theme.font.sans};
   font-size: 0.95rem; /* Tamanho da fonte similar ao UserBio */
   line-height: 1.5;
@@ -221,7 +221,7 @@ export const StyledTextArea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: #5865f2;
+    border-color: ${theme.color.primary};
   }
 `;
 
@@ -240,9 +240,9 @@ export const AvatarGrid = styled(motion.div)`
 `;
 
 export const AvatarOption = styled.button<{ $isSelected: boolean }>`
-  background-color: #36393f;
+  background-color: ${theme.color.bg};
   border: 2px solid
-    ${(props) => (props.$isSelected ? '#5865f2' : 'transparent')};
+    ${(props) => (props.$isSelected ? theme.color.primary : 'transparent')};
   border-radius: 8px;
   padding: 0.25rem;
   cursor: pointer;
@@ -250,7 +250,7 @@ export const AvatarOption = styled.button<{ $isSelected: boolean }>`
   transform: ${(props) => (props.$isSelected ? 'scale(1.1)' : 'scale(1)')};
 
   &:hover {
-    border-color: #5865f2;
+    border-color: ${theme.color.primary};
   }
 
   img {

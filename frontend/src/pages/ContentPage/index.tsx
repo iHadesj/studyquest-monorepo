@@ -1,8 +1,13 @@
 import { BookOpen } from 'phosphor-react';
 import { type Variants } from 'framer-motion';
 import type { Nivel } from '../../interfaces';
-import { BackButton, Title } from '../../style/globalStyle';
-import { ContentWrapper, StartExercisesButton, ContentCard } from './style';
+import { BackButton } from '../../style/globalStyle';
+import {
+  ContentWrapper,
+  StartExercisesButton,
+  ContentCard,
+  ReadingHeader,
+} from './style';
 
 const formatText = (text: string) => {
   return text
@@ -39,17 +44,14 @@ export const ContentPage = ({
   return (
     <ContentWrapper>
       <BackButton onClick={onBack}>&larr; Voltar</BackButton>
-      <Title
-        as="h1"
-        style={{
-          textAlign: 'left',
-          border: 'none',
-          padding: 0,
-          marginBottom: '2rem',
-        }}
-      >
-        {level.conteudo.titulo}
-      </Title>
+
+      <ReadingHeader>
+        <div className="rotulo">
+          <BookOpen size={14} weight="fill" />
+          Material de estudo
+        </div>
+        <h1>{level.conteudo.titulo}</h1>
+      </ReadingHeader>
 
       {contentParagraphs.map((paragraph, index) => (
         <ContentCard
@@ -64,7 +66,7 @@ export const ContentPage = ({
 
       <StartExercisesButton onClick={onStartExercises}>
         <BookOpen weight="bold" />
-        Bora pros Exercícios!
+        Ir para os exercícios
       </StartExercisesButton>
     </ContentWrapper>
   );

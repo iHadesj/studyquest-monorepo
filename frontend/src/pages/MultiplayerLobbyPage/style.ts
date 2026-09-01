@@ -3,6 +3,7 @@
 import styled from 'styled-components';
 import { Card, FormControlLabel } from '@mui/material';
 import { motion } from 'framer-motion';
+import { theme } from '../../style/theme';
 
 // --- Layout Principal ---
 export const LobbyWrapper = styled.div`
@@ -21,7 +22,7 @@ export const Header = styled.header`
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 1rem;
-  background-color: #2f3136;
+  background-color: ${theme.color.bgRaised};
   border-radius: 8px;
 `;
 
@@ -30,7 +31,7 @@ export const PlayerInfo = styled.div<{ isMe?: boolean }>`
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  color: ${(props) => (props.isMe ? '#5865f2' : 'white')};
+  color: ${(props) => (props.isMe ? theme.color.primary : 'white')};
   font-weight: ${(props) => (props.isMe ? 'bold' : 'normal')};
   flex-basis: 30%; // Garante espaço pra cada jogador
 
@@ -50,12 +51,12 @@ export const PlayerInfo = styled.div<{ isMe?: boolean }>`
 export const CentralTimer = styled(motion.div)<{ timeLow: boolean }>`
   font-size: 2.5rem;
   font-weight: bold;
-  color: ${(props) => (props.timeLow ? '#ed4245' : '#faa61a')};
+  color: ${(props) => (props.timeLow ? theme.color.danger : '#faa61a')};
 `;
 
 // --- Card da Pergunta ---
 export const QuestionCard = styled(motion(Card))`
-  background-color: #202225 !important;
+  background-color: ${theme.color.bgDeep} !important;
   color: white !important;
   padding: 2rem;
   border-radius: 8px !important;
@@ -78,16 +79,16 @@ export const OptionsContainer = styled.div`
 export const StyledFormControlLabel = styled(FormControlLabel)<{
   $selected: boolean;
 }>`
-  background-color: ${(props) => (props.$selected ? '#5865f2' : '#36393f')};
-  border: 2px solid ${(props) => (props.$selected ? '#7289da' : '#2f3136')};
+  background-color: ${(props) => (props.$selected ? theme.color.primary : theme.color.bg)};
+  border: 2px solid ${(props) => (props.$selected ? '#7289da' : theme.color.bgRaised)};
   border-radius: 8px;
   padding: 0.5rem 1rem;
   margin: 0 !important;
   transition: all 0.2s ease-in-out;
 
   &:hover {
-    background-color: #40444b;
-    border-color: #5865f2;
+    background-color: ${theme.color.stroke};
+    border-color: ${theme.color.primary};
   }
 
   .MuiRadio-root {
@@ -107,7 +108,7 @@ export const FeedbackOverlay = styled(motion.div)<{ $isCorrect?: boolean }>`
   transform: translate(-50%, -50%);
   padding: 2rem 3rem;
   background-color: rgba(47, 49, 54, 0.95);
-  border: 3px solid ${(props) => (props.$isCorrect ? '#43b581' : '#ed4245')};
+  border: 3px solid ${(props) => (props.$isCorrect ? theme.color.success : theme.color.danger)};
   border-radius: 16px;
   z-index: 10;
   display: flex;
@@ -119,18 +120,18 @@ export const FeedbackOverlay = styled(motion.div)<{ $isCorrect?: boolean }>`
   .status {
     font-size: 3rem;
     font-weight: bold;
-    color: ${(props) => (props.$isCorrect ? '#43b581' : '#ed4245')};
+    color: ${(props) => (props.$isCorrect ? theme.color.success : theme.color.danger)};
   }
 
   .points {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #f1c40f;
+    color: ${theme.color.gold};
   }
 `;
 
 export const WaitingText = styled.h2`
-  color: #b9bbbe;
+  color: ${theme.color.textMuted};
   min-height: 200px;
   display: flex;
   align-items: center;
@@ -146,7 +147,7 @@ export const GameOverScreen = styled(motion.div)`
   align-items: center;
   gap: 1rem;
   padding: 2rem;
-  background-color: #202225;
+  background-color: ${theme.color.bgDeep};
   border-radius: 8px;
   width: 100%;
 `;

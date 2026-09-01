@@ -3,7 +3,7 @@ import { Title } from '../../style/globalStyle';
 import { theme } from '../../style/theme';
 
 export const EditorBox = styled.div`
-  background-color: #2f3136;
+  background-color: ${theme.color.bgRaised};
   border-radius: 8px;
   width: 100%;
   max-width: 550px;
@@ -21,7 +21,7 @@ export const EditorTitle = styled(Title)`
 `;
 
 export const EditorSubtitle = styled.p`
-  color: #b9bbbe;
+  color: ${theme.color.textMuted};
   margin-top: -0.5rem;
   margin-bottom: 1rem;
 `;
@@ -29,17 +29,17 @@ export const EditorSubtitle = styled.p`
 export const UsernameInput = styled.input`
   width: 95%;
   padding: 0.75rem;
-  background-color: #202225;
-  border: 1px solid #40444b;
+  background-color: ${theme.color.bgDeep};
+  border: 1px solid ${theme.color.stroke};
   border-radius: 4px;
-  color: #dcddde;
+  color: ${theme.color.text};
   font-family: ${theme.font.sans};
   font-size: 1.2rem;
   text-align: center;
   margin-bottom: 1rem;
   &:focus {
     outline: none;
-    border-color: #5865f2;
+    border-color: ${theme.color.primary};
   }
 `;
 
@@ -54,9 +54,9 @@ export const AvatarGrid = styled.div`
 `;
 
 export const AvatarOption = styled.button<{ $isSelected: boolean }>`
-  background-color: #36393f;
+  background-color: ${theme.color.bg};
   border: 2px solid
-    ${(props) => (props.$isSelected ? '#5865f2' : 'transparent')};
+    ${(props) => (props.$isSelected ? theme.color.primary : 'transparent')};
   border-radius: 8px;
   padding: 0.5rem;
   cursor: pointer;
@@ -64,7 +64,7 @@ export const AvatarOption = styled.button<{ $isSelected: boolean }>`
   transform: ${(props) => (props.$isSelected ? 'scale(1.1)' : 'scale(1)')};
 
   &:hover {
-    border-color: #5865f2;
+    border-color: ${theme.color.primary};
   }
 
   img {
@@ -75,7 +75,7 @@ export const AvatarOption = styled.button<{ $isSelected: boolean }>`
 `;
 
 export const SaveButton = styled.button`
-  background-color: #43b581;
+  background-color: ${theme.color.success};
   color: #ffffff;
   font-family: ${theme.font.sans};
   font-weight: bold;
@@ -86,10 +86,10 @@ export const SaveButton = styled.button`
   cursor: pointer;
   transition: background-color 0.2s;
   &:disabled {
-    background-color: #40444b;
+    background-color: ${theme.color.stroke};
     cursor: not-allowed;
   }
   &:hover:not(:disabled) {
-    background-color: #3aa570;
+    background-color: ${theme.color.success};
   }
 `;
