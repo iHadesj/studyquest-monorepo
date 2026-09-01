@@ -147,7 +147,16 @@ export const AuthPage = () => {
         <IconContainer>
           <Brain size={42} weight="fill" color="white" />
         </IconContainer>
-        <Title style={{ border: 'none', padding: 0, fontSize: '2rem' }}>
+        <Title
+          style={{
+            border: 'none',
+            padding: 0,
+            // Cabe em uma linha dentro do card; o tamanho global é grande
+            // demais para os 420px da caixa de login.
+            fontSize: 'clamp(1.35rem, 5vw, 1.65rem)',
+            letterSpacing: '-0.5px',
+          }}
+        >
           {isLogin ? 'Bem-vindo de Volta!' : 'Crie a sua Conta'}
         </Title>
         <Subtitle style={{ marginBottom: '1.5rem' }}>

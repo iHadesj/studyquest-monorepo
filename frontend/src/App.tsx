@@ -37,28 +37,67 @@ import {
   RankingButton,
 } from './style/globalStyle';
 import { House, Trophy, Users } from 'phosphor-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { socket } from './services/socket';
 import { api } from './services/api';
 import toast, { Toaster } from 'react-hot-toast';
 import { calculateLevelInfo } from './style/level';
 import { RankingPage } from './pages/Ranking';
 import { FriendsList } from './components/FriendsList';
+import { AuroraBackground } from './components/AuroraBackground';
+import { theme } from './style/theme';
+import { pageTransition } from './style/motion';
 
 type SubjectInfo = Omit<Materia, 'niveis'>;
 export type GamePlayer = { tag: string; score: number };
 
 const GlobalStyle = createGlobalStyle`
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
   body {
     margin: 0;
-    font-family: 'Fira Code', monospace;
-    scrollbar-color: #5865f2 #202225;
+    font-family: ${theme.font.mono};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    -webkit-user-select: none; 
-    -ms-user-select: none; 
-    user-select: none; 
-    background-color: #36393f;
-    color: #dcddde;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: ${theme.color.bg};
+    color: ${theme.color.text};
+  }
+
+  ::selection {
+    background: rgba(124, 92, 255, 0.35);
+    color: #fff;
+  }
+
+  /* Scrollbar combinando com o resto da interface. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: ${theme.color.primary} transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: rgba(124, 92, 255, 0.45);
+    border-radius: ${theme.radius.pill};
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(124, 92, 255, 0.7);
+    background-clip: content-box;
+  }
+
+  button {
+    font-family: inherit;
   }
 `;
 
@@ -268,18 +307,36 @@ export default function App() {
     setTimeout(() => setViewedUser(null), 300);
   };
 
+  // As telas anteriores ao app (loading, login, setup) saem antes do shell,
+  // então precisam trazer o GlobalStyle e o fundo animado por conta própria.
   if (isInitializing) {
     return (
-      <LoadingContainer>
-        <LoadingSpinner />
-      </LoadingContainer>
+      <>
+        <GlobalStyle />
+        <AuroraBackground />
+        <LoadingContainer style={{ background: 'transparent' }}>
+          <LoadingSpinner />
+        </LoadingContainer>
+      </>
     );
   }
   if (!firebaseUser) {
-    return <AuthPage />;
+    return (
+      <>
+        <GlobalStyle />
+        <AuroraBackground />
+        <AuthPage />
+      </>
+    );
   }
   if (!currentUserStoreData.username) {
-    return <ProfileSetup />;
+    return (
+      <>
+        <GlobalStyle />
+        <AuroraBackground />
+        <ProfileSetup />
+      </>
+    );
   }
 
   const renderScreen = (): JSX.Element => {
@@ -359,19 +416,44 @@ export default function App() {
   return (
     <>
       <GlobalStyle />
+      <AuroraBackground />
       <Toaster
         position="top-center"
-        toastOptions={{ style: { background: '#333', color: '#fff' } }}
+        toastOptions={{
+          style: {
+            background: 'rgba(24, 24, 40, 0.92)',
+            color: theme.color.text,
+            border: `1px solid ${theme.color.strokeStrong}`,
+            borderRadius: theme.radius.md,
+            backdropFilter: 'blur(14px)',
+            fontFamily: theme.font.mono,
+            fontSize: '0.88rem',
+          },
+        }}
       />
       <BarWrapper>
         <TopBar onClick={handleOpenMyProfile} />
       </BarWrapper>
       <AppContainer>
-        <MainContent>{renderScreen()}</MainContent>
+        <MainContent>
+          {/* Cada tela entra e sai com a mesma transição; a key é o que diz
+              ao AnimatePresence que houve troca de página. */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={screen}
+              variants={pageTransition}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              {renderScreen()}
+            </motion.div>
+          </AnimatePresence>
+        </MainContent>
       </AppContainer>
       <Footer>
         <FooterWrapper>
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
             <RankingButton onClick={() => setScreen('ranking')}>
               <Trophy weight="bold" /> Ranking
             </RankingButton>

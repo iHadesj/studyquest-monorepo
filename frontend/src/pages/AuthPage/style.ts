@@ -1,4 +1,5 @@
 import styled, { keyframes } from 'styled-components';
+import { theme } from '../../style/theme';
 
 // --- 1. ESTILOS (Toda a parte de Styled Components) ---
 export const fadeIn = keyframes`
@@ -12,47 +13,90 @@ export const fadeIn = keyframes`
   }
 `;
 
+const cardIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+`;
+
+const iconFloat = keyframes`
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+`;
+
+const iconGlow = keyframes`
+  0%, 100% { box-shadow: 0 0 0 0 rgba(124, 92, 255, 0.5), ${theme.shadow.md}; }
+  50%      { box-shadow: 0 0 0 14px rgba(124, 92, 255, 0), ${theme.shadow.md}; }
+`;
+
+/* O container é transparente: o AuroraBackground é quem pinta o fundo. */
 export const AuthContainer = styled.div`
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  /* NOVO: Fundo principal mais escuro, quase preto com um toque de azul/roxo */
-  background-color: #171c26; /* Cor bem escura da ref */
+  padding: 1.5rem;
 `;
 
 export const AuthBox = styled.div`
-  /* NOVO: Fundo do card de login, mais claro que o container, mas ainda escuro */
-  background-color: #202736; /* Cor do card da ref */
-  padding: 3.5rem 3rem; /* Aumentar o padding pra ficar mais espaçoso */
-  border-radius: 8px;
-  margin: 1rem;
+  position: relative;
+  background: linear-gradient(
+    160deg,
+    rgba(30, 30, 48, 0.82) 0%,
+    rgba(16, 16, 28, 0.88) 100%
+  );
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  border: 1px solid ${theme.color.strokeStrong};
+  padding: 3rem 2.75rem;
+  border-radius: ${theme.radius.xl};
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   text-align: center;
-  /* NOVO: Sombra mais sutil e discreta, para dar leve elevação */
-  box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.4);
-  /* REMOVIDO: Borda, a ref não tem */
+  box-shadow: ${theme.shadow.lg};
+  animation: ${cardIn} 0.6s ${theme.ease.out};
+
+  /* Fio de luz no topo do card. */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 12%;
+    right: 12%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      ${theme.color.primarySoft},
+      transparent
+    );
+  }
+
+  @media (max-width: 480px) {
+    padding: 2.25rem 1.5rem;
+  }
 `;
 
-// O Logo deve vir de um SVG ou IMG, não de um IconContainer com cor sólida
 export const LogoContainer = styled.div`
-  margin-bottom: 2.5rem; /* Espaço maior entre o logo e o formulário */
-  /* Se você tiver o SVG do logo, coloque ele aqui diretamente */
-  /* Por exemplo: <img src="/path/to/gratify-logo.svg" alt="Gratify Logo" /> */
-  /* Placeholder para o logo se não tiver imagem: */
-  font-family: 'Montserrat', sans-serif; /* Usar uma fonte mais clean */
+  margin-bottom: 2.5rem;
   font-size: 2.5rem;
   font-weight: 700;
-  color: #e0e6ed; /* Cor clara para o texto do logo */
+  color: ${theme.color.text};
   letter-spacing: -0.05em;
 `;
 
 export const Form = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 1.25rem; /* Espaçamento entre os campos, um pouco mais apertado */
-  animation: ${fadeIn} 0.5s ease-in-out;
+  gap: 1.1rem;
+  animation: ${fadeIn} 0.5s ${theme.ease.out};
 `;
 
 export const InputWrapper = styled.div`
@@ -62,101 +106,110 @@ export const InputWrapper = styled.div`
 
 export const InputLabel = styled.label`
   position: absolute;
-  top: -10px; /* Posição acima do input */
+  top: -10px;
   left: 10px;
-  background: #202736; /* Cor do fundo do card para cobrir a linha do input */
+  background: ${theme.color.bgRaised};
   padding: 0 5px;
-  color: #aeb8c9; /* Cor do texto do label */
-  font-size: 0.75rem; /* Tamanho da fonte menor */
+  color: ${theme.color.textMuted};
+  font-size: 0.75rem;
   pointer-events: none;
   z-index: 1;
 `;
 
 export const Input = styled.input`
   width: 100%;
-  padding: 1rem 0.75rem; /* Padding maior pra alinhar com a ref */
+  padding: 0.95rem 1rem;
   box-sizing: border-box;
-  background-color: #2a3243; /* Cor do background do input, mais escuro */
-  border: 1px solid #3c4456; /* Borda sutil nos inputs */
-  border-radius: 4px;
-  color: #e0e6ed; /* Cor do texto no input */
-  font-family: 'Inter', sans-serif; /* Font mais clean */
-  font-size: 0.95rem; /* Tamanho da fonte dos inputs */
-  transition: border-color 0.2s, box-shadow 0.2s;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid ${theme.color.stroke};
+  border-radius: ${theme.radius.md};
+  color: ${theme.color.text};
+  font-family: ${theme.font.mono};
+  font-size: 0.92rem;
+  transition: border-color 220ms ease, box-shadow 220ms ease,
+    background 220ms ease;
 
   &:focus {
     outline: none;
-    border-color: #5865f2; /* Sua cor primária ao focar */
-    box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.3); /* Um leve glow ao focar */
+    border-color: ${theme.color.primary};
+    background: rgba(0, 0, 0, 0.42);
+    box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.18);
   }
 
   &::placeholder {
-    color: #5c677f; /* Cor do placeholder mais discreta */
+    color: ${theme.color.textFaint};
   }
 `;
 
 export const PasswordToggleButton = styled.button`
   position: absolute;
-  right: 15px; /* Ajuste a posição para não cortar o ícone */
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #aeb8c9; /* Cor mais clara para o ícone */
+  color: ${theme.color.textMuted};
   cursor: pointer;
   padding: 0.5rem;
   display: flex;
   align-items: center;
-  z-index: 2; /* Para garantir que fique acima do label */
+  z-index: 2;
+  transition: color 200ms ease, transform 220ms ${theme.ease.bounce};
+
   &:hover {
-    color: #5865f2;
+    color: ${theme.color.primarySoft};
+    transform: translateY(-50%) scale(1.15);
   }
 `;
 
 export const Button = styled.button`
-  background-color: #5865f2; /* Sua cor primária */
+  position: relative;
+  overflow: hidden;
+  background: ${theme.gradient.primary};
   color: #ffffff;
-  font-family: 'Inter', sans-serif;
-  font-weight: 600; /* Um pouco mais encorpado */
-  padding: 1rem; /* Padding maior pro botão */
-  border-radius: 4px;
-  font-size: 1rem;
+  font-family: ${theme.font.mono};
+  font-weight: 800;
+  padding: 0.95rem;
+  border-radius: ${theme.radius.pill};
+  font-size: 0.98rem;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  margin-top: 0.35rem;
+  box-shadow: 0 10px 28px rgba(124, 92, 255, 0.32);
+  transition: transform 240ms ${theme.ease.bounce}, box-shadow 240ms ease,
+    filter 240ms ease;
 
   &:hover {
-    background-color: #4f5bd5; /* Um tom ligeiramente mais escuro no hover */
-    transform: translateY(-2px); /* Leve levantada */
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-3px);
+    filter: brightness(1.08);
+    box-shadow: 0 14px 36px rgba(124, 92, 255, 0.45);
   }
   &:active {
-    transform: translateY(0);
-    box-shadow: none;
+    transform: translateY(0) scale(0.98);
   }
 `;
 
 export const ToggleText = styled.p`
-  color: #aeb8c9; /* Cor mais clara para links e textos de ação */
+  color: ${theme.color.textMuted};
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   margin-top: 1.5rem;
-  /* NOVO: Link 'forgot password' */
-  text-decoration: none; /* Remover underline padrão */
+  text-decoration: none;
+  transition: color 200ms ease;
+
   &:hover {
-    color: #e0e6ed; /* Fica mais claro no hover */
-    text-decoration: underline; /* Adicionar underline no hover */
+    color: ${theme.color.primarySoft};
   }
 `;
 
 export const MessageText = styled.p`
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   margin-top: 1rem;
   min-height: 1.2em;
 `;
 
 export const IconContainer = styled.div`
-  background-color: #5865f2;
+  background: ${theme.gradient.primary};
   width: 70px;
   height: 70px;
   border-radius: 50%;
@@ -164,13 +217,19 @@ export const IconContainer = styled.div`
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.5rem auto;
-  box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
+  animation: ${iconFloat} 5s ease-in-out infinite,
+    ${iconGlow} 3s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    box-shadow: ${theme.shadow.md};
+  }
 `;
 
 export const ErrorText = styled(MessageText)`
-  color: #e65252; /* Um vermelho de erro mais alinhado ao tema escuro */
+  color: ${theme.color.danger};
 `;
 
 export const SuccessText = styled(MessageText)`
-  color: #43b581;
+  color: ${theme.color.success};
 `;

@@ -1,130 +1,27 @@
-import { useState, useEffect } from 'react';
-import styled, { keyframes, css } from 'styled-components';
+import { useState, useEffect, useMemo } from 'react';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { motion } from 'framer-motion';
 import { db, auth } from '../../config/firebase';
-import { BackButton, Title } from '../../style/globalStyle';
-import { Crown } from 'phosphor-react';
+import {
+  BackButton,
+  LoadingSpinner,
+  Subtitle,
+  Title,
+} from '../../style/globalStyle';
+import { Crown as CrownIcon, Trophy } from 'phosphor-react';
 import type { FirestoreUserData } from '../../hooks/useProgressStore';
 import type { UserProfileData } from '../../interfaces';
-import { Avatar as BaseAvatar } from '../../style/globalStyle';
+import { calculateLevelInfo } from '../../style/level';
+import { fadeUp, popIn, spring, staggerContainer } from '../../style/motion';
+import * as S from './style';
 
-const neonGold = keyframes`
-  0%, 100% { box-shadow: 0 0 3px #f1c40f, 0 0 6px #f1c40f, 0 0 9px #f1c40f; }
-  50% { box-shadow: 0 0 6px #f1c40f, 0 0 18px #f1c40f, 0 0 6px #f1c40f; }
-`;
+const DEV_TAG = 'Edu.dev#8636';
+const MEDALS = ['gold', 'silver', 'bronze'] as const;
 
-const neonSilver = keyframes`
-  0%, 100% { box-shadow: 0 0 3px #c0c0c0, 0 0 6px #c0c0c0, 0 0 9px #c0c0c0; }
-  50% { box-shadow: 0 0 6px #c0c0c0, 0 0 18px #c0c0c0, 0 0 6px #c0c0c0; }
-`;
-
-const neonBronze = keyframes`
-  0%, 100% { box-shadow: 0 0 3px #cd7f32, 0 0 6px #cd7f32, 0 0 9px #cd7f32; }
-  50% { box-shadow: 0 0 6px #cd7f32, 0 0 18px #cd7f32, 0 0 6px #cd7f32; }
-`;
-
-const RankingContainer = styled.div`
-  max-width: 600px;
-  margin: 0 auto;
-`;
-
-const UserRow = styled.div<{ rank: number; isCurrentUser: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: ${(props) => (props.isCurrentUser ? '#3a3e45' : '#2f3136')};
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin-bottom: 0.75rem;
-  transition: transform 0.2s ease-in-out;
-  border: 2px solid
-    ${(props) => (props.isCurrentUser ? '#5865f2' : 'transparent')};
-  cursor: pointer;
-
-  animation: ${(props) => {
-    if (props.rank === 1)
-      return css`
-        ${neonGold} 2s ease-in-out infinite
-      `;
-    if (props.rank === 2)
-      return css`
-        ${neonSilver} 2.2s ease-in-out infinite
-      `;
-    if (props.rank === 3)
-      return css`
-        ${neonBronze} 2.4s ease-in-out infinite
-      `;
-    return 'none';
-  }};
-
-  &:hover {
-    transform: scale(1.02);
-  }
-`;
-
-const Rank = styled.div`
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #ffffff;
-  width: 50px;
-  text-align: center;
-`;
-
-export const Avatar = styled(BaseAvatar)`
-  width: 40px;
-  height: 40px;
-  border: 4px solid #4f545c;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-`;
-
-const UserInfo = styled.div`
-  flex-grow: 1;
-`;
-
-const Username = styled.p`
-  font-weight: bold;
-  color: #ffffff;
-  margin: 0;
-`;
-
-const UserStats = styled.p`
-  color: #b9bbbe;
-  margin: 0;
-  font-size: 0.875rem;
-`;
-
-const spin = keyframes`
-  to { transform: rotate(360deg); }
-`;
-
-const LoadingSpinner = styled.div`
-  border: 4px solid rgba(255, 255, 255, 0.2);
-  border-left-color: #5865f2;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: ${spin} 1s linear infinite;
-`;
-
-const CenteredContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 5rem 0;
-  text-align: center;
-  color: #b9bbbe;
-`;
-
-function calculateLevel(xp: number): number {
-  let level = 1;
-  let xpForNextLevel = 150;
-  while (xp >= xpForNextLevel) {
-    level++;
-    xpForNextLevel += 150 * level;
-  }
-  return level;
-}
+const avatarFor = (user: UserProfileData) =>
+  user.fullTag === DEV_TAG
+    ? '/Light.jpg'
+    : `https://api.dicebear.com/8.x/pixel-art/svg?seed=${user.avatarSeed}`;
 
 interface RankingPageProps {
   onBack: () => void;
@@ -149,7 +46,8 @@ export const RankingPage = ({ onBack, onViewProfile }: RankingPageProps) => {
             return {
               ...data,
               uid: doc.id,
-              level: calculateLevel(data.xp || 0),
+              xp: data.xp || 0,
+              level: calculateLevelInfo(data.xp || 0).level,
               rank: index + 1,
             };
           }
@@ -168,69 +66,165 @@ export const RankingPage = ({ onBack, onViewProfile }: RankingPageProps) => {
     fetchRanking();
   }, []);
 
+  // O XP do líder vira a régua das barrinhas de cada linha.
+  const topXp = useMemo(
+    () => Math.max(1, ...ranking.map((u) => u.xp ?? 0)),
+    [ranking]
+  );
+
+  const podium = ranking.slice(0, 3);
+  const rest = ranking.slice(3);
+
+  // Ordem visual do pódio: prata, ouro, bronze — com o ouro no meio e no alto.
+  const podiumOrder = [podium[1], podium[0], podium[2]];
+
   if (isLoading) {
     return (
-      <CenteredContainer>
+      <S.CenteredContainer>
         <LoadingSpinner />
-      </CenteredContainer>
+        <p>Montando o ranking...</p>
+      </S.CenteredContainer>
     );
   }
 
   if (error) {
     return (
-      <CenteredContainer>
-        <p style={{ color: '#ed4245' }}>{error}</p>
-        <BackButton onClick={onBack} style={{ marginTop: '1rem' }}>
-          &larr; Voltar
-        </BackButton>
-      </CenteredContainer>
+      <S.CenteredContainer>
+        <p style={{ color: '#FB7185' }}>{error}</p>
+        <BackButton onClick={onBack}>&larr; Voltar</BackButton>
+      </S.CenteredContainer>
     );
   }
 
   return (
-    <RankingContainer>
+    <S.RankingContainer>
       <BackButton onClick={onBack}>&larr; Voltar</BackButton>
-      <Title
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '1rem',
-        }}
-      >
-        <Crown size={32} weight="fill" /> Ranking Global
-      </Title>
+
+      <S.TitleRow>
+        <Trophy size={32} weight="fill" />
+        <Title style={{ marginBottom: 0, paddingBottom: 0 }}>
+          Ranking Global
+        </Title>
+      </S.TitleRow>
+      <Subtitle style={{ marginBottom: 0 }}>
+        Os 50 estudantes com mais XP na plataforma.
+      </Subtitle>
+
       {ranking.length === 0 ? (
-        <CenteredContainer>
+        <S.CenteredContainer>
           <p>O ranking ainda está vazio. Seja o primeiro a marcar pontos!</p>
-        </CenteredContainer>
+        </S.CenteredContainer>
       ) : (
-        ranking.map((user, index) => {
-          const devTag = 'Edu.dev#8636';
-          const avatarSrc =
-            user.fullTag === devTag
-              ? '/Light.jpg'
-              : `https://api.dicebear.com/8.x/pixel-art/svg?seed=${user.avatarSeed}`;
-          return (
-            <UserRow
-              key={user.uid}
-              rank={index + 1}
-              isCurrentUser={user.uid === auth.currentUser?.uid}
-              onClick={() => onViewProfile(user)}
-            >
-              <Rank>#{index + 1}</Rank>
-              <Avatar src={avatarSrc} alt={user.username || 'Avatar'} />
-              <UserInfo>
-                <Username>{user.username}</Username>
-                <UserStats>
-                  Nível {user.level} - {(user.xp ?? 0).toLocaleString('pt-BR')}{' '}
-                  XP
-                </UserStats>
-              </UserInfo>
-            </UserRow>
-          );
-        })
+        <>
+          <S.Podium
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer(0.14, 0.1)}
+          >
+            {podiumOrder.map((user, i) => {
+              if (!user) return <div key={`empty-${i}`} />;
+
+              // podiumOrder é [prata, ouro, bronze]; o índice real vem do rank.
+              const place = (user.rank ?? 1) - 1;
+              const medal = MEDALS[place] ?? 'bronze';
+
+              return (
+                <S.PodiumSlot
+                  key={user.uid}
+                  $medal={medal}
+                  variants={popIn}
+                  whileHover={{ y: -6 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={spring}
+                  onClick={() => onViewProfile(user)}
+                >
+                  {medal === 'gold' && (
+                    <S.Crown
+                      initial={{ y: -14, opacity: 0, rotate: -20 }}
+                      animate={{ y: 0, opacity: 1, rotate: 0 }}
+                      transition={{ ...spring, delay: 0.45 }}
+                    >
+                      <CrownIcon size={26} weight="fill" />
+                    </S.Crown>
+                  )}
+
+                  <S.PodiumAvatar
+                    $medal={medal}
+                    src={avatarFor(user)}
+                    alt={user.username || 'Avatar'}
+                  />
+
+                  <S.PodiumName>{user.username}</S.PodiumName>
+                  <S.PodiumXp $medal={medal}>
+                    {(user.xp ?? 0).toLocaleString('pt-BR')} XP
+                  </S.PodiumXp>
+
+                  <S.PodiumBlock $medal={medal}>
+                    <motion.span
+                      className="place"
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ ...spring, delay: 0.3 }}
+                    >
+                      {place + 1}
+                    </motion.span>
+                  </S.PodiumBlock>
+                </S.PodiumSlot>
+              );
+            })}
+          </S.Podium>
+
+          <S.List
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer(0.04, 0.5)}
+          >
+            {rest.map((user) => {
+              const isCurrentUser = user.uid === auth.currentUser?.uid;
+              const pct = Math.round(((user.xp ?? 0) / topXp) * 100);
+
+              return (
+                <S.UserRow
+                  key={user.uid}
+                  $isCurrentUser={isCurrentUser}
+                  variants={fadeUp}
+                  whileHover={{ x: 6 }}
+                  whileTap={{ scale: 0.99 }}
+                  transition={spring}
+                  onClick={() => onViewProfile(user)}
+                >
+                  <S.Rank>#{user.rank}</S.Rank>
+                  <S.Avatar
+                    src={avatarFor(user)}
+                    alt={user.username || 'Avatar'}
+                  />
+                  <S.UserInfo>
+                    <S.Username>
+                      {user.username}
+                      {isCurrentUser && <span>VOCÊ</span>}
+                    </S.Username>
+                    <S.UserStats>
+                      <S.LevelPill>Nv {user.level}</S.LevelPill>
+                      <S.XpTrack>
+                        <S.XpFill
+                          initial={{ width: 0 }}
+                          animate={{ width: `${pct}%` }}
+                          transition={{
+                            duration: 0.8,
+                            ease: [0.22, 1, 0.36, 1],
+                            delay: 0.6,
+                          }}
+                        />
+                      </S.XpTrack>
+                      <span>{(user.xp ?? 0).toLocaleString('pt-BR')} XP</span>
+                    </S.UserStats>
+                  </S.UserInfo>
+                </S.UserRow>
+              );
+            })}
+          </S.List>
+        </>
       )}
-    </RankingContainer>
+    </S.RankingContainer>
   );
 };

@@ -1,4 +1,5 @@
 import styled, { keyframes } from 'styled-components';
+import { theme } from './theme';
 
 const fadeIn = keyframes`
   from {
@@ -14,28 +15,37 @@ const fadeIn = keyframes`
 const scaleIn = keyframes`
   from {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.94) translateY(8px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
   }
 `;
 
+const sheenSweep = keyframes`
+  0%   { transform: translateX(-120%) skewX(-20deg); }
+  100% { transform: translateX(260%) skewX(-20deg); }
+`;
+
+const titleShift = keyframes`
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+`;
+
+/* O container é transparente: quem pinta o fundo é o AuroraBackground. */
 export const AppContainer = styled.div`
-  background-color: #36393f;
-  color: #dcddde;
+  position: relative;
+  z-index: 1;
+  color: ${theme.color.text};
   padding: 2rem;
-  padding-top: 5rem;
+  padding-top: 6rem;
   min-height: 100vh;
-  font-family: 'Fira Code', monospace;
-  padding-bottom: 5rem;
+  font-family: ${theme.font.mono};
+  padding-bottom: 6rem;
 
   @media (max-width: 480px) {
-    padding-top: 0rem;
-    padding-bottom: 0rem;
-
-    padding: 6rem 2.5rem 6rem 2.5rem;
+    padding: 6rem 1.25rem;
     min-height: 100vh;
   }
 `;
@@ -44,7 +54,7 @@ export const FooterWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
+  max-width: ${theme.layout.maxWidth};
   margin: 0 auto;
   width: 100%;
   position: relative;
@@ -53,7 +63,7 @@ export const FooterWrapper = styled.div`
     font-size: 0.875rem;
   }
   a {
-    color: #5865f2;
+    color: ${theme.color.primarySoft};
     text-decoration: none;
     &:hover {
       text-decoration: underline;
@@ -74,47 +84,91 @@ export const HomeButton = styled.button`
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  background-color: #5865f2;
-  color: white;
+  background: ${theme.gradient.primary};
+  color: #fff;
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 46px;
+  height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  box-shadow: ${theme.shadow.glowPrimary};
+  transition: transform 220ms ${theme.ease.bounce}, box-shadow 220ms ease;
 
   &:hover {
-    background-color: #4f5bd5;
+    transform: translate(-50%, -50%) scale(1.12) rotate(-6deg);
+    box-shadow: 0 0 0 1px rgba(124, 92, 255, 0.5),
+      0 12px 40px rgba(124, 92, 255, 0.45);
+  }
+  &:active {
+    transform: translate(-50%, -50%) scale(0.95);
   }
 
   @media (max-width: 480px) {
     position: static;
     transform: none;
-    margin: 0 1rem;
+    margin: 0 0.5rem;
+    &:hover {
+      transform: scale(1.12) rotate(-6deg);
+    }
   }
 `;
 
 const FooterButton = styled.button`
-  background: none;
-  border: none;
-  color: #b9bbbe;
+  position: relative;
+  background: ${theme.color.glass};
+  border: 1px solid ${theme.color.stroke};
+  color: ${theme.color.textMuted};
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: 'Fira Code', monospace;
-  font-size: 1rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: ${theme.radius.pill};
+  font-family: ${theme.font.mono};
+  font-size: 0.9rem;
+  font-weight: 600;
+  overflow: hidden;
+  transition: color 200ms ease, border-color 200ms ease,
+    transform 220ms ${theme.ease.bounce}, background 200ms ease;
+
+  svg {
+    transition: transform 260ms ${theme.ease.bounce};
+  }
+
   &:hover {
-    color: #ffffff;
+    color: #fff;
+    background: ${theme.color.glassStrong};
+    border-color: ${theme.color.strokeStrong};
+    transform: translateY(-2px);
+    svg {
+      transform: scale(1.18) rotate(-8deg);
+    }
+  }
+  &:active {
+    transform: translateY(0) scale(0.97);
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem 0.85rem;
   }
 `;
 
-export const RankingButton = styled(FooterButton)``;
+export const RankingButton = styled(FooterButton)`
+  &:hover {
+    color: ${theme.color.gold};
+    border-color: rgba(245, 197, 66, 0.4);
+  }
+`;
 
-export const FriendsButton = styled(FooterButton)``;
+export const FriendsButton = styled(FooterButton)`
+  &:hover {
+    color: ${theme.color.cyan};
+    border-color: rgba(34, 211, 238, 0.4);
+  }
+`;
 
 export const spin = keyframes`
   to {
@@ -123,12 +177,24 @@ export const spin = keyframes`
 `;
 
 export const LoadingSpinner = styled.div`
-  border: 4px solid rgba(255, 255, 255, 0.2);
-  border-left-color: #5865f2;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: ${spin} 1s linear infinite;
+  /* Anel em gradiente: cor sólida girando parece um GIF de 2012. */
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    ${theme.color.primary} 45%,
+    ${theme.color.cyan} 75%,
+    transparent 100%
+  );
+  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 0);
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 4px),
+    #000 0
+  );
+  animation: ${spin} 0.9s linear infinite;
 `;
 
 export const LoadingContainer = styled.div`
@@ -137,78 +203,92 @@ export const LoadingContainer = styled.div`
   align-items: center;
   height: 100vh;
   width: 100%;
-  background-color: #36393f;
+  background-color: ${theme.color.bg};
 `;
 
 export const MainContent = styled.div`
-  max-width: 1280px;
+  max-width: ${theme.layout.maxWidth};
   margin: 0 auto;
-  animation: ${fadeIn} 0.4s ease-in-out;
 `;
 
 export const Avatar = styled.img`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #2f3136;
-  border: 2px solid #40444b;
+  background-color: ${theme.color.bgRaised};
+  border: 2px solid ${theme.color.stroke};
   object-fit: cover;
 `;
 
 export const BackButton = styled.button`
   position: relative;
-  background: none;
-  border: none;
-  color: #b9bbbe;
+  background: ${theme.color.glass};
+  border: 1px solid ${theme.color.stroke};
+  color: ${theme.color.textMuted};
   margin-bottom: 1.5rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: ${theme.radius.pill};
   cursor: pointer;
-  font-family: 'Fira Code', monospace;
-  font-size: 1rem;
-  font-weight: bold;
-  transition: color 0.2s ease-in-out;
+  font-family: ${theme.font.mono};
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: color 200ms ease, transform 220ms ${theme.ease.bounce},
+    background 200ms ease, border-color 200ms ease;
+
   &:hover {
-    color: #ffffff;
+    color: #fff;
+    background: ${theme.color.glassStrong};
+    border-color: ${theme.color.strokeStrong};
+    transform: translateX(-4px);
+  }
+  &:active {
+    transform: translateX(-4px) scale(0.97);
   }
 `;
 
 export const Title = styled.h1`
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #ffffff;
+  font-size: clamp(1.9rem, 4.5vw, 2.8rem);
+  font-weight: 800;
   margin-bottom: 0.5rem;
   text-align: center;
-  border-bottom: 2px solid #40444b;
   padding-bottom: 0.5rem;
-  letter-spacing: -1px;
-  animation: ${fadeIn} 0.5s ease-out;
-  @media (max-width: 480px) {
-    font-size: 1.7rem;
-    margin-top: 2rem;
+  letter-spacing: -1.4px;
+  /* Gradiente animado no texto, em vez de branco chapado. */
+  background: linear-gradient(
+    100deg,
+    ${theme.color.text} 0%,
+    ${theme.color.primarySoft} 30%,
+    ${theme.color.cyan} 55%,
+    ${theme.color.text} 85%
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: ${titleShift} 9s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
   }
 `;
 
 export const TitleExercise = styled.h1`
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #ffffff;
+  font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+  font-weight: 800;
+  color: ${theme.color.text};
   margin-bottom: 0.5rem;
   text-align: center;
-  border-bottom: 2px solid #40444b;
   padding-bottom: 0.5rem;
   letter-spacing: -1px;
-  animation: ${fadeIn} 0.5s ease-out;
-
-  @media (max-width: 480px) {
-    font-size: 1.2rem;
-  }
+  animation: ${fadeIn} 0.5s ${theme.ease.out};
 `;
 
 export const Subtitle = styled.p`
-  font-size: 1.1rem;
-  color: #b9bbbe;
+  font-size: 1.05rem;
+  color: ${theme.color.textMuted};
   margin-bottom: 2rem;
   text-align: center;
-  animation: ${fadeIn} 0.5s ease-out 0.2s;
+  animation: ${fadeIn} 0.5s ${theme.ease.out} 0.12s;
   animation-fill-mode: backwards;
 `;
 
@@ -217,28 +297,29 @@ export const BarWrapper = styled.div`
   top: 0;
   left: 0;
   right: 0;
-  background-color: #202225;
-  padding: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  background: rgba(11, 11, 20, 0.72);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  padding: 0.65rem 1rem;
   z-index: 50;
-  border-bottom: 1px solid #2f3136;
+  border-bottom: 1px solid ${theme.color.stroke};
 `;
 
 export const XPDisplay = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #5865f2;
+  background: ${theme.gradient.primary};
   color: white;
   font-weight: bold;
   padding: 0.25rem 1rem;
-  border-radius: 4px;
+  border-radius: ${theme.radius.pill};
   margin: 0 auto;
   width: fit-content;
 `;
 
 export const LevelSelectorWrapper = styled.div`
-  max-width: 42rem;
+  max-width: 46rem;
   margin: 0 auto;
   margin-top: 2rem;
 `;
@@ -250,36 +331,66 @@ export const LevelList = styled.div`
 `;
 
 export const LevelButton = styled.button`
+  position: relative;
   width: 100%;
   padding: 1.5rem;
-  border-radius: 4px;
-  border: 1px solid #40444b;
+  border-radius: ${theme.radius.lg};
+  border: 1px solid ${theme.color.stroke};
   text-align: left;
-  transition: all 0.2s ease-in-out;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: ${(props) =>
-    props.disabled ? 'rgba(47, 49, 54, 0.3)' : '#2f3136'};
-  color: ${(props) => (props.disabled ? '#72767d' : '#dcddde')};
+  overflow: hidden;
+  background: ${(props) =>
+    props.disabled ? 'rgba(255,255,255,0.02)' : theme.color.glass};
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: ${(props) =>
+    props.disabled ? theme.color.textFaint : theme.color.text};
   cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
+  transition: transform 260ms ${theme.ease.bounce}, border-color 220ms ease,
+    background 220ms ease, box-shadow 220ms ease;
+
+  /* Faixa de destaque que cresce na lateral esquerda no hover. */
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    border-radius: 0 3px 3px 0;
+    background: ${theme.gradient.primary};
+    transition: height 300ms ${theme.ease.out};
+  }
 
   &:hover {
-    background-color: ${(props) => !props.disabled && '#40444b'};
-    border-color: #5c5c5c;
-    transform: ${(props) => !props.disabled && 'scale(1.02)'};
+    background: ${(props) => !props.disabled && theme.color.glassStrong};
+    border-color: ${(props) =>
+      !props.disabled ? 'rgba(124, 92, 255, 0.4)' : theme.color.stroke};
+    transform: ${(props) => !props.disabled && 'translateY(-3px)'};
+    box-shadow: ${(props) => !props.disabled && theme.shadow.md};
+    &::before {
+      height: ${(props) => (props.disabled ? '0' : '62%')};
+    }
   }
+  &:active {
+    transform: ${(props) => !props.disabled && 'translateY(-1px) scale(0.995)'};
+  }
+
   h2 {
-    font-family: 'Fira Code', monospace;
-    font-size: 1.5rem;
-    font-weight: bold;
+    font-family: ${theme.font.mono};
+    font-size: 1.4rem;
+    font-weight: 700;
     margin: 0;
+    letter-spacing: -0.5px;
   }
   p {
-    font-family: 'Fira Code', monospace;
-    font-size: 0.875rem;
-    color: #43b581;
-    margin: 0.25rem 0 0 0;
+    font-family: ${theme.font.mono};
+    font-size: 0.85rem;
+    color: ${theme.color.success};
+    margin: 0.35rem 0 0 0;
   }
 `;
 
@@ -289,60 +400,72 @@ export const LessonWrapper = styled.div`
 `;
 
 export const ContentBox = styled.div`
-  background-color: #2f3136;
-  padding: 1.5rem;
-  border-radius: 4px;
-  border: 1px solid #40444b;
+  background: ${theme.color.glass};
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 1.75rem;
+  border-radius: ${theme.radius.lg};
+  border: 1px solid ${theme.color.stroke};
   margin-bottom: 2rem;
+  box-shadow: ${theme.shadow.md};
 `;
 
 export const ExerciseBox = styled.div<{
   $hasMarginTop?: boolean;
 }>`
-  background-color: #2f3136;
-  border: 1px solid #40444b;
-  padding: 1.5rem;
+  background: ${theme.color.glass};
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid ${theme.color.stroke};
+  padding: 1.75rem;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  border-radius: ${theme.radius.lg};
+  box-shadow: ${theme.shadow.md};
+  transition: box-shadow 260ms ease, border-color 260ms ease;
 
-  border-radius: 4px;
-  transition: box-shadow 0.2s ease-in-out;
   &:hover {
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-color: ${theme.color.strokeStrong};
+    box-shadow: ${theme.shadow.lg};
   }
 
   @media (max-width: 480px) {
-    margin-top: ${(props) => (props.$hasMarginTop ? '7rem' : '0')};
+    margin-top: ${(props) => (props.$hasMarginTop ? '2rem' : '0')};
+    padding: 1.25rem;
   }
 `;
 
 export const QuestionText = styled.p`
-  font-size: 1rem;
-  font-weight: bold;
+  font-size: 1.05rem;
+  font-weight: 700;
   user-select: none;
   margin: 0 0 1rem 0;
-  line-height: 1.5;
-  color: #ffffff;
+  line-height: 1.6;
+  color: ${theme.color.text};
 
   @media (max-width: 480px) {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
   }
 `;
 
 export const OptionLabel = styled.label`
   display: flex;
   align-items: center;
-  padding: 0.75rem;
-  background-color: #36393f;
-  border-radius: 4px;
-  font-size: 0.8rem;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: ${theme.radius.md};
+  font-size: 0.9rem;
   user-select: none;
-  border: 1px solid #40444b;
+  border: 1px solid ${theme.color.stroke};
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: background 200ms ease, border-color 200ms ease,
+    transform 200ms ${theme.ease.out};
+
   &:hover {
-    background-color: #40444b;
+    background: ${theme.color.glassStrong};
+    border-color: rgba(124, 92, 255, 0.45);
+    transform: translateX(4px);
   }
 `;
 
@@ -351,115 +474,156 @@ export const RadioInput = styled.input`
   width: 1rem;
   height: 1rem;
   user-select: none;
-  accent-color: #5865f2;
-  @media (max-width: 480px) {
-    font-size: 0.7rem;
-  }
+  accent-color: ${theme.color.primary};
 `;
 
 export const TextInput = styled.input`
   width: 90%;
-  padding: 0.75rem;
-  background-color: #202225;
-  border: 1px solid #40444b;
-  border-radius: 4px;
-  color: #dcddde;
-  font-family: 'Fira Code', monospace;
-  font-size: 1.1rem;
-  transition: border-color 0.2s ease-in-out;
+  padding: 0.85rem 1rem;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid ${theme.color.stroke};
+  border-radius: ${theme.radius.md};
+  color: ${theme.color.text};
+  font-family: ${theme.font.mono};
+  font-size: 1rem;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+
+  &::placeholder {
+    color: ${theme.color.textFaint};
+  }
   &:focus {
     outline: none;
-    border-color: #5865f2;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 0.8rem;
+    border-color: ${theme.color.primary};
+    box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.18);
   }
 `;
 
 export const SubmitButton = styled.button`
-  background-color: ${(props) => (props.disabled ? '#40444b' : '#43b581')};
+  position: relative;
+  overflow: hidden;
+  background: ${(props) =>
+    props.disabled ? 'rgba(255,255,255,0.06)' : theme.gradient.success};
   cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
-  color: #ffffff;
-  font-family: 'Fira Code', monospace;
-  font-weight: bold;
-  padding: 0.75rem 3rem;
-  border-radius: 4px;
-  font-size: 1.1rem;
+  color: ${(props) => (props.disabled ? theme.color.textFaint : '#04231A')};
+  font-family: ${theme.font.mono};
+  font-weight: 800;
+  padding: 0.85rem 2.75rem;
+  border-radius: ${theme.radius.pill};
+  font-size: 1rem;
   border: none;
-  transition: all 0.2s ease-in-out;
+  box-shadow: ${(props) => (props.disabled ? 'none' : theme.shadow.md)};
+  transition: transform 240ms ${theme.ease.bounce}, box-shadow 240ms ease,
+    filter 240ms ease;
+
+  /* Brilho que atravessa o botão no hover. */
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: ${theme.gradient.sheen};
+    transform: translateX(-120%) skewX(-20deg);
+  }
+
   &:hover {
-    background-color: ${(props) => !props.disabled && '#3aa570'};
-    transform: ${(props) => !props.disabled && 'scale(1.05)'};
+    transform: ${(props) => !props.disabled && 'translateY(-3px) scale(1.03)'};
+    box-shadow: ${(props) =>
+      !props.disabled && '0 14px 34px rgba(52, 211, 153, 0.35)'};
+    &::after {
+      animation: ${sheenSweep} 750ms ${theme.ease.out};
+    }
+  }
+  &:active {
+    transform: ${(props) => !props.disabled && 'translateY(0) scale(0.97)'};
   }
 `;
 
 export const ModalOverlay = styled.div`
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.85);
+  background-color: rgba(4, 4, 10, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 50;
-  animation: ${fadeIn} 0.3s ease-in-out;
+  padding: 1rem;
+  animation: ${fadeIn} 0.28s ${theme.ease.out};
 
   @media (max-width: 480px) {
     align-items: flex-start;
+    padding-top: 5rem;
   }
 `;
 
 export const ModalContent = styled.div`
-  background-color: #2f3136;
-  padding: 2rem;
-  border-radius: 4px;
-  border: 1px solid #40444b;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(
+    160deg,
+    rgba(30, 30, 48, 0.95) 0%,
+    rgba(16, 16, 28, 0.95) 100%
+  );
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  padding: 2.25rem;
+  border-radius: ${theme.radius.xl};
+  border: 1px solid ${theme.color.strokeStrong};
+  box-shadow: ${theme.shadow.lg};
   text-align: center;
-  max-width: 28rem;
-  width: 90%;
-  animation: ${scaleIn} 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  max-width: 30rem;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: ${scaleIn} 0.42s ${theme.ease.bounce};
 
   @media (max-width: 480px) {
-    padding: 2rem;
-    overflow-y: auto;
-    max-width: 18rem;
-    margin-top: 6rem;
-    max-height: 489px;
-    width: 90%;
+    padding: 1.5rem;
+    max-width: 100%;
   }
 `;
 
 export const XPDisplayModal = styled.div`
   margin-top: 1.5rem;
-  background-color: #5865f2;
+  background: ${theme.gradient.primary};
   color: #ffffff;
-  font-weight: bold;
+  font-weight: 800;
   padding: 0.75rem 1.5rem;
-  border-radius: 4px;
+  border-radius: ${theme.radius.pill};
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  box-shadow: ${theme.shadow.glowPrimary};
 `;
 
 export const ContinueButton = styled.button<{
   variant?: 'primary' | 'secondary';
 }>`
-  margin-top: 2rem;
-  width: 50%;
-  background-color: ${({ variant }) =>
-    variant === 'primary' ? '#43b581' : '#5c5c5c'};
-  color: #ffffff;
-  font-family: 'Fira Code', monospace;
-  font-weight: bold;
-  padding: 0.75rem;
-  border-radius: 4px;
-  border: none;
-  transition: background-color 0.3s ease-in-out;
+  margin-top: 1.75rem;
+  width: 100%;
+  background: ${({ variant }) =>
+    variant === 'primary' ? theme.gradient.success : theme.color.glassStrong};
+  color: ${({ variant }) => (variant === 'primary' ? '#04231A' : '#fff')};
+  border: 1px solid
+    ${({ variant }) =>
+      variant === 'primary' ? 'transparent' : theme.color.stroke};
+  font-family: ${theme.font.mono};
+  font-weight: 800;
+  padding: 0.85rem 1.5rem;
+  border-radius: ${theme.radius.pill};
   cursor: pointer;
-  &:hover {
-    background-color: ${({ variant }) =>
-      variant === 'primary' ? '#43b58273' : '#ff5f5fac'};
+  transition: transform 240ms ${theme.ease.bounce}, box-shadow 240ms ease,
+    filter 240ms ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-3px);
+    filter: brightness(1.08);
+    box-shadow: ${theme.shadow.md};
+  }
+  &:active:not(:disabled) {
+    transform: translateY(0) scale(0.97);
+  }
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
   }
 `;
 
@@ -468,15 +632,17 @@ export const Footer = styled.footer`
   bottom: 0;
   left: 0;
   width: 100%;
-  background-color: #202225;
-  color: #b9bbbe;
+  background: rgba(11, 11, 20, 0.72);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  color: ${theme.color.textMuted};
   text-align: center;
-  padding: 1rem;
+  padding: 0.85rem 1rem;
   font-size: 0.875rem;
-  border-top: 1px solid #2f3136;
-  z-index: 1000;
+  border-top: 1px solid ${theme.color.stroke};
+  z-index: 40;
   a {
-    color: #5865f2;
+    color: ${theme.color.primarySoft};
     text-decoration: none;
     font-weight: bold;
     &:hover {
@@ -490,11 +656,11 @@ export const Footer = styled.footer`
 
 export const FooterCredit = styled.p`
   margin: 0;
-  font-size: 0.8rem;
-  color: #72767d;
+  font-size: 0.78rem;
+  color: ${theme.color.textFaint};
 
   a {
-    color: #5865f2;
+    color: ${theme.color.primarySoft};
     text-decoration: none;
     font-weight: bold;
     &:hover {
