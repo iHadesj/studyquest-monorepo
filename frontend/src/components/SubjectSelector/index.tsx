@@ -23,13 +23,14 @@ import {
   Trophy,
   Fire,
   FlagBanner,
+  ArrowRight,
 } from 'phosphor-react';
-import { Subtitle, Title } from '../../style/globalStyle';
 import type { Materia } from '../../interfaces';
 import { useProgressStore } from '../../hooks/useProgressStore';
 import { theme } from '../../style/theme';
 import { fadeUp, popIn, spring, staggerContainer } from '../../style/motion';
 import { JourneyMap, type TrailGroup } from '../JourneyMap';
+import { BrainScene } from '../BrainScene';
 import * as S from './style';
 
 type SubjectInfo = Omit<Materia, 'niveis'> & {
@@ -127,6 +128,13 @@ export const SubjectSelector: React.FC<{
     if (subject) onSelect(subject);
   };
 
+  // Mesma regra do "você está aqui" na trilha: a primeira parada em aberto.
+  const proximaMateria = useMemo(
+    () =>
+      groups.flatMap((g) => g.subjects).find((s) => s.percent < 100) ?? null,
+    [groups]
+  );
+
   const isLoading = subjects.length === 0;
 
   return (
@@ -136,42 +144,70 @@ export const SubjectSelector: React.FC<{
         animate="visible"
         variants={staggerContainer(0.08)}
       >
-        <S.HeroBadge variants={fadeUp}>
-          <Sparkle size={14} weight="fill" />
-          {username ? `Bom te ver, ${username}` : 'Bem-vindo de volta'}
-        </S.HeroBadge>
+        <S.HeroText>
+          <S.HeroBadge variants={fadeUp}>
+            <Sparkle size={14} weight="fill" />
+            {username ? `Bom te ver, ${username}` : 'Bem-vindo de volta'}
+          </S.HeroBadge>
 
-        <Title>Sua jornada</Title>
+          <S.DisplayTitle variants={fadeUp}>
+            <span className="leve">Bora treinar</span>
+            <span className="forte">esse cérebro.</span>
+          </S.DisplayTitle>
 
-        <Subtitle style={{ marginBottom: 0 }}>
-          Cada parada é uma matéria. Siga a trilha e chegue ao Brainstorm.
-        </Subtitle>
+          <S.HeroLead variants={fadeUp}>
+            Cada parada da trilha é uma matéria. Siga o caminho, acenda os nós
+            que faltam e chegue ao Brainstorm.
+          </S.HeroLead>
 
-        <S.StatStrip variants={popIn}>
-          <S.Stat $accent={theme.color.success}>
-            <Target size={20} weight="duotone" />
-            <div>
-              <div className="value">{overview.totalAcertos}</div>
-              <div className="label">acertos</div>
-            </div>
-          </S.Stat>
-          <S.Stat $accent={theme.color.gold}>
-            <Trophy size={20} weight="duotone" />
-            <div>
-              <div className="value">{overview.niveisConcluidos}</div>
-              <div className="label">níveis</div>
-            </div>
-          </S.Stat>
-          <S.Stat $accent={theme.color.pink}>
-            <Fire size={20} weight="duotone" />
-            <div>
-              <div className="value">
-                {overview.materiasIniciadas}/{subjects.length || '–'}
+          <S.StatStrip variants={popIn}>
+            <S.Stat $accent={theme.color.success}>
+              <Target size={20} weight="duotone" />
+              <div>
+                <div className="value">{overview.totalAcertos}</div>
+                <div className="label">acertos</div>
               </div>
-              <div className="label">em curso</div>
-            </div>
-          </S.Stat>
-        </S.StatStrip>
+            </S.Stat>
+            <S.Stat $accent={theme.color.gold}>
+              <Trophy size={20} weight="duotone" />
+              <div>
+                <div className="value">{overview.niveisConcluidos}</div>
+                <div className="label">níveis</div>
+              </div>
+            </S.Stat>
+            <S.Stat $accent={theme.color.pink}>
+              <Fire size={20} weight="duotone" />
+              <div>
+                <div className="value">
+                  {overview.materiasIniciadas}/{subjects.length || '–'}
+                </div>
+                <div className="label">em curso</div>
+              </div>
+            </S.Stat>
+          </S.StatStrip>
+
+          {proximaMateria && (
+            <S.ContinueButton
+              variants={fadeUp}
+              whileHover={{ y: -3 }}
+              whileTap={{ scale: 0.97 }}
+              transition={spring}
+              onClick={() => handleSelectById(proximaMateria.id)}
+            >
+              <span
+                className="ponto"
+                style={{ background: proximaMateria.accent }}
+              />
+              <span className="rotulo">Continuar em</span>
+              {proximaMateria.nome}
+              <ArrowRight size={16} weight="bold" />
+            </S.ContinueButton>
+          )}
+        </S.HeroText>
+
+        <S.BrainSlot variants={popIn}>
+          <BrainScene />
+        </S.BrainSlot>
       </S.Hero>
 
       {isLoading ? (

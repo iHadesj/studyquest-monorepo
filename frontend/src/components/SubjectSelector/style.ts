@@ -43,9 +43,33 @@ export const Container = styled.div`
 
 /* ------------------------------------------------------- HUD do jogador -- */
 
+/**
+ * Cabeçalho assimétrico: texto à esquerda, cérebro à direita. Foge do
+ * empilhamento centrado (selo, título, subtítulo, números) que toda home tem.
+ */
 export const Hero = styled(motion.header)`
-  text-align: center;
-  padding: 0.5rem 0 2rem;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+  gap: 2rem;
+  padding: 0.5rem 0 2.5rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    text-align: center;
+    justify-items: center;
+  }
+`;
+
+export const HeroText = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  @media (max-width: 900px) {
+    align-items: center;
+  }
 `;
 
 export const HeroBadge = styled(motion.div)`
@@ -59,10 +83,106 @@ export const HeroBadge = styled(motion.div)`
   color: ${theme.color.textMuted};
   font-size: 0.78rem;
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 1.1rem;
 
   svg {
     color: ${theme.color.warn};
+  }
+`;
+
+/** Título editorial em duas linhas, com pesos e cores contrastantes. */
+export const DisplayTitle = styled(motion.h1)`
+  margin: 0;
+  font-size: clamp(2.2rem, 6.2vw, 4rem);
+  line-height: 0.98;
+  letter-spacing: -2.5px;
+  font-weight: 800;
+
+  .leve {
+    display: block;
+    font-weight: 300;
+    color: ${theme.color.textMuted};
+  }
+
+  .forte {
+    display: block;
+    background: linear-gradient(
+      100deg,
+      ${theme.color.primarySoft} 0%,
+      ${theme.color.cyan} 55%,
+      ${theme.color.pink} 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+`;
+
+export const HeroLead = styled(motion.p)`
+  margin: 1.1rem 0 0;
+  max-width: 42ch;
+  color: ${theme.color.textMuted};
+  font-size: 0.98rem;
+  line-height: 1.65;
+`;
+
+/** Atalho para a matéria em andamento: deixa o cabeçalho útil, não decorativo. */
+export const ContinueButton = styled(motion.button)`
+  position: relative;
+  overflow: hidden;
+  margin-top: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1.4rem;
+  border-radius: ${theme.radius.pill};
+  border: 1px solid ${theme.color.strokeStrong};
+  background: ${theme.color.glass};
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: ${theme.color.text};
+  font-family: ${theme.font.mono};
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  .rotulo {
+    color: ${theme.color.textFaint};
+    font-weight: 600;
+  }
+
+  .ponto {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: ${theme.gradient.sheen};
+    transform: translateX(-130%) skewX(-20deg);
+  }
+
+  &:hover {
+    border-color: ${theme.color.primary};
+    &::after {
+      animation: ${shine} 800ms ${theme.ease.out};
+    }
+  }
+`;
+
+export const BrainSlot = styled(motion.div)`
+  width: 100%;
+  max-width: 420px;
+  justify-self: center;
+
+  @media (max-width: 900px) {
+    max-width: 260px;
+    order: -1;
+    margin-bottom: 0.5rem;
   }
 `;
 
@@ -73,7 +193,7 @@ export const HeroBadge = styled(motion.div)`
 export const StatStrip = styled(motion.div)`
   display: inline-flex;
   align-items: stretch;
-  margin-top: 1.5rem;
+  margin-top: 1.75rem;
   border-radius: ${theme.radius.pill};
   background: ${theme.color.glass};
   border: 1px solid ${theme.color.stroke};
