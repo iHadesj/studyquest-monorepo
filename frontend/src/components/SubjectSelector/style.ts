@@ -7,6 +7,10 @@ const shine = keyframes`
   100% { transform: translateX(320%) skewX(-20deg); }
 `;
 
+const spinSlow = keyframes`
+  to { transform: rotate(360deg); }
+`;
+
 const float = keyframes`
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-8px); }
@@ -37,12 +41,11 @@ export const Container = styled.div`
   padding-bottom: 2rem;
 `;
 
-/* ---------------------------------------------------------------- Hero -- */
+/* ------------------------------------------------------- HUD do jogador -- */
 
 export const Hero = styled(motion.header)`
-  position: relative;
   text-align: center;
-  padding: 1rem 0 2.5rem;
+  padding: 0.5rem 0 2rem;
 `;
 
 export const HeroBadge = styled(motion.div)`
@@ -56,33 +59,45 @@ export const HeroBadge = styled(motion.div)`
   color: ${theme.color.textMuted};
   font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.3px;
-  margin-bottom: 1.1rem;
+  margin-bottom: 1rem;
 
   svg {
     color: ${theme.color.warn};
   }
 `;
 
-export const HeroStats = styled(motion.div)`
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1.75rem;
+/**
+ * Faixa única com as três métricas, em vez de três cartões soltos: menos
+ * caixas empilhadas e uma leitura horizontal só.
+ */
+export const StatStrip = styled(motion.div)`
+  display: inline-flex;
+  align-items: stretch;
+  margin-top: 1.5rem;
+  border-radius: ${theme.radius.pill};
+  background: ${theme.color.glass};
+  border: 1px solid ${theme.color.stroke};
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  overflow: hidden;
+
+  @media (max-width: 560px) {
+    width: 100%;
+    border-radius: ${theme.radius.lg};
+  }
 `;
 
-export const StatChip = styled(motion.div)<{ $accent: string }>`
+export const Stat = styled.div<{ $accent: string }>`
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.7rem 1.15rem;
-  border-radius: ${theme.radius.md};
-  background: ${theme.color.glass};
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid ${theme.color.stroke};
-  transition: border-color 220ms ease, background 220ms ease;
+  gap: 0.6rem;
+  padding: 0.7rem 1.35rem;
+  flex: 1;
+  justify-content: center;
+
+  & + & {
+    border-left: 1px solid ${theme.color.stroke};
+  }
 
   svg {
     color: ${(p) => p.$accent};
@@ -90,409 +105,202 @@ export const StatChip = styled(motion.div)<{ $accent: string }>`
   }
 
   .value {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     font-weight: 800;
     color: ${theme.color.text};
     line-height: 1;
     font-variant-numeric: tabular-nums;
   }
   .label {
-    font-size: 0.72rem;
+    font-size: 0.66rem;
     color: ${theme.color.textFaint};
     text-transform: uppercase;
     letter-spacing: 0.6px;
+    margin-top: 0.15rem;
+    white-space: nowrap;
   }
 
-  &:hover {
-    background: ${theme.color.glassStrong};
-    border-color: ${(p) => p.$accent}55;
+  @media (max-width: 560px) {
+    padding: 0.7rem 0.5rem;
+    gap: 0.45rem;
+    .value {
+      font-size: 0.95rem;
+    }
+    .label {
+      font-size: 0.58rem;
+    }
   }
 `;
 
-/* ------------------------------------------------------------ Matérias -- */
-
-export const CategoryHeader = styled(motion.div)`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin: 2.75rem 0 1.25rem;
-`;
-
-export const CategoryTitle = styled.h2`
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: ${theme.color.text};
-  margin: 0;
-  white-space: nowrap;
-  letter-spacing: -0.2px;
-`;
-
-export const CategoryCount = styled.span`
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: ${theme.color.textFaint};
-  background: ${theme.color.glass};
-  border: 1px solid ${theme.color.stroke};
-  padding: 0.15rem 0.55rem;
-  border-radius: ${theme.radius.pill};
-`;
-
-export const CategoryRule = styled.div`
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    ${theme.color.stroke},
-    transparent
-  );
-`;
-
-export const SubjectGrid = styled(motion.div)`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
-`;
-
-export const SubjectCard = styled(motion.button)<{ $accent: string }>`
-  --accent: ${(p) => p.$accent};
-
-  position: relative;
-  isolation: isolate;
-  border: 1px solid ${theme.color.stroke};
-  border-radius: ${theme.radius.lg};
-  padding: 1.15rem;
+/* Marcos de largada e chegada, nas pontas da trilha. */
+export const TrailStart = styled(motion.div)`
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
-  align-items: stretch;
-  text-align: left;
-  cursor: pointer;
-  min-height: 172px;
-  overflow: hidden;
-  color: ${theme.color.text};
-  background: ${theme.color.glass};
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: ${theme.shadow.sm};
-  transition: border-color 260ms ease, box-shadow 260ms ease;
+  align-items: center;
+  gap: 0.5rem;
+  color: ${theme.color.textFaint};
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
 
-  /* Véu da cor da matéria: quase invisível parado, acende no hover. */
+  .linha {
+    width: 1px;
+    height: 34px;
+    background: linear-gradient(180deg, transparent, ${theme.color.stroke});
+  }
+`;
+
+/* Liga a última parada ao portal, para o Brainstorm não ficar solto. */
+export const TrailEnd = styled.div`
+  width: 2px;
+  height: 72px;
+  margin: 0 auto;
+  background: linear-gradient(
+    180deg,
+    ${theme.color.stroke},
+    ${theme.color.primary}
+  );
+  mask-image: linear-gradient(180deg, #000 0 4px, transparent 4px 12px);
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    #000 0 4px,
+    transparent 4px 12px
+  );
+  mask-size: 100% 12px;
+  -webkit-mask-size: 100% 12px;
+  mask-repeat: repeat-y;
+  -webkit-mask-repeat: repeat-y;
+`;
+
+/* ---------------------------------------------------------- Brainstorm -- */
+
+/* Fim da trilha: um portal, não mais um retângulo de destaque. */
+export const PortalSection = styled(motion.section)`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 1rem;
+  padding: 0 1rem 1rem;
+`;
+
+export const PortalRing = styled.div`
+  position: relative;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  animation: ${float} 6s ease-in-out infinite;
+
+  /* Anel cônico girando, dando a sensação de portal. */
   &::before {
     content: '';
     position: absolute;
     inset: 0;
-    z-index: -1;
-    background: radial-gradient(
-      120% 100% at 0% 0%,
-      var(--accent) 0%,
-      transparent 62%
+    border-radius: 50%;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0%,
+      ${theme.color.primary} 25%,
+      ${theme.color.cyan} 50%,
+      ${theme.color.pink} 75%,
+      transparent 100%
     );
-    opacity: 0.16;
-    transition: opacity 320ms ${theme.ease.out};
+    mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 0);
+    -webkit-mask: radial-gradient(
+      farthest-side,
+      transparent calc(100% - 3px),
+      #000 0
+    );
+    animation: ${spinSlow} 8s linear infinite;
   }
 
-  /* Brilho diagonal que varre o card. */
   &::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 45%;
-    height: 100%;
-    z-index: -1;
-    background: ${theme.gradient.sheen};
-    transform: translateX(-130%) skewX(-20deg);
+    inset: 12px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(124, 92, 255, 0.34) 0%,
+      transparent 72%
+    );
+    filter: blur(10px);
   }
 
-  &:hover {
-    border-color: var(--accent);
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--accent) inset;
-    &::before {
-      opacity: 0.42;
-    }
-    &::after {
-      animation: ${shine} 900ms ${theme.ease.out};
-    }
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
-  }
-
-  .top {
-    display: flex;
-    gap: 0.85rem;
-    align-items: center;
-  }
-
-  h3 {
-    margin: 0;
-    font-size: 1.05rem;
-    font-weight: 700;
+  svg {
+    position: relative;
+    z-index: 1;
     color: #fff;
-    letter-spacing: -0.3px;
-  }
-
-  .meta {
-    font-size: 0.76rem;
-    color: ${theme.color.textMuted};
-    margin-top: 0.2rem;
-  }
-
-  .progress-wrap {
-    margin-top: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-`;
-
-export const IconWrap = styled.div<{ $accent: string }>`
-  position: relative;
-  width: 54px;
-  height: 54px;
-  border-radius: ${theme.radius.md};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  background: linear-gradient(
-    145deg,
-    ${(p) => p.$accent}44,
-    ${(p) => p.$accent}14
-  );
-  border: 1px solid ${(p) => p.$accent}55;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  transition: transform 320ms ${theme.ease.bounce};
-
-  ${SubjectCard}:hover & {
-    transform: translateY(-3px) rotate(-6deg) scale(1.06);
-  }
-`;
-
-export const DoneBadge = styled(motion.div)`
-  position: absolute;
-  top: 0.9rem;
-  right: 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${theme.color.success};
-`;
-
-export const ProgressBarContainer = styled.div`
-  height: 8px;
-  width: 100%;
-  background: rgba(0, 0, 0, 0.32);
-  border-radius: ${theme.radius.pill};
-  overflow: hidden;
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-`;
-
-export const ProgressBarFill = styled(motion.div)<{ $accent: string }>`
-  height: 100%;
-  border-radius: ${theme.radius.pill};
-  background: linear-gradient(
-    90deg,
-    ${(p) => p.$accent},
-    ${theme.color.cyan}
-  );
-  position: relative;
-  overflow: hidden;
-
-  /* Reflexo correndo por dentro da barra preenchida. */
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: ${theme.gradient.sheen};
-    transform: translateX(-130%) skewX(-20deg);
-    animation: ${shine} 3.2s ${theme.ease.inOut} infinite;
+    filter: drop-shadow(0 0 14px rgba(124, 92, 255, 0.8));
   }
 
   @media (prefers-reduced-motion: reduce) {
-    &::after {
+    animation: none;
+    &::before {
       animation: none;
     }
   }
 `;
 
-export const ProgressLabel = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 700;
-  font-size: 0.74rem;
-  color: ${theme.color.textMuted};
-  font-variant-numeric: tabular-nums;
-`;
-
-export const Separator = styled.div`
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    ${theme.color.stroke},
-    transparent
-  );
-  margin: 3rem 0 2.5rem;
-`;
-
-/* ------------------------------------------------------------- Loader --- */
-
-export const Loader = styled.span`
-  position: relative;
-  width: 108px;
-  display: flex;
-  justify-content: space-between;
-
-  &::after,
-  &::before {
-    content: '';
-    display: inline-block;
-    width: 48px;
-    height: 48px;
-    background-color: #fff;
-    background-image: radial-gradient(circle 14px, #0d161b 100%, transparent 0);
-    background-repeat: no-repeat;
-    border-radius: 50%;
-    animation: ${eyeMove} 10s infinite, ${blink} 10s infinite;
-  }
-`;
-
-export const LoaderWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 200px;
-  padding: 3rem 0;
-`;
-
-export const SkeletonGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
-  width: 100%;
-`;
-
-const shimmer = keyframes`
-  0%   { background-position: -420px 0; }
-  100% { background-position: 420px 0; }
-`;
-
-export const SkeletonCard = styled.div`
-  height: 172px;
-  border-radius: ${theme.radius.lg};
-  border: 1px solid ${theme.color.stroke};
-  background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.05) 50%,
-      transparent 100%
-    ),
-    ${theme.color.glass};
-  background-size: 420px 100%;
-  background-repeat: no-repeat;
-  animation: ${shimmer} 1.4s linear infinite;
-`;
-
-/* ---------------------------------------------------------- Brainstorm -- */
-
-export const BrainstormSection = styled(motion.section)`
-  position: relative;
-  border-radius: ${theme.radius.xl};
-  padding: 2.5rem;
-  overflow: hidden;
-  border: 1px solid ${theme.color.strokeStrong};
-  background: linear-gradient(
-    135deg,
-    rgba(124, 92, 255, 0.16) 0%,
-    rgba(34, 211, 238, 0.08) 45%,
-    rgba(244, 114, 182, 0.12) 100%
-  );
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  box-shadow: ${theme.shadow.lg};
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  align-items: center;
-  gap: 2.5rem;
-
-  @media (max-width: 880px) {
-    grid-template-columns: 1fr;
-    text-align: center;
-    padding: 2rem 1.5rem;
-  }
-`;
-
-/* Orbe decorativo que flutua no canto do CTA. */
-export const BrainstormOrb = styled.div`
-  position: absolute;
-  top: -70px;
-  right: -50px;
-  width: 260px;
-  height: 260px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(124, 92, 255, 0.42) 0%,
-    transparent 68%
-  );
-  filter: blur(28px);
-  pointer-events: none;
-  animation: ${float} 7s ease-in-out infinite;
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-`;
-
-export const BrainstormContent = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-
-  @media (max-width: 880px) {
-    align-items: center;
-  }
-`;
-
-export const BrainStormTitle = styled.h2`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
+export const PortalTitle = styled.h2`
+  font-size: clamp(1.75rem, 5vw, 2.4rem);
   font-weight: 800;
-  color: #ffffff;
-  margin: 0;
+  margin: 0 0 0.6rem;
   letter-spacing: -1.2px;
+  background: ${theme.gradient.primary};
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+`;
+
+export const PortalDescription = styled.p`
+  color: ${theme.color.textMuted};
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 440px;
+  margin: 0 auto;
+`;
+
+export const PortalMeta = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1.25rem 0 1.5rem;
+`;
+
+export const MetaChip = styled(motion.span)`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: ${theme.radius.pill};
+  background: ${theme.color.glass};
+  border: 1px solid ${theme.color.stroke};
+  color: ${theme.color.textMuted};
+  font-size: 0.76rem;
+  font-weight: 600;
+
+  strong {
+    color: ${theme.color.text};
+  }
 
   svg {
-    color: ${theme.color.primarySoft};
+    color: ${theme.color.cyan};
   }
-`;
-
-export const BrainstormDescription = styled.p`
-  color: ${theme.color.textMuted};
-  font-size: 0.98rem;
-  line-height: 1.65;
-  max-width: 460px;
-  margin: 0;
 `;
 
 export const BrainControls = styled.div`
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.85rem;
-  margin-top: 0.75rem;
-
-  @media (max-width: 880px) {
-    justify-content: center;
-  }
 `;
 
 export const LargeButton = styled(motion.button)<{
@@ -500,7 +308,7 @@ export const LargeButton = styled(motion.button)<{
 }>`
   position: relative;
   overflow: hidden;
-  padding: 0.85rem 1.75rem;
+  padding: 0.85rem 1.9rem;
   border-radius: ${theme.radius.pill};
   border: none;
   cursor: pointer;
@@ -532,7 +340,6 @@ export const LargeButton = styled(motion.button)<{
   }
 `;
 
-/* Anel que pulsa atrás do botão de multiplayer, chamando atenção. */
 export const PulseDot = styled.span`
   position: relative;
   display: inline-flex;
@@ -557,50 +364,33 @@ export const PulseDot = styled.span`
   }
 `;
 
-export const BrainInfo = styled.div`
+/* ------------------------------------------------------------- Loader --- */
+
+export const Loader = styled.span`
   position: relative;
-  background: rgba(0, 0, 0, 0.26);
-  border: 1px solid ${theme.color.stroke};
-  border-radius: ${theme.radius.lg};
-  padding: 1.5rem;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  width: 108px;
+  display: flex;
+  justify-content: space-between;
 
-  h4 {
-    margin: 0 0 1rem 0;
-    font-size: 0.82rem;
-    color: ${theme.color.textFaint};
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
+  &::after,
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    background-color: #fff;
+    background-image: radial-gradient(circle 14px, #0d161b 100%, transparent 0);
+    background-repeat: no-repeat;
+    border-radius: 50%;
+    animation: ${eyeMove} 10s infinite, ${blink} 10s infinite;
   }
 `;
 
-export const InfoItem = styled(motion.li)`
-  color: ${theme.color.textMuted};
+export const LoaderWrapper = styled.div`
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 0.7rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-
-  strong {
-    color: ${theme.color.text};
-  }
-
-  svg {
-    flex-shrink: 0;
-    color: ${theme.color.cyan};
-  }
+  min-height: 200px;
+  padding: 3rem 0;
 `;
